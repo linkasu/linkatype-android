@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Настройки</string>
+    <string name="choose_voice">Выбрать голос</string>
+    <string-array name="voices">
+
+        <item>Алиса</item>
+
+        <item>Емиль</item>
+
+        <item>Джейн</item>
+
+        <item>Ома</item>
+
+        <item>Захар</item>
+
+
+    </string-array>
+    <string name="cancel">Отмена</string>
+    <string name="say">Сказать</string>
+    <string name="add_category">Добавить категорию</string>
+    <string name="add_statement">Добавить высказывание</string>
+    <string name="change_category">Сменить категорию</string>
+    <string name="clear">Отчистить</string>
+    <string name="delete">Удалить</string>
+    <string name="edit_statement">Редактировать высказывание</string>
+
+
+
+    <string name="is_online_voice">Использовать интернет</string>
+    <string name="no">Нет</string>
+    <string name="new_speech">Новый диалог</string>
+    <string name="selectSpeech">Выбрать диалог</string>
+    <string name="withoutCategory">Без категории</string>
+    <string name="yes">Да</string>
+    <string name="edit_category">Редактировать категорию</string>
+    <string name="say_after_word_input">Произносить после ввода каждого слова</string>
+</resources>

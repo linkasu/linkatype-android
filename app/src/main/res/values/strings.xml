@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name" translatable="false">DisType Pro</string>
+    <string name="action_settings">Settings</string>
+    <string name="apiKey" translatable="false">bbe234a6-edf0-45ee-bb92-169fccfb8653</string>
+    <string name="choose_voice">Choose voice</string>
+    <string name="cancel">Cancel</string>
+    <string name="say">Say</string>
+    <string name="withoutCategory">Without category</string>
+    <string name="add_statement">Add statement</string>
+    <string name="add_category">Add category</string>
+    <string name="delete">Delete</string>
+    <string name="edit_statement">Edit statement</string>
+    <string name="change_category">Change category</string>
+    <string name="metrikaKey" translatable="false">74b3edb9-a12c-4ec6-96e2-817e75e03941</string>
+    <string name="yes">yes</string>
+    <string name="no">No</string>
+    <string name="selectSpeech">Select speech</string>
+    <string name="new_speech">New speech</string>
+    <string name="clear">Clear</string>
+    <string name="current_voice" translatable="false">Current voice</string>
+    <string name="is_online_voice">Is online voice</string>
+    <string name="edit_category">Edit category</string>
+    <string name="say_after_word_input">Say after ever word</string>
+    <string-array name="voices">
+
+        <item>ALYSS</item>
+
+        <item>ERMIL</item>
+
+        <item>JANE</item>
+
+        <item>OMAZH</item>
+
+        <item>ZAHAR</item>
+
+
+    </string-array>
+</resources>
