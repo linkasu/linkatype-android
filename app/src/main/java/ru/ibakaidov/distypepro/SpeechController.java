@@ -1,66 +1,62 @@
 package ru.ibakaidov.distypepro;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
 import android.widget.EditText;
 
 /**
  * Created by aacidov on 06.06.16.
  */
-public class SpeechController implements DialogInterface.OnClickListener{
-    private static final int DIALOGSCOUNT = 5;
-    private final String nd;
-    private Context cxt;
-    private int cid = 0; //current dialog id
-    private String[] speechs = new String[DIALOGSCOUNT];
+public class SpeechController implements DialogInterface.OnClickListener {
+    private static final int DIALOGS_COUNT = 5;
+    private final String newDialog;
+    /**
+     * Current dialog id.
+     */
+    private int dialogId = 0;
+    private String[] speechs = new String[DIALOGS_COUNT];
+    private EditText speechInput;
 
-    private EditText si;
-
-    public SpeechController(Context con, String newDialog, EditText speechInput){
-        this.cxt=con;
-        this.nd = newDialog;
-        this.si = speechInput;
-
+    public SpeechController(String newDialog, EditText speechInput) {
+        this.newDialog = newDialog;
+        this.speechInput = speechInput;
     }
+
     public void openDialog() {
-        String currentText = si.getText().toString();
-        speechs[cid]=currentText;
-
-        AlertDialog.Builder adb = new AlertDialog.Builder(cxt);
-
-        adb.setSingleChoiceItems(getSpeechsNames(), cid, this);
-        adb.setNegativeButton(R.string.cancel, null);
-        adb.setTitle(R.string.selectSpeech);
-        adb.show();
+        String currentText = speechInput.getText().toString();
+        speechs[dialogId] = currentText;
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(speechInput.getContext());
+        dialogBuilder.setSingleChoiceItems(getSpeechsNames(), dialogId, this);
+        dialogBuilder.setNegativeButton(R.string.cancel, null);
+        dialogBuilder.setTitle(R.string.selectSpeech);
+        dialogBuilder.show();
     }
 
-    String[] getSpeechsNames(){
-        String[] sn = new String[DIALOGSCOUNT];
-        for (int i = 0; i < DIALOGSCOUNT; i++) {
-            if (speechs[i]==null||speechs[i]==""){
-                sn[i]=this.nd;
-                continue;
+    String[] getSpeechsNames() {
+        String[] names = new String[DIALOGS_COUNT];
+        for (int i = 0; i < DIALOGS_COUNT; i++) {
+            if (TextUtils.isEmpty(speechs[i])) {
+                names[i] = newDialog;
             }
-            sn[i] = speechs[i];
-
+            names[i] = speechs[i];
         }
-        return sn;
+        return names;
     }
 
     @Override
     public void onClick(DialogInterface dialog, int which) {
-        cid = which;
-        String newText = speechs[cid];
+        dialogId = which;
+        String newText = speechs[dialogId];
         if (newText == null) {
-            si.setText("");
+            speechInput.setText("");
         } else {
-            si.setText(newText);
+            speechInput.setText(newText);
         }
-
         dialog.cancel();
     }
-    public void onSay(){
-        speechs[cid]=null;
+
+    public void onSay() {
+        speechs[dialogId] = null;
     }
 }

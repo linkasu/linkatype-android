@@ -30,10 +30,7 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="443dp"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true">
+            android:layout_height="443dp" >
 
             <ListView
                 android:layout_width="wrap_content"
@@ -47,6 +44,5 @@
                 android:id="@+id/wordsListView"
                 android:layout_weight="1" />
         </LinearLayout>
-
     </LinearLayout>
 </RelativeLayout>
