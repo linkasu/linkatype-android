@@ -48,8 +48,6 @@ public class TTS  {
             return;
         }
         tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-
-
     }
     public void update (){
         NetworkInfo ni = cm.getActiveNetworkInfo();

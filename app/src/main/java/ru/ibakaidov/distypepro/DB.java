@@ -23,17 +23,19 @@ public class DB {
         dbHelper = new DBHelper(cxt);
 
     }
-    public void createCategory(String label){
+
+    public void createCategory(String label) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        DB.createCategory(db,label);
+        DB.createCategory(db, label);
         db.close();
     }
-    public static void createCategory(SQLiteDatabase db, String label){
+
+    public static void createCategory(SQLiteDatabase db, String label) {
         ContentValues cv = new ContentValues();
         cv.put("label", label);
         db.insert("categories", null, cv);
-        YandexMetrica.reportEvent("create category", "{\"text\":\""+label+"\"}");
+        YandexMetrica.reportEvent("create category", "{\"text\":\"" + label + "\"}");
     }
 
 
@@ -41,10 +43,11 @@ public class DB {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         Cursor c = db.query("statements", new String[]{"text"}, "`text`=?", new String[]{statement}, null, null, null);
-        if (c.getCount()==1){
+        if (c.getCount() == 1) {
             updateRating(statement);
             return;
-        };
+        }
+        ;
 
         c.close();
         ContentValues cv = new ContentValues();
@@ -52,17 +55,17 @@ public class DB {
         cv.put("category", category);
         db.insert("statements", null, cv);
         db.close();
-        YandexMetrica.reportEvent("create statement", "{\"text\":\""+statement+"\"}");
+        YandexMetrica.reportEvent("create statement", "{\"text\":\"" + statement + "\"}");
 
     }
 
     public void updateRating(String statement) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.execSQL("UPDATE statements SET rating = rating + 1 WHERE `text`=\""+statement+"\"");
+        db.execSQL("UPDATE statements SET rating = rating + 1 WHERE `text`=\"" + statement + "\"");
         db.close();
     }
 
-    public ArrayList<String> getCategories (){
+    public ArrayList<String> getCategories() {
         ArrayList<String> categories = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor c = db.query("categories", null, null, null, null, null, null);
@@ -77,7 +80,7 @@ public class DB {
         }
         db.close();
         c.close();
-        return  categories;
+        return categories;
     }
 
     public ArrayList<String> getStatements(int position) {
@@ -99,28 +102,45 @@ public class DB {
         return statements;
     }
 
+    public ArrayList<String> getStatements() {
+        ArrayList<String> statements = new ArrayList<String>();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.query("statements", new String[]{"text"}, null, null, null, null, "rating DESC");
+        if (c.moveToFirst()) {
+
+            int textColIndex = c.getColumnIndex("text");
+
+            do {
+                statements.add(c.getString(textColIndex));
+            } while (c.moveToNext());
+        }
+        c.close();
+        db.close();
+        return statements;
+    }
+
     public void setCategory(int idCategory, String statement) {
         ContentValues cv = new ContentValues();
         cv.put("text", statement);
         cv.put("category", idCategory);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.update("statements", cv, "text='"+statement+"'", null);
+        db.update("statements", cv, "text='" + statement + "'", null);
         db.close();
-        YandexMetrica.reportEvent("change category", "{\"text\":\""+statement+"\"}");
+        YandexMetrica.reportEvent("change category", "{\"text\":\"" + statement + "\"}");
 
     }
 
     public void deleteStatement(String selected) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete("statements", "text='"+selected+"'", new String[]{});
+        db.delete("statements", "text='" + selected + "'", new String[]{});
         db.close();
     }
 
-    public void editStatement(String old   , String newText) {
+    public void editStatement(String old, String newText) {
         ContentValues cv = new ContentValues();
         cv.put("text", newText);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.update("statements", cv, "text='"+old+"'", null);
+        db.update("statements", cv, "text='" + old + "'", null);
         db.close();
     }
 
@@ -128,13 +148,13 @@ public class DB {
         ContentValues cv = new ContentValues();
         cv.put("label", s);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.update("categories", cv, "label='"+selected+"'", null);
+        db.update("categories", cv, "label='" + selected + "'", null);
         db.close();
     }
 
     public void deleteCategory(String selected) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete("categories", "label='"+selected+"'", new String[]{});
+        db.delete("categories", "label='" + selected + "'", new String[]{});
         db.close();
     }
 
@@ -152,6 +172,7 @@ public class DB {
             db.execSQL("CREATE TABLE `categories` ( `id` INTEGER primary key autoincrement  , `label` VARCHAR(200) NOT NULL );");
             DB.createCategory(db, withoutCategory);
         }
+
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 
