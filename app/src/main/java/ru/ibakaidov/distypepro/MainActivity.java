@@ -11,8 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
 
 import com.yandex.metrica.YandexMetrica;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private DB db;
     private ListView wordsLV;
     private ListView categoriesLV;
-    private EditText si;
+    private AutoCompleteTextView si;
     private IsOnlineVoiceController iovc;
     private SpeechController sc;
     private SayButtonController sbc;
@@ -56,27 +57,25 @@ public class MainActivity extends AppCompatActivity {
         cc.setWC(wc);
         iovc = new IsOnlineVoiceController(tts);
 
-        si = (EditText) findViewById(R.id.sayEditText);
+        si = (AutoCompleteTextView) findViewById(R.id.sayEditText);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, db.getStatements());
+        si.setAdapter(adapter);
+
         Button sb = (Button) findViewById(R.id.sayButton);
         sbc = new SayButtonController(si, db, cc, wc, tts);
 
         sb.setOnClickListener(sbc);
-
 
         categoriesLV.setOnItemClickListener(cc);
         categoriesLV.setOnItemLongClickListener(cc);
         wordsLV.setOnItemClickListener(wc);
         wordsLV.setOnItemLongClickListener(wc);
 
-
         cc.loadCategories();
         wc.loadStatements();
 
-
-
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     d.cancel();
                     tts.voice=voiceNames[n];
                     editor.putInt(sCurrentVoice, n);
-                    editor.commit();
+                    editor.apply();
 
                 }
 

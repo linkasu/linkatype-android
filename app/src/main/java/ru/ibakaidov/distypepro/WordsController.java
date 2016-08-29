@@ -58,12 +58,10 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
 
         managerLV.setAdapter(new ArrayAdapter<String>(cxt, R.layout.support_simple_spinner_dropdown_item, managerStrings));
 
-
         ll.addView(titleBox);
         ll.addView(lv);
         ll.addView(titleEditBox);
         ll.addView(managerLV);
-
 
         builder.setView(ll);
 
@@ -157,12 +155,10 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
             final EditText input = new EditText(cxt);
             builder.setView(input);
 
-
             builder.setPositiveButton(R.string.add_statement, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     db.createStatement(input.getText().toString(), categoryController.currentCategory);
                     loadStatements();
-
                 }
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {

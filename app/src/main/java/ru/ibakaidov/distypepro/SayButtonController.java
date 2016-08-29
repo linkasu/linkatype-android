@@ -20,7 +20,7 @@ public class SayButtonController implements View.OnClickListener {
     private SpeechController sc;
 
 
-    public SayButtonController(EditText speechInput, DB dateBase, CategoryController categoryController, WordsController wordsController, TTS textToSpeech){
+    public SayButtonController(EditText speechInput, DB dateBase, CategoryController categoryController, WordsController wordsController, TTS textToSpeech) {
         this.si = speechInput;
         this.db = dateBase;
         this.cc = categoryController;
@@ -35,15 +35,15 @@ public class SayButtonController implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!tts.isSayAfterWordInput||before>count) return;
-                if (s.charAt(s.length()-1)==' '){
-
-                    String text = si.getText().toString();
-;
-                    String[] b = text.split("\\s+");
-                    String word = b[b.length - 1];
-                    tts.speak(word);
-                }
+//                if (!tts.isSayAfterWordInput || before > count) return;
+//                if (s.charAt(s.length() - 1) == ' ') {
+//
+//                    String text = si.getText().toString();
+//
+//                    String[] b = text.split("\\s+");
+//                    String word = b[b.length - 1];
+//                    tts.speak(word);
+//                }
             }
 
             @Override
@@ -52,9 +52,11 @@ public class SayButtonController implements View.OnClickListener {
             }
         });
     }
-    public void setSC(SpeechController sc){
-       this.sc = sc;
+
+    public void setSC(SpeechController sc) {
+        this.sc = sc;
     }
+
     @Override
     public void onClick(View v) {
         String tfs = si.getText().toString();
@@ -64,7 +66,7 @@ public class SayButtonController implements View.OnClickListener {
             wc.loadStatements();
         }
 
-        YandexMetrica.reportEvent("said", "{\"text\":\""+tfs+"\"}");
+        YandexMetrica.reportEvent("said", "{\"text\":\"" + tfs + "\"}");
         tts.speak(tfs);
         sc.onSay();
     }
