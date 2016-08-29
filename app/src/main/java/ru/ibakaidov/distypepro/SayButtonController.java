@@ -4,15 +4,20 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
 import com.yandex.metrica.YandexMetrica;
+
+import java.lang.reflect.Array;
+import java.util.List;
 
 /**
  * Created by aacidov on 29.05.16.
  */
 public class SayButtonController implements View.OnClickListener {
-    private EditText si;
+    private AutoCompleteTextView si;
     private DB db;
     private CategoryController cc;
     private WordsController wc;
@@ -20,7 +25,7 @@ public class SayButtonController implements View.OnClickListener {
     private SpeechController sc;
 
 
-    public SayButtonController(EditText speechInput, DB dateBase, CategoryController categoryController, WordsController wordsController, TTS textToSpeech) {
+    public SayButtonController(AutoCompleteTextView speechInput, DB dateBase, CategoryController categoryController, WordsController wordsController, TTS textToSpeech) {
         this.si = speechInput;
         this.db = dateBase;
         this.cc = categoryController;
@@ -61,6 +66,15 @@ public class SayButtonController implements View.OnClickListener {
     public void onClick(View v) {
         String tfs = si.getText().toString();
         db.createStatement(tfs, 0);
+
+        //Updating statements containing in adapter
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>)si.getAdapter();
+        adapter.clear();
+        List<String> updatedStatements = db.getStatements();
+        for (String statement : updatedStatements) {
+            adapter.add(statement);
+        }
+
 
         if (cc.currentCategory == 0) {
             wc.loadStatements();
