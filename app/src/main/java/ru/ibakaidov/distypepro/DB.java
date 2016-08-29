@@ -15,45 +15,46 @@ import java.util.ArrayList;
  */
 
 public class DB {
-    DBHelper dbHelper;
+    private static final String TABLE_CATEGORIES = "categories";
+    private static final String TABLE_STATEMENTS = "statements";
     static String withoutCategory;
+    DBHelper dbHelper;
 
     public DB(Context cxt, String withoutCategory) {
         DB.withoutCategory = withoutCategory;
         dbHelper = new DBHelper(cxt);
-
-    }
-
-    public void createCategory(String label) {
-
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        DB.createCategory(db, label);
-        db.close();
     }
 
     public static void createCategory(SQLiteDatabase db, String label) {
         ContentValues cv = new ContentValues();
         cv.put("label", label);
-        db.insert("categories", null, cv);
+        db.insert(TABLE_CATEGORIES, null, cv);
         YandexMetrica.reportEvent("create category", "{\"text\":\"" + label + "\"}");
     }
 
+    public void createCategory(String label) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        DB.createCategory(db, label);
+        db.close();
+    }
 
     public void createStatement(String statement, int category) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query("statements", new String[]{"text"}, "`text`=?", new String[]{statement}, null, null, null);
+        Cursor c = db.query(
+                TABLE_STATEMENTS, new String[]{"text"}, "`text`=?", new String[]{statement},
+                null, null, null
+        );
         if (c.getCount() == 1) {
             updateRating(statement);
             return;
         }
-        ;
 
         c.close();
         ContentValues cv = new ContentValues();
         cv.put("text", statement);
         cv.put("category", category);
-        db.insert("statements", null, cv);
+        db.insert(TABLE_STATEMENTS, null, cv);
         db.close();
         YandexMetrica.reportEvent("create statement", "{\"text\":\"" + statement + "\"}");
 
@@ -68,7 +69,7 @@ public class DB {
     public ArrayList<String> getCategories() {
         ArrayList<String> categories = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query("categories", null, null, null, null, null, null);
+        Cursor c = db.query(TABLE_CATEGORIES, null, null, null, null, null, null);
 
         if (c.moveToFirst()) {
 
@@ -86,8 +87,10 @@ public class DB {
     public ArrayList<String> getStatements(int position) {
         ArrayList<String> statements = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor c = db.query("statements", new String[]{"text"}, "`category`=?", new String[]{Integer.toString(position)}, null, null, "rating DESC");
+        Cursor c = db.query(
+                TABLE_STATEMENTS, new String[]{"text"}, "`category`=?",
+                new String[]{Integer.toString(position)}, null, null, "rating DESC"
+        );
         if (c.moveToFirst()) {
 
             int textColIndex = c.getColumnIndex("text");
@@ -105,7 +108,9 @@ public class DB {
     public ArrayList<String> getStatements() {
         ArrayList<String> statements = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query("statements", new String[]{"text"}, null, null, null, null, "rating DESC");
+        Cursor c = db.query(
+                TABLE_STATEMENTS, new String[]{"text"}, null, null, null, null,"rating DESC"
+        );
         if (c.moveToFirst()) {
 
             int textColIndex = c.getColumnIndex("text");
@@ -124,7 +129,7 @@ public class DB {
         cv.put("text", statement);
         cv.put("category", idCategory);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.update("statements", cv, "text='" + statement + "'", null);
+        db.update(TABLE_STATEMENTS, cv, "text='" + statement + "'", null);
         db.close();
         YandexMetrica.reportEvent("change category", "{\"text\":\"" + statement + "\"}");
 
@@ -132,7 +137,7 @@ public class DB {
 
     public void deleteStatement(String selected) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete("statements", "text='" + selected + "'", new String[]{});
+        db.delete(TABLE_STATEMENTS, "text='" + selected + "'", new String[]{});
         db.close();
     }
 
@@ -140,7 +145,7 @@ public class DB {
         ContentValues cv = new ContentValues();
         cv.put("text", newText);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.update("statements", cv, "text='" + old + "'", null);
+        db.update(TABLE_STATEMENTS, cv, "text='" + old + "'", null);
         db.close();
     }
 
@@ -148,13 +153,13 @@ public class DB {
         ContentValues cv = new ContentValues();
         cv.put("label", s);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.update("categories", cv, "label='" + selected + "'", null);
+        db.update(TABLE_CATEGORIES, cv, "label='" + selected + "'", null);
         db.close();
     }
 
     public void deleteCategory(String selected) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        db.delete("categories", "label='" + selected + "'", new String[]{});
+        db.delete(TABLE_CATEGORIES, "label='" + selected + "'", new String[]{});
         db.close();
     }
 
@@ -162,14 +167,16 @@ public class DB {
     class DBHelper extends SQLiteOpenHelper {
 
         public DBHelper(Context context) {
-
             super(context, "DisCannibal", null, 1);
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE `statements` ( `id` INTEGER primary key autoincrement  , `text` VARCHAR(500) NOT NULL , `category` INT DEFAULT 1, `rating` INT DEFAULT 0);");
-            db.execSQL("CREATE TABLE `categories` ( `id` INTEGER primary key autoincrement  , `label` VARCHAR(200) NOT NULL );");
+            db.execSQL("CREATE TABLE " + TABLE_STATEMENTS + " (`id` INTEGER primary key " +
+                    "autoincrement, `text` VARCHAR(500) NOT NULL, `category` INT DEFAULT 1, " +
+                    "`rating` INT DEFAULT 0);");
+            db.execSQL("CREATE TABLE " + TABLE_CATEGORIES + " (`id` INTEGER primary key " +
+                    "autoincrement, `label` VARCHAR(200) NOT NULL );");
             DB.createCategory(db, withoutCategory);
         }
 

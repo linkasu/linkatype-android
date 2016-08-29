@@ -2,15 +2,12 @@ package ru.ibakaidov.distypepro;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 
 import com.yandex.metrica.YandexMetrica;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 /**
@@ -21,16 +18,18 @@ public class SayButtonController implements View.OnClickListener {
     private DB db;
     private CategoryController cc;
     private WordsController wc;
-    private TTS tts;
+    private SpeechProvider speechProvider;
     private SpeechController sc;
 
 
-    public SayButtonController(AutoCompleteTextView speechInput, DB dateBase, CategoryController categoryController, WordsController wordsController, TTS textToSpeech) {
+    public SayButtonController(AutoCompleteTextView speechInput, DB dateBase,
+                               CategoryController categoryController,
+                               WordsController wordsController, SpeechProvider textToSpeech) {
         this.si = speechInput;
         this.db = dateBase;
         this.cc = categoryController;
         this.wc = wordsController;
-        this.tts = textToSpeech;
+        this.speechProvider = textToSpeech;
 
         speechInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -40,14 +39,12 @@ public class SayButtonController implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!tts.isSayAfterWordInput || before > count) return;
+                if (!speechProvider.isSayAfterWordInput || before > count) return;
                 if (s.charAt(s.length() - 1) == ' ') {
-
                     String text = si.getText().toString();
-
                     String[] b = text.split("\\s+");
                     String word = b[b.length - 1];
-                    tts.speak(word);
+                    speechProvider.speak(word);
                 }
             }
 
@@ -58,7 +55,7 @@ public class SayButtonController implements View.OnClickListener {
         });
     }
 
-    public void setSC(SpeechController sc) {
+    public void setSpeechController(SpeechController sc) {
         this.sc = sc;
     }
 
@@ -68,7 +65,7 @@ public class SayButtonController implements View.OnClickListener {
         db.createStatement(tfs, 0);
 
         //Updating statements containing in adapter
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>)si.getAdapter();
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) si.getAdapter();
         adapter.clear();
         List<String> updatedStatements = db.getStatements();
         for (String statement : updatedStatements) {
@@ -77,11 +74,11 @@ public class SayButtonController implements View.OnClickListener {
 
 
         if (cc.currentCategory == 0) {
-            wc.loadStatements();
+            wc.loadStatements(v.getContext());
         }
 
         YandexMetrica.reportEvent("said", "{\"text\":\"" + tfs + "\"}");
-        tts.speak(tfs);
+        speechProvider.speak(tfs);
         sc.onSay();
     }
 }
