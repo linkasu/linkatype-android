@@ -41,6 +41,11 @@
                 android:id="@+id/categoriesListView"
                 android:layout_weight="1" />
 
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/darker_gray"/>
+
             <ListView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

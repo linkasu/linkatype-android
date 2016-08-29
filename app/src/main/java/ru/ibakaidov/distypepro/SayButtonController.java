@@ -65,16 +65,21 @@ public class SayButtonController implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         String tfs = si.getText().toString();
+
+        //Do not react on empty input in AutoCompleteTextView
+        if (tfs.length() == 0) {
+            return;
+        }
+
         db.createStatement(tfs, 0);
 
         //Updating statements containing in adapter
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>)si.getAdapter();
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) si.getAdapter();
         adapter.clear();
         List<String> updatedStatements = db.getStatements();
         for (String statement : updatedStatements) {
             adapter.add(statement);
         }
-
 
         if (cc.currentCategory == 0) {
             wc.loadStatements();
