@@ -8,8 +8,8 @@ android {
         applicationId "ru.ibakaidov.distypepro"
         minSdkVersion 10
         targetSdkVersion 23
-        versionCode 5
-        versionName "2.2"
+        versionCode 6
+        versionName "2.3"
     }
     buildTypes {
         release {
