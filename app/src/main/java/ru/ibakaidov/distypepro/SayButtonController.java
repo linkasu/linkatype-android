@@ -35,15 +35,15 @@ public class SayButtonController implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-//                if (!tts.isSayAfterWordInput || before > count) return;
-//                if (s.charAt(s.length() - 1) == ' ') {
-//
-//                    String text = si.getText().toString();
-//
-//                    String[] b = text.split("\\s+");
-//                    String word = b[b.length - 1];
-//                    tts.speak(word);
-//                }
+                if (!tts.isSayAfterWordInput || before > count) return;
+                if (s.charAt(s.length() - 1) == ' ') {
+
+                    String text = si.getText().toString();
+
+                    String[] b = text.split("\\s+");
+                    String word = b[b.length - 1];
+                    tts.speak(word);
+                }
             }
 
             @Override
