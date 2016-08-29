@@ -17,8 +17,11 @@ import android.widget.ListView;
 
 import com.yandex.metrica.YandexMetrica;
 
-
 public class MainActivity extends AppCompatActivity {
+    /**
+     * Use ZAHAR voice by default.
+     */
+    private static final int DEFAULT_VOICE_ID = 4;
     SpeechProvider speechProvider;
     private AutoCompleteTextView speechInput;
     private MenuItem.OnMenuItemClickListener onItemClickReport;
@@ -93,9 +96,8 @@ public class MainActivity extends AppCompatActivity {
             final String[] voices = getResources().getStringArray(R.array.voices);
 
             SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-            final String sCurrentVoice = getString(R.string.current_voice);
-            // TODO: 8/30/16 replace "magic number" with a constant
-            int idCurrentVoice = sharedPref.getInt(sCurrentVoice, 4);
+            final String currentVoice = getString(R.string.current_voice);
+            int idCurrentVoice = sharedPref.getInt(currentVoice, DEFAULT_VOICE_ID);
 
             final SharedPreferences.Editor editor = sharedPref.edit();
 
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onClick(DialogInterface d, int n) {
                     d.cancel();
                     speechProvider.voice = voices[n];
-                    editor.putInt(sCurrentVoice, n);
+                    editor.putInt(currentVoice, n);
                     editor.apply();
 
                 }
