@@ -8,7 +8,7 @@ import android.widget.EditText;
 /**
  * Created by aacidov on 06.06.16.
  */
-public class SpeechController implements DialogInterface.OnClickListener{
+public class SpeechController implements DialogInterface.OnClickListener {
     private static final int DIALOGSCOUNT = 5;
     private final String nd;
     private Context cxt;
@@ -17,15 +17,16 @@ public class SpeechController implements DialogInterface.OnClickListener{
 
     private EditText si;
 
-    public SpeechController(Context con, String newDialog, EditText speechInput){
-        this.cxt=con;
+    public SpeechController(Context con, String newDialog, EditText speechInput) {
+        this.cxt = con;
         this.nd = newDialog;
         this.si = speechInput;
 
     }
+
     public void openDialog() {
         String currentText = si.getText().toString();
-        speechs[cid]=currentText;
+        speechs[cid] = currentText;
 
         AlertDialog.Builder adb = new AlertDialog.Builder(cxt);
 
@@ -35,11 +36,11 @@ public class SpeechController implements DialogInterface.OnClickListener{
         adb.show();
     }
 
-    String[] getSpeechsNames(){
+    String[] getSpeechsNames() {
         String[] sn = new String[DIALOGSCOUNT];
         for (int i = 0; i < DIALOGSCOUNT; i++) {
-            if (speechs[i]==null||speechs[i]==""){
-                sn[i]=this.nd;
+            if (speechs[i] == null || speechs[i].length() ==  0) {
+                sn[i] = this.nd;
                 continue;
             }
             sn[i] = speechs[i];
@@ -60,7 +61,8 @@ public class SpeechController implements DialogInterface.OnClickListener{
 
         dialog.cancel();
     }
-    public void onSay(){
-        speechs[cid]=null;
+
+    public void onSay() {
+        speechs[cid] = null;
     }
 }

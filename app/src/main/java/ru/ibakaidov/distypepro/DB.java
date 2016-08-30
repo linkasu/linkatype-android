@@ -10,6 +10,8 @@ import com.yandex.metrica.YandexMetrica;
 
 import java.util.ArrayList;
 
+import ru.ibakaidov.distypepro.util.Logger;
+
 /**
  * Created by aacidov on 28.05.16.
  */
@@ -40,6 +42,11 @@ public class DB {
 
 
     public void createStatement(String statement, int category) {
+        if (statement == null || statement.length() == 0) {
+            Logger.log("Trying to add empty statement.");
+            return;
+        }
+
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         Cursor c = db.query("statements", new String[]{"text"}, "`text`=?", new String[]{statement}, null, null, null);
@@ -47,7 +54,6 @@ public class DB {
             updateRating(statement);
             return;
         }
-        ;
 
         c.close();
         ContentValues cv = new ContentValues();
@@ -56,7 +62,6 @@ public class DB {
         db.insert("statements", null, cv);
         db.close();
         YandexMetrica.reportEvent("create statement", "{\"text\":\"" + statement + "\"}");
-
     }
 
     public void updateRating(String statement) {
@@ -137,6 +142,11 @@ public class DB {
     }
 
     public void editStatement(String old, String newText) {
+        if (newText == null || newText.length() == 0) {
+            Logger.log("Trying to empty statement.");
+            return;
+        }
+
         ContentValues cv = new ContentValues();
         cv.put("text", newText);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
