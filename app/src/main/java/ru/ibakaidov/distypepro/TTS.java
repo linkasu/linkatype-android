@@ -39,7 +39,7 @@ public class TTS  {
     }
     public void speak(String text){
 
-        if (this.isOnline&&this.isConnected && (Locale.getDefault().getCountry()=="RU")){
+        if (this.isOnline&&this.isConnected){
 
             Vocalizer vocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, voice.toLowerCase());
 
