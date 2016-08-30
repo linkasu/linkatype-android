@@ -16,7 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.ListView;
 
-import com.yandex.metrica.YandexMetrica;
+import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -35,9 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        YandexMetrica.activate(getApplicationContext(), getString(R.string.metrikaKey));
-        YandexMetrica.enableActivityAutoTracking(this.getApplication());
-
+        YandexMetricaHelper.activate(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
