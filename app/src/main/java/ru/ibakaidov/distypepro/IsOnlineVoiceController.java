@@ -2,7 +2,7 @@ package ru.ibakaidov.distypepro;
 
 import android.view.MenuItem;
 
-import com.yandex.metrica.YandexMetrica;
+import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
 
 /**
  * Created by aacidov on 06.06.16.
@@ -20,12 +20,12 @@ public class IsOnlineVoiceController implements MenuItem.OnMenuItemClickListener
             case R.id.is_online_voice:
                 this.tts.isOnline=!this.tts.isOnline;
 
-                YandexMetrica.reportEvent("change online voice status", "{\"on\":"+this.tts.isOnline+"}");
+                YandexMetricaHelper.changeOnlineValueEvent(this.tts.isOnline);
                 item.setChecked(this.tts.isOnline);
                 break;
             case R.id.say_after_word_input:
                 this.tts.isSayAfterWordInput=!this.tts.isSayAfterWordInput;
-                YandexMetrica.reportEvent("say after word status", "{\"on\":"+this.tts.isSayAfterWordInput+"}");
+                YandexMetricaHelper.changeSayingAfterWordValueEvent(this.tts.isSayAfterWordInput);
 
                 item.setChecked(this.tts.isSayAfterWordInput);
 

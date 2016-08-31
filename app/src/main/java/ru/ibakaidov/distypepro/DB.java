@@ -6,11 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.yandex.metrica.YandexMetrica;
-
 import java.util.ArrayList;
 
 import ru.ibakaidov.distypepro.util.Logger;
+import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
 
 /**
  * Created by aacidov on 28.05.16.
@@ -37,7 +36,7 @@ public class DB {
         ContentValues cv = new ContentValues();
         cv.put("label", label);
         db.insert("categories", null, cv);
-        YandexMetrica.reportEvent("create category", "{\"text\":\"" + label + "\"}");
+        YandexMetricaHelper.categoryEvent(label);
     }
 
 
@@ -61,7 +60,7 @@ public class DB {
         cv.put("category", category);
         db.insert("statements", null, cv);
         db.close();
-        YandexMetrica.reportEvent("create statement", "{\"text\":\"" + statement + "\"}");
+        YandexMetricaHelper.statementEvent(statement);
     }
 
     public void updateRating(String statement) {
@@ -131,7 +130,7 @@ public class DB {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.update("statements", cv, "text='" + statement + "'", null);
         db.close();
-        YandexMetrica.reportEvent("change category", "{\"text\":\"" + statement + "\"}");
+        YandexMetricaHelper.changeCategoryEvent(statement);
 
     }
 

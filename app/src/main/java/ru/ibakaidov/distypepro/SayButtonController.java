@@ -8,10 +8,10 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 
-import com.yandex.metrica.YandexMetrica;
-
 import java.lang.reflect.Array;
 import java.util.List;
+
+import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
 
 /**
  * Created by aacidov on 29.05.16.
@@ -85,7 +85,7 @@ public class SayButtonController implements View.OnClickListener {
             wc.loadStatements();
         }
 
-        YandexMetrica.reportEvent("said", "{\"text\":\"" + tfs + "\"}");
+        YandexMetricaHelper.pronouncedTextEvent(tfs);
         tts.speak(tfs);
         sc.onSay();
     }
