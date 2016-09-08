@@ -18,42 +18,33 @@ import java.util.ArrayList;
  */
 public class CategoryController implements AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener {
 
-    private final String delete;
     public int currentCategory = 0;
-    private ListView categoriesLV;
-    private Context cxt;
+    private ListView categories;
     private DB db;
-    private String addCategory;
     private WordsController wc;
-    private String editCategory;
 
-    public CategoryController(ListView categoriesLV, Context cxt, DB db, String addCategory, String editCategory, String delete) {
-        this.categoriesLV = categoriesLV;
-        this.cxt = cxt;
+    public CategoryController(ListView categories, DB db) {
+        this.categories = categories;
         this.db = db;
-        this.addCategory = addCategory;
-        this.editCategory = editCategory;
-        this.delete = delete;
     }
 
-    public void setWC(WordsController wc) {
+    public void setWordsController(WordsController wc) {
         this.wc = wc;
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (categoriesLV.getAdapter().getCount() - 1 == position) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(cxt);
+    public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
+        if (categories.getAdapter().getCount() - 1 == position) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
             builder.setTitle(R.string.add_category);
-            final EditText input = new EditText(cxt);
+            final EditText input = new EditText(view.getContext());
 
             builder.setView(input);
-
 
             builder.setPositiveButton(R.string.add_category, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
                     db.createCategory(input.getText().toString());
-                    loadCategories();
+                    loadCategories(view.getContext());
 
                 }
             });
@@ -67,41 +58,42 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
             return;
         }
         currentCategory = position;
-        wc.loadStatements();
+        wc.loadStatements(view.getContext());
     }
 
-    public void loadCategories() {
-
+    public void loadCategories(Context context) {
         ArrayList<String> categoriesList = db.getCategories();
-        categoriesList.add(addCategory);
+        categoriesList.add(context.getString(R.string.add_category));
         String[] categories = categoriesList.toArray(new String[categoriesList.size()]);
-
-        this.categoriesLV.setAdapter(new ArrayAdapter<String>(cxt, R.layout.support_simple_spinner_dropdown_item, categories));
-
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                context, R.layout.support_simple_spinner_dropdown_item, categories
+        );
+        this.categories.setAdapter(adapter);
     }
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == parent.getAdapter().getCount() - 1 || position == 0) return true;
         final String selected = ((TextView) view).getText().toString();
-        final AlertDialog.Builder builder = new AlertDialog.Builder(cxt);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
 
 
-        final LinearLayout ll = new LinearLayout(cxt);
+        final LinearLayout ll = new LinearLayout(view.getContext());
         ll.setOrientation(LinearLayout.VERTICAL);
 
-
+        String editCategory = view.getContext().getString(R.string.edit_category);
+        String delete = view.getContext().getString(R.string.delete);
         String[] managerStrings = new String[]{editCategory, delete};
-        final ListView managerLV = new ListView(cxt);
+        final ListView managerLV = new ListView(view.getContext());
 
-        managerLV.setAdapter(new ArrayAdapter<String>(cxt, R.layout.support_simple_spinner_dropdown_item, managerStrings));
+        managerLV.setAdapter(new ArrayAdapter<>(
+                view.getContext(), R.layout.support_simple_spinner_dropdown_item, managerStrings
+        ));
 
 
         ll.addView(managerLV);
 
-
         builder.setView(ll);
-
 
         final AlertDialog mainDialog = builder.create();
         mainDialog.setTitle(R.string.edit_category);
@@ -109,24 +101,22 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
 
         managerLV.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+            public void onItemClick(AdapterView<?> parent, final View view, int position, long id) {
                 switch (position) {
                     case 0:
                         //edit category
-                        AlertDialog.Builder builder = new AlertDialog.Builder(cxt);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                         builder.setTitle(R.string.edit_category);
-                        final EditText input = new EditText(cxt);
+                        final EditText input = new EditText(view.getContext());
                         input.setText(selected);
                         builder.setView(input);
-
 
                         builder.setPositiveButton(R.string.edit_category, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
                                 db.editCategory(selected, input.getText().toString());
                                 mainDialog.hide();
-                                loadCategories();
+                                loadCategories(view.getContext());
 
                             }
                         });
@@ -141,7 +131,6 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
                         break;
                     case 1:
                         //delete statement
-
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dDialog, int which) {
@@ -150,7 +139,7 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
 
                                         db.deleteCategory(selected);
                                         mainDialog.hide();
-                                        loadCategories();
+                                        loadCategories(view.getContext());
                                         break;
 
                                     case DialogInterface.BUTTON_NEGATIVE:
@@ -159,15 +148,15 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
                                 }
                             }
                         };
-
-                        builder = new AlertDialog.Builder(cxt);
-                        builder.setMessage(R.string.delete).setPositiveButton(R.string.yes, dialogClickListener)
-                                .setNegativeButton(R.string.no, dialogClickListener).show();
+                        builder = new AlertDialog.Builder(view.getContext());
+                        builder.setMessage(R.string.delete)
+                                .setPositiveButton(R.string.yes, dialogClickListener)
+                                .setNegativeButton(R.string.no, dialogClickListener)
+                                .show();
                         break;
                 }
             }
         });
         return true;
     }
-
 }

@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
-import android.media.session.MediaController;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -18,17 +17,12 @@ import android.widget.ListView;
 
 import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
 
-
 public class MainActivity extends AppCompatActivity {
-
-    TTS tts;
-    private DB db;
-    private ListView wordsLV;
-    private ListView categoriesLV;
-    private AutoCompleteTextView si;
-    private IsOnlineVoiceController iovc;
-    private SpeechController sc;
-    private SayButtonController sbc;
+    SpeechProvider speechProvider;
+    private AutoCompleteTextView speechInput;
+    private MenuItem.OnMenuItemClickListener onItemClickReport;
+    private SpeechController speechController;
+    private SayButtonController sayButtonController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,46 +35,47 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        speechProvider = new SpeechProvider(getApplicationContext(), getString(R.string.apiKey));
 
-        tts=new TTS(getApplicationContext(), getString(R.string.apiKey));
+        DB db = new DB(MainActivity.this, getString(R.string.withoutCategory));
+        ListView wordsList = (ListView) findViewById(R.id.wordsListView);
+        ListView categoriesList = (ListView) findViewById(R.id.categoriesListView);
 
+        CategoryController categoryController = new CategoryController(categoriesList, db);
+        WordsController wordsController = new WordsController(
+                db, categoryController, wordsList, speechProvider
+        );
 
-        db = new DB(MainActivity.this, getString(R.string.withoutCategory));
-        wordsLV = (ListView) findViewById(R.id.wordsListView);
-        categoriesLV = (ListView) findViewById(R.id.categoriesListView);
+        categoryController.setWordsController(wordsController);
+        onItemClickReport = new OnItemClickReport(speechProvider);
 
-        final CategoryController cc=new CategoryController(categoriesLV, this, db, getString(R.string.add_category), getString(R.string.edit_category), getString(R.string.delete));
-        final WordsController wc = new WordsController(this, db, getString(R.string.delete), getString(R.string.edit_statement), getString(R.string.add_statement), cc, wordsLV, tts);
+        speechInput = (AutoCompleteTextView) findViewById(R.id.sayEditText);
+        speechInput.setAdapter(new ArrayAdapter<>(
+                this, android.R.layout.simple_dropdown_item_1line, db.getStatements()
+        ));
 
-        cc.setWC(wc);
-        iovc = new IsOnlineVoiceController(tts);
+        Button sayButton = (Button) findViewById(R.id.sayButton);
+        sayButtonController = new SayButtonController(
+                speechInput, db, categoryController, wordsController, speechProvider
+        );
 
-        si = (AutoCompleteTextView) findViewById(R.id.sayEditText);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, db.getStatements());
-        si.setAdapter(adapter);
+        sayButton.setOnClickListener(sayButtonController);
 
-        Button sb = (Button) findViewById(R.id.sayButton);
-        sbc = new SayButtonController(si, db, cc, wc, tts);
+        categoriesList.setOnItemClickListener(categoryController);
+        categoriesList.setOnItemLongClickListener(categoryController);
+        wordsList.setOnItemClickListener(wordsController);
+        wordsList.setOnItemLongClickListener(wordsController);
 
-        sb.setOnClickListener(sbc);
-
-        categoriesLV.setOnItemClickListener(cc);
-        categoriesLV.setOnItemLongClickListener(cc);
-        wordsLV.setOnItemClickListener(wc);
-        wordsLV.setOnItemLongClickListener(wc);
-
-        cc.loadCategories();
-        wc.loadStatements();
-
+        categoryController.loadCategories(this);
+        wordsController.loadStatements(this);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
-        sc = new SpeechController(this,  getString(R.string.new_speech), si);
-        sbc.setSC(sc);
+        speechController = new SpeechController(getString(R.string.new_speech), speechInput);
+        sayButtonController.setSpeechController(speechController);
         return true;
     }
 
@@ -94,56 +89,51 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.choose_voice) {
             final String[] voices = getResources().getStringArray(R.array.voices);
-            final String[] voiceNames = new String[]{"ALYSS","ERMIL","JANE","OMAZH","ZAHAR"};
 
-
-            SharedPreferences sharedPref = MainActivity.this.getPreferences(Context.MODE_PRIVATE);
-            final String sCurrentVoice=getString(R.string.current_voice);
+            SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
+            final String sCurrentVoice = getString(R.string.current_voice);
+            // TODO: 8/30/16 replace "magic number" with a constant
             int idCurrentVoice = sharedPref.getInt(sCurrentVoice, 4);
 
             final SharedPreferences.Editor editor = sharedPref.edit();
 
-            AlertDialog.Builder adb = new AlertDialog.Builder(this);
-
-            adb.setSingleChoiceItems(voices, idCurrentVoice, new DialogInterface.OnClickListener() {
-
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            dialogBuilder.setSingleChoiceItems(voices, idCurrentVoice, new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface d, int n) {
                     d.cancel();
-                    tts.voice=voiceNames[n];
+                    speechProvider.voice = voices[n];
                     editor.putInt(sCurrentVoice, n);
                     editor.apply();
 
                 }
-
             });
-            adb.setNegativeButton(R.string.cancel, null);
-            adb.setTitle(R.string.choose_voice);
-            adb.show();
+            dialogBuilder.setNegativeButton(R.string.cancel, null);
+            dialogBuilder.setTitle(R.string.choose_voice);
+            dialogBuilder.show();
             return true;
         }
 
-        if (id==R.id.clear){
-            si.setText("");
+        if (id == R.id.clear) {
+            speechInput.setText("");
             return true;
         }
 
-        if (id==R.id.is_online_voice||id==R.id.say_after_word_input){
-            iovc.onMenuItemClick(item);
+        if (id == R.id.is_online_voice || id == R.id.say_after_word_input) {
+            onItemClickReport.onMenuItemClick(item);
             return true;
         }
 
-        if(id==R.id.selectSpeech){
-            sc.openDialog();
+        if (id == R.id.selectSpeech) {
+            speechController.openDialog();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     protected void onResume() {
-        tts.update();
+        speechProvider.update();
         super.onResume();
     }
 }

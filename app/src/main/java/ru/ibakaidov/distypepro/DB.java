@@ -16,20 +16,12 @@ import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
  */
 
 public class DB {
-    DBHelper dbHelper;
     static String withoutCategory;
+    DBHelper dbHelper;
 
     public DB(Context cxt, String withoutCategory) {
         DB.withoutCategory = withoutCategory;
         dbHelper = new DBHelper(cxt);
-
-    }
-
-    public void createCategory(String label) {
-
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        DB.createCategory(db, label);
-        db.close();
     }
 
     public static void createCategory(SQLiteDatabase db, String label) {
@@ -39,6 +31,11 @@ public class DB {
         YandexMetricaHelper.categoryEvent(label);
     }
 
+    public void createCategory(String label) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        DB.createCategory(db, label);
+        db.close();
+    }
 
     public void createStatement(String statement, int category) {
         if (statement == null || statement.length() == 0) {
@@ -48,7 +45,10 @@ public class DB {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Cursor c = db.query("statements", new String[]{"text"}, "`text`=?", new String[]{statement}, null, null, null);
+        Cursor c = db.query(
+                "statements", new String[]{"text"}, "`text`=?", new String[]{statement},
+                null, null, null
+        );
         if (c.getCount() == 1) {
             updateRating(statement);
             return;
@@ -90,8 +90,10 @@ public class DB {
     public ArrayList<String> getStatements(int position) {
         ArrayList<String> statements = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-        Cursor c = db.query("statements", new String[]{"text"}, "`category`=?", new String[]{Integer.toString(position)}, null, null, "rating DESC");
+        Cursor c = db.query(
+                "statements", new String[]{"text"}, "`category`=?",
+                new String[]{Integer.toString(position)}, null, null, "rating DESC"
+        );
         if (c.moveToFirst()) {
 
             int textColIndex = c.getColumnIndex("text");
@@ -109,7 +111,9 @@ public class DB {
     public ArrayList<String> getStatements() {
         ArrayList<String> statements = new ArrayList<String>();
         SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor c = db.query("statements", new String[]{"text"}, null, null, null, null, "rating DESC");
+        Cursor c = db.query(
+                "statements", new String[]{"text"}, null, null, null, null,"rating DESC"
+        );
         if (c.moveToFirst()) {
 
             int textColIndex = c.getColumnIndex("text");
@@ -171,14 +175,16 @@ public class DB {
     class DBHelper extends SQLiteOpenHelper {
 
         public DBHelper(Context context) {
-
             super(context, "DisCannibal", null, 1);
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
-            db.execSQL("CREATE TABLE `statements` ( `id` INTEGER primary key autoincrement  , `text` VARCHAR(500) NOT NULL , `category` INT DEFAULT 1, `rating` INT DEFAULT 0);");
-            db.execSQL("CREATE TABLE `categories` ( `id` INTEGER primary key autoincrement  , `label` VARCHAR(200) NOT NULL );");
+            db.execSQL("CREATE TABLE `statements` (`id` INTEGER primary key autoincrement, " +
+                    "`text` VARCHAR(500) NOT NULL, " +
+                    "`category` INT DEFAULT 1, `rating` INT DEFAULT 0);");
+            db.execSQL("CREATE TABLE `categories` (`id` INTEGER primary key autoincrement, " +
+                    "`label` VARCHAR(200) NOT NULL );");
             DB.createCategory(db, withoutCategory);
         }
 
