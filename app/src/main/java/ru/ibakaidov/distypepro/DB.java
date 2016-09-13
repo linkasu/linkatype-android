@@ -15,36 +15,20 @@ import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
  * Created by aacidov on 28.05.16.
  */
 
-public class DatabaseManager {
-
+public class DB {
     DBHelper dbHelper;
     static String withoutCategory;
 
-    private static volatile DatabaseManager instance;
-
-    public static DatabaseManager getInstance() {
-        DatabaseManager localInstance = instance;
-        if (localInstance == null) {
-            synchronized (DatabaseManager.class) {
-                localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = new DatabaseManager();
-                }
-            }
-        }
-        return localInstance;
-    }
-
-    private DatabaseManager() {
-        withoutCategory = DisTypePro.getAppContext().getString(R.string.withoutCategory);
-        dbHelper = new DBHelper(DisTypePro.getAppContext());
+    public DB(Context cxt, String withoutCategory) {
+        DB.withoutCategory = withoutCategory;
+        dbHelper = new DBHelper(cxt);
 
     }
 
     public void createCategory(String label) {
 
         SQLiteDatabase db = dbHelper.getWritableDatabase();
-        DatabaseManager.createCategory(db, label);
+        DB.createCategory(db, label);
         db.close();
     }
 
@@ -195,7 +179,7 @@ public class DatabaseManager {
         public void onCreate(SQLiteDatabase db) {
             db.execSQL("CREATE TABLE `statements` ( `id` INTEGER primary key autoincrement  , `text` VARCHAR(500) NOT NULL , `category` INT DEFAULT 1, `rating` INT DEFAULT 0);");
             db.execSQL("CREATE TABLE `categories` ( `id` INTEGER primary key autoincrement  , `label` VARCHAR(200) NOT NULL );");
-            DatabaseManager.createCategory(db, withoutCategory);
+            DB.createCategory(db, withoutCategory);
         }
 
         @Override

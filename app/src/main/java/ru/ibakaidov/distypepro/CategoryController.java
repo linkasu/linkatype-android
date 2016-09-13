@@ -21,19 +21,19 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
     private final String delete;
     public int currentCategory = 0;
     private ListView categoriesLV;
-    private Context mContext;
-    private DatabaseManager mDatabaseManager;
+    private Context cxt;
+    private DB db;
     private String addCategory;
     private WordsController wc;
     private String editCategory;
 
-    public CategoryController(Context context, ListView categoriesLV) {
-        this.mContext = context;
+    public CategoryController(ListView categoriesLV, Context cxt, DB db, String addCategory, String editCategory, String delete) {
         this.categoriesLV = categoriesLV;
-        this.mDatabaseManager = DatabaseManager.getInstance();
-        this.addCategory = context.getString(R.string.add_category);
-        this.editCategory = context.getString(R.string.edit_category);
-        this.delete = context.getString(R.string.delete);
+        this.cxt = cxt;
+        this.db = db;
+        this.addCategory = addCategory;
+        this.editCategory = editCategory;
+        this.delete = delete;
     }
 
     public void setWC(WordsController wc) {
@@ -43,16 +43,16 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (categoriesLV.getAdapter().getCount() - 1 == position) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            AlertDialog.Builder builder = new AlertDialog.Builder(cxt);
             builder.setTitle(R.string.add_category);
-            final EditText input = new EditText(mContext);
+            final EditText input = new EditText(cxt);
 
             builder.setView(input);
 
 
             builder.setPositiveButton(R.string.add_category, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
-                    mDatabaseManager.createCategory(input.getText().toString());
+                    db.createCategory(input.getText().toString());
                     loadCategories();
 
                 }
@@ -72,11 +72,11 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
 
     public void loadCategories() {
 
-        ArrayList<String> categoriesList = mDatabaseManager.getCategories();
+        ArrayList<String> categoriesList = db.getCategories();
         categoriesList.add(addCategory);
         String[] categories = categoriesList.toArray(new String[categoriesList.size()]);
 
-        this.categoriesLV.setAdapter(new ArrayAdapter<String>(mContext, R.layout.support_simple_spinner_dropdown_item, categories));
+        this.categoriesLV.setAdapter(new ArrayAdapter<String>(cxt, R.layout.support_simple_spinner_dropdown_item, categories));
 
     }
 
@@ -84,17 +84,17 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (position == parent.getAdapter().getCount() - 1 || position == 0) return true;
         final String selected = ((TextView) view).getText().toString();
-        final AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(cxt);
 
 
-        final LinearLayout ll = new LinearLayout(mContext);
+        final LinearLayout ll = new LinearLayout(cxt);
         ll.setOrientation(LinearLayout.VERTICAL);
 
 
         String[] managerStrings = new String[]{editCategory, delete};
-        final ListView managerLV = new ListView(mContext);
+        final ListView managerLV = new ListView(cxt);
 
-        managerLV.setAdapter(new ArrayAdapter<String>(mContext, R.layout.support_simple_spinner_dropdown_item, managerStrings));
+        managerLV.setAdapter(new ArrayAdapter<String>(cxt, R.layout.support_simple_spinner_dropdown_item, managerStrings));
 
 
         ll.addView(managerLV);
@@ -114,9 +114,9 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
                 switch (position) {
                     case 0:
                         //edit category
-                        AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                        AlertDialog.Builder builder = new AlertDialog.Builder(cxt);
                         builder.setTitle(R.string.edit_category);
-                        final EditText input = new EditText(mContext);
+                        final EditText input = new EditText(cxt);
                         input.setText(selected);
                         builder.setView(input);
 
@@ -124,7 +124,7 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
                         builder.setPositiveButton(R.string.edit_category, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int id) {
 
-                                mDatabaseManager.editCategory(selected, input.getText().toString());
+                                db.editCategory(selected, input.getText().toString());
                                 mainDialog.hide();
                                 loadCategories();
 
@@ -148,7 +148,7 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
                                 switch (which) {
                                     case DialogInterface.BUTTON_POSITIVE:
 
-                                        mDatabaseManager.deleteCategory(selected);
+                                        db.deleteCategory(selected);
                                         mainDialog.hide();
                                         loadCategories();
                                         break;
@@ -160,7 +160,7 @@ public class CategoryController implements AdapterView.OnItemClickListener, Adap
                             }
                         };
 
-                        builder = new AlertDialog.Builder(mContext);
+                        builder = new AlertDialog.Builder(cxt);
                         builder.setMessage(R.string.delete).setPositiveButton(R.string.yes, dialogClickListener)
                                 .setNegativeButton(R.string.no, dialogClickListener).show();
                         break;
