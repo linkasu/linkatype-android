@@ -2,13 +2,10 @@ package ru.ibakaidov.distypepro;
 
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.EditText;
 
-import java.lang.reflect.Array;
 import java.util.List;
 
 import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
@@ -17,20 +14,18 @@ import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
  * Created by aacidov on 29.05.16.
  */
 public class SayButtonController implements View.OnClickListener {
-    private AutoCompleteTextView si;
-    private DB db;
-    private CategoryController cc;
-    private WordsController wc;
-    private TTS tts;
-    private SpeechController sc;
+
+    private AutoCompleteTextView mAutoCompleteTextView;
+    private DatabaseManager mDatabaseManager;
+    private CategoryController mCategoryController;
+    private WordsController mWordsController;
 
 
-    public SayButtonController(AutoCompleteTextView speechInput, DB dateBase, CategoryController categoryController, WordsController wordsController, TTS textToSpeech) {
-        this.si = speechInput;
-        this.db = dateBase;
-        this.cc = categoryController;
-        this.wc = wordsController;
-        this.tts = textToSpeech;
+    public SayButtonController(AutoCompleteTextView speechInput, CategoryController categoryController, WordsController wordsController) {
+        this.mAutoCompleteTextView = speechInput;
+        this.mDatabaseManager = DatabaseManager.getInstance();
+        this.mCategoryController = categoryController;
+        this.mWordsController = wordsController;
 
         speechInput.addTextChangedListener(new TextWatcher() {
             @Override
@@ -40,14 +35,14 @@ public class SayButtonController implements View.OnClickListener {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (!tts.isSayAfterWordInput || before > count) return;
+                if (!TTS.getInstance().isSayAfterWordInput || before > count) return;
                 if (s.charAt(s.length() - 1) == ' ') {
 
-                    String text = si.getText().toString();
+                    String text = mAutoCompleteTextView.getText().toString();
 
                     String[] b = text.split("\\s+");
                     String word = b[b.length - 1];
-                    tts.speak(word);
+                    TTS.getInstance().speak(word);
                 }
             }
 
@@ -58,35 +53,30 @@ public class SayButtonController implements View.OnClickListener {
         });
     }
 
-    public void setSC(SpeechController sc) {
-        this.sc = sc;
-    }
-
     @Override
     public void onClick(View v) {
-        String tfs = si.getText().toString();
+        String tfs = mAutoCompleteTextView.getText().toString();
 
         //Do not react on empty input in AutoCompleteTextView
         if (tfs.length() == 0) {
             return;
         }
 
-        db.createStatement(tfs, 0);
+        mDatabaseManager.createStatement(tfs, 0);
 
         //Updating statements containing in adapter
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>) si.getAdapter();
+        ArrayAdapter<String> adapter = (ArrayAdapter<String>) mAutoCompleteTextView.getAdapter();
         adapter.clear();
-        List<String> updatedStatements = db.getStatements();
+        List<String> updatedStatements = mDatabaseManager.getStatements();
         for (String statement : updatedStatements) {
             adapter.add(statement);
         }
 
-        if (cc.currentCategory == 0) {
-            wc.loadStatements();
+        if (mCategoryController.currentCategory == 0) {
+            mWordsController.loadStatements();
         }
 
         YandexMetricaHelper.pronouncedTextEvent(tfs);
-        tts.speak(tfs);
-        sc.onSay();
+        TTS.getInstance().speak(tfs);
     }
 }
