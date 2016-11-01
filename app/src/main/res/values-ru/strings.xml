@@ -28,4 +28,5 @@
         <item>Ома</item>
         <item>Захар</item>
     </string-array>
+    <string name="bell">Подать сигнал</string>
 </resources>

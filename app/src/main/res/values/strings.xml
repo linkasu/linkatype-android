@@ -23,6 +23,7 @@
     <string name="say_after_word_input">Say after ever word</string>
 
     <string name="chat">Chat</string>
+    <string name="bell">Call attation</string>
 
     <string-array name="voices">
         <item>ALYSS</item>

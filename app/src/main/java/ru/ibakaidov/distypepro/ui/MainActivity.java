@@ -1,9 +1,12 @@
-package ru.ibakaidov.distypepro.ui;
+ package ru.ibakaidov.distypepro.ui;
 
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
@@ -13,6 +16,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.IOException;
+
+import ru.ibakaidov.distypepro.BellButtonController;
 import ru.ibakaidov.distypepro.IsOnlineVoiceController;
 import ru.ibakaidov.distypepro.R;
 import ru.ibakaidov.distypepro.TTS;
@@ -26,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private IsOnlineVoiceController iovc;
     private ViewPager mViewPager;
     private SharedPreferences mSharedPreferences;
+    private BellButtonController mBellButtonController;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         iovc = new IsOnlineVoiceController();
-
+        mBellButtonController = new BellButtonController();
         mSharedPreferences = getPreferences(Context.MODE_PRIVATE);
         restoreVoiceSettings();
     }
@@ -103,9 +110,19 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
+        if (id==R.id.bell){
+            try {
+                mBellButtonController.play();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
 
+        return super.onOptionsItemSelected(item);
+
+
+    }
     @Override
     protected void onResume() {
         super.onResume();

@@ -36,4 +36,9 @@
             android:icon="@android:drawable/ic_menu_delete"
             android:title="@string/clear"
             app:showAsAction="always"/>
+    <item
+        android:id="@+id/bell"
+        android:icon="@android:drawable/ic_menu_call"
+        android:title="@string/bell"
+        app:showAsAction="always"/>
 </menu>
