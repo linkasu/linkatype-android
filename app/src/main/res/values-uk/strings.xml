@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="action_settings">Налаштування</string>
+    <string name="choose_voice">Вибрати голос</string>
+    <string name="cancel">Відміна</string>
+    <string name="say">Сказати</string>
+    <string name="add_category">Додати категорію</string>
+    <string name="add_statement">Додати вислів</string>
+    <string name="change_category">Змінити категорію</string>
+    <string name="clear">Очистити</string>
+    <string name="delete">Видалити</string>
+    <string name="edit_statement">Редагувати вислови</string>
+    <string name="is_online_voice">Використовувати інтернет</string>
+    <string name="no">Ні</string>
+    <string name="add_speech">Додати діалог</string>
+    <string name="remove_speech">Видалити діалог</string>
+    <string name="withoutCategory">Без категорії</string>
+    <string name="yes">Так</string>
+    <string name="edit_category">Редагувати категорію</string>
+    <string name="say_after_word_input">Вимовляти після введення кожного слова</string>
+
+    <string name="chat">Чат</string>
+
+    <string-array name="voices">
+        <item>Аліса</item>
+        <item>Еміль</item>
+        <item>Джейн</item>
+        <item>Ома</item>
+        <item>Захар</item>
+    </string-array>
+    <string name="bell">Подати сигнал</string>
+    <string name="input_text_for_synth">Введіть текст для запису в файл</string>
+    <string name="synth_to_file">Записати голос в файл</string>
+</resources>

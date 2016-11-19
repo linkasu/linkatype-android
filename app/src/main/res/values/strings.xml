@@ -24,6 +24,8 @@
 
     <string name="chat">Chat</string>
     <string name="bell">Call attation</string>
+    <string name="synth_to_file">Say to file</string>
+    <string name="input_text_for_synth">Input text for record to file</string>
 
     <string-array name="voices">
         <item>ALYSS</item>

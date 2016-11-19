@@ -41,4 +41,10 @@
         android:icon="@android:drawable/ic_menu_call"
         android:title="@string/bell"
         app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/synth_to_file"
+        android:icon="@android:drawable/ic_menu_call"
+        android:title="@string/synth_to_file"
+        app:showAsAction="never"/>
 </menu>

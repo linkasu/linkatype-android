@@ -29,4 +29,6 @@
         <item>Захар</item>
     </string-array>
     <string name="bell">Подать сигнал</string>
+    <string name="input_text_for_synth">Введите текст для записи в файл</string>
+    <string name="synth_to_file">Записать голос в файл</string>
 </resources>

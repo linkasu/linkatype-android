@@ -1,7 +1,9 @@
  package ru.ibakaidov.distypepro.ui;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -15,10 +17,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.EditText;
 
+import java.io.File;
 import java.io.IOException;
 
 import ru.ibakaidov.distypepro.BellButtonController;
+import ru.ibakaidov.distypepro.DisTypePro;
 import ru.ibakaidov.distypepro.IsOnlineVoiceController;
 import ru.ibakaidov.distypepro.R;
 import ru.ibakaidov.distypepro.TTS;
@@ -27,7 +32,10 @@ import ru.ibakaidov.distypepro.TTS;
 public class MainActivity extends AppCompatActivity {
 
     public static final int DEFAULT_TABS_COUNT = 3;
+    public static Activity activity;
+
     private static final String PREFS_VOICE_INDEX = "current_voice";
+
 
     private IsOnlineVoiceController iovc;
     private ViewPager mViewPager;
@@ -38,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        activity=this;
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -116,6 +124,38 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            return true;
+        }
+
+        if(id==R.id.synth_to_file){
+            String text="";
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.input_text_for_synth);
+            final EditText input = new EditText(this);
+
+            builder.setView(input);
+
+
+            builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    String text = input.getText().toString();
+                    File audioFile = TTS.getInstance().speakToFile(text);
+                    Intent i = new Intent();
+                    i.setAction(android.content.Intent.ACTION_VIEW);
+                    i.setDataAndType(Uri.fromFile(audioFile), "audio/wave");
+                    startActivity(i);
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+
+                }
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
+
+            TTS.getInstance().speakToFile(text);
             return true;
         }
 

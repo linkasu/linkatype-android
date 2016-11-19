@@ -1,13 +1,17 @@
 package ru.ibakaidov.distypepro;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Locale;
 
+import ru.ibakaidov.distypepro.ui.MainActivity;
 import ru.yandex.speechkit.Vocalizer;
 
 /**
@@ -28,6 +32,7 @@ public class TTS {
     public boolean isSayAfterWordInput = false;
 
     private static volatile TTS instance;
+    private FileStorage mfs;
 
     public static TTS getInstance() {
         TTS localInstance = instance;
@@ -45,6 +50,7 @@ public class TTS {
     private TTS() {
         mCurrentVoice = Vocalizer.Voice.ZAHAR;
         mAvailableVoices = DisTypePro.getAppContext().getResources().getStringArray(R.array.voices);
+        mfs = new FileStorage(MainActivity.activity);
 
         tts = new TextToSpeech(DisTypePro.getAppContext(), new TextToSpeech.OnInitListener() {
             @Override
@@ -71,6 +77,18 @@ public class TTS {
         } else {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         }
+    }
+
+    public File speakToFile(String text){
+        File file = mfs.getAudioFile();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            tts.synthesizeToFile(text, null, file,null);
+
+        }else {
+            tts.synthesizeToFile(text, null, file.getAbsolutePath());
+        }
+        return file;
     }
 
     public void update() {
