@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "800888317067",
+    "firebase_url": "https://distypepro-android.firebaseio.com",
+    "project_id": "distypepro-android",
+    "storage_bucket": "distypepro-android.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800888317067:android:06e954d4007fb515",
+        "android_client_info": {
+          "package_name": "ru.ibakaidov.distypepro"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "800888317067-g2fiacadak4adl89duvh7a5nabdhnlb6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.ibakaidov.distypepro",
+            "certificate_hash": "46C6B789F46199DF6B7706029EE7D0C72C1674FF"
+          }
+        },
+        {
+          "client_id": "800888317067-nbq3g1ghp4gsn2rmg5hanhckb6glafjn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNJUzqwMjvMKsFPxB9L1VbHHvO-4qi7IQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "800888317067-nbq3g1ghp4gsn2rmg5hanhckb6glafjn.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

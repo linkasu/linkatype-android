@@ -47,4 +47,9 @@
         android:icon="@android:drawable/ic_menu_call"
         android:title="@string/synth_to_file"
         app:showAsAction="never"/>
+
+    <item
+        android:id="@+id/action_feedback"
+        android:title="@string/action_feedback"
+        app:showAsAction="never"/>
 </menu>

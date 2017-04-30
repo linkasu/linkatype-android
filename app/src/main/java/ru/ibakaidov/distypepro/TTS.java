@@ -1,32 +1,34 @@
 package ru.ibakaidov.distypepro;
 
-import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
 
 import java.io.File;
-import java.net.URL;
 import java.util.Locale;
 
 import ru.ibakaidov.distypepro.ui.MainActivity;
+import ru.yandex.speechkit.Error;
+import ru.yandex.speechkit.Synthesis;
 import ru.yandex.speechkit.Vocalizer;
+import ru.yandex.speechkit.VocalizerListener;
 
 /**
  * Created by aacidov on 27.05.16.
  */
 public class TTS {
-
     public static String[] VOICES = new String[]{Vocalizer.Voice.ALYSS, Vocalizer.Voice.ERMIL, Vocalizer.Voice.JANE, Vocalizer
             .Voice.OMAZH, Vocalizer.Voice.ZAHAR};
 
-    private boolean isConnected;
     private TextToSpeech tts;
-    private ConnectivityManager cm;
     private String mCurrentVoice;
     private String[] mAvailableVoices;
+    static int TIMEOUT = 1500;
+
+
 
     public boolean isOnline = true;
     public boolean isSayAfterWordInput = false;
@@ -59,16 +61,67 @@ public class TTS {
             }
         });
         tts.setLanguage(Locale.getDefault());
-        cm = (ConnectivityManager) DisTypePro.getAppContext().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        update();
     }
 
-    public void speak(String text) {
 
-        if (this.isOnline && this.isConnected) {
-            Vocalizer vocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, mCurrentVoice.toLowerCase());
+    public void speak(final String text, boolean primaryOffline) {
+
+        if (this.isOnline && ! primaryOffline ) {
+            final boolean[] started = new boolean[]{false};
+
+            final Vocalizer vocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, mCurrentVoice.toLowerCase());
+
+
+
+            vocalizer.setListener(new VocalizerListener() {
+                @Override
+                public void onSynthesisBegin(Vocalizer vocalizer) {
+
+                }
+
+                @Override
+                public void onSynthesisDone(Vocalizer vocalizer, Synthesis synthesis) {
+
+                }
+
+                @Override
+                public void onPlayingBegin(Vocalizer vocalizer) {
+                    started[0]=true;
+
+                }
+
+                @Override
+                public void onPlayingDone(Vocalizer vocalizer) {
+
+                }
+
+                @Override
+                public void onVocalizerError(Vocalizer vocalizer, Error error) {
+
+                }
+            });
             vocalizer.start();
+
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        this.sleep(TIMEOUT);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    if(!started[0]){
+                        vocalizer.cancel();
+                        instance.speak(text, true);
+
+                    }
+
+                }
+            }.start();
+
+
             return;
         }
 
@@ -78,7 +131,9 @@ public class TTS {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         }
     }
-
+    public void speak(String text){
+        speak(text, false);
+    }
     public File speakToFile(String text){
         File file = mfs.getAudioFile();
 
@@ -89,16 +144,6 @@ public class TTS {
             tts.synthesizeToFile(text, null, file.getAbsolutePath());
         }
         return file;
-    }
-
-    public void update() {
-        NetworkInfo ni = cm.getActiveNetworkInfo();
-        if (ni == null) {
-            this.isConnected = false;
-            return;
-        }
-        ;
-        this.isConnected = ni.isConnected();
     }
 
     public String[] getAvailableVoices() {

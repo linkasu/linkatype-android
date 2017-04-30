@@ -1,8 +1,8 @@
 package ru.ibakaidov.distypepro.util;
 
-import com.yandex.metrica.YandexMetrica;
-
 import android.app.Application;
+
+import com.yandex.metrica.YandexMetrica;
 
 /**
  * Created by kolenyov on 31/08/16.

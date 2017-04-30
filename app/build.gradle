@@ -6,10 +6,10 @@ android {
 
     defaultConfig {
         applicationId "ru.ibakaidov.distypepro"
-        minSdkVersion 10
-        targetSdkVersion 23
-        versionCode 9
-        versionName "2.6"
+        minSdkVersion 13
+        targetSdkVersion 25
+        versionCode 12
+        versionName "2.9"
     }
     buildTypes {
         release {
@@ -21,10 +21,16 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    testCompile 'junit:junit:4.12'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
-    compile 'com.android.support:support-annotations:24.2.0'
+
+    compile project(path: ':disfeedback')
+    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:design:24.2.1'
+    compile 'com.android.support:support-annotations:24.2.1'
     compile 'com.yandex.android:speechkit:2.5.0'
     compile 'com.yandex.android:mobmetricalib:2.41'
+    compile 'com.google.firebase:firebase-messaging:10.0.1'
+    testCompile 'junit:junit:4.12'
 }
+
+
+apply plugin: 'com.google.gms.google-services'

@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name" translatable="false">DisFeedBack</string>
+    <string name="action_feedback">Send feedback</string>
+    <string name="input_email">Input your email for our answer</string>
+    <string name="input_feedback">Input text for feedback</string>
+    <string name="ok">OK</string>
+    <string name="dont_input">You do not input text or email</string>
+    <string name="cancel">Cancel</string>
+    <string name="sending">Sending feedback to server</string>
+    <string name="success">Success. Thanks for your feedback, we will connect to you.</string>
+    <string name="fail">Fail sending feedback, please try again</string>
+</resources>

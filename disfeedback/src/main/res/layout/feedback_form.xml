@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:id="@+id/feedback_form">
+    <TextViewz
+        android:text="@string/input_email"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        style="?android:attr/listSeparatorTextViewStyle" />
+    />
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/input_email"
+        android:id="@+id/input_email"
+        android:inputType="textEmailAddress"/>
+    <TextView
+        android:text="@string/input_feedback"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        style="?android:attr/listSeparatorTextViewStyle" />
+    />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:hint="@string/input_feedback"
+        android:id="@+id/input_feedback"
+        android:inputType="textMultiLine"/>
+
+
+</LinearLayout>

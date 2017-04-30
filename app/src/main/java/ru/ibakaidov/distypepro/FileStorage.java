@@ -2,8 +2,6 @@ package ru.ibakaidov.distypepro;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.Application;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;

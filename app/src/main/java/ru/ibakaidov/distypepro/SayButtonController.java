@@ -42,7 +42,7 @@ public class SayButtonController implements View.OnClickListener {
 
                     String[] b = text.split("\\s+");
                     String word = b[b.length - 1];
-                    TTS.getInstance().speak(word);
+                    TTS.getInstance().speak(word, true);
                 }
             }
 
