@@ -26,9 +26,15 @@
         <item>Еміль</item>
         <item>Джейн</item>
         <item>Ома</item>
-        <item>Захар</item>
+        <item>Захар/</item>
     </string-array>
     <string name="bell">Подати сигнал</string>
     <string name="input_text_for_synth">Введіть текст для запису в файл</string>
     <string name="synth_to_file">Записати голос в файл</string>
+    <string name="app_name">LINKa: напиши</string>
+    <string name="show">Показать</string>
+    <string name="install_tts">Будь ласка, встановіть синтез мовлення з магазину Play.</string>
+    <string name="tts_settings">Відкрити параметри синтезатора мови</string>
+    <string name="lang_doesnt_support">Не можу говорити</string>
+    <string name="send_to">Поділитися аудіо файлом</string>
 </resources>

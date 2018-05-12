@@ -1,27 +1,30 @@
+
 package ru.ibakaidov.distypepro;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.Locale;
 
 import ru.ibakaidov.distypepro.ui.MainActivity;
-import ru.yandex.speechkit.Error;
-import ru.yandex.speechkit.Synthesis;
-import ru.yandex.speechkit.Vocalizer;
-import ru.yandex.speechkit.VocalizerListener;
+import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
+
 
 /**
  * Created by aacidov on 27.05.16.
  */
 public class TTS {
-    public static String[] VOICES = new String[]{Vocalizer.Voice.ALYSS, Vocalizer.Voice.ERMIL, Vocalizer.Voice.JANE, Vocalizer
-            .Voice.OMAZH, Vocalizer.Voice.ZAHAR};
+    //public static String[] VOICES = new String[]{Vocalizer.Voice.ALYSS, Vocalizer.Voice.ERMIL, Vocalizer.Voice.JANE, Vocalizer.Voice.OMAZH, Vocalizer.Voice.ZAHAR};
 
     private TextToSpeech tts;
     private String mCurrentVoice;
@@ -50,14 +53,33 @@ public class TTS {
     }
 
     private TTS() {
-        mCurrentVoice = Vocalizer.Voice.ZAHAR;
-        mAvailableVoices = DisTypePro.getAppContext().getResources().getStringArray(R.array.voices);
-        mfs = new FileStorage(MainActivity.activity);
+        mfs = FileStorage.getInstance();
 
         tts = new TextToSpeech(DisTypePro.getAppContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    if(!tts.getAvailableLanguages().contains(Locale.getDefault())) {
+                        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(MainActivity.activity);
+                        dlgAlert.setMessage(R.string.install_tts);
+                        dlgAlert.setTitle(R.string.lang_doesnt_support);
+                        dlgAlert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                YandexMetricaHelper.openTTSInstall();
+                                final String appPackageName = "com.google.android.tts";
+                                try {
+                                    MainActivity.activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+                                } catch (android.content.ActivityNotFoundException anfe) {
+                                    MainActivity.activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+                                }
+                            }
+                        });
+                        dlgAlert.create().show();
 
+                    }
+
+                }
             }
         });
         tts.setLanguage(Locale.getDefault());
@@ -67,66 +89,8 @@ public class TTS {
 
     public void speak(final String text, boolean primaryOffline) {
 
-        if (this.isOnline && ! primaryOffline ) {
-            final boolean[] started = new boolean[]{false};
-
-            final Vocalizer vocalizer = Vocalizer.createVocalizer(Vocalizer.Language.RUSSIAN, text, true, mCurrentVoice.toLowerCase());
-
-
-
-            vocalizer.setListener(new VocalizerListener() {
-                @Override
-                public void onSynthesisBegin(Vocalizer vocalizer) {
-
-                }
-
-                @Override
-                public void onSynthesisDone(Vocalizer vocalizer, Synthesis synthesis) {
-
-                }
-
-                @Override
-                public void onPlayingBegin(Vocalizer vocalizer) {
-                    started[0]=true;
-
-                }
-
-                @Override
-                public void onPlayingDone(Vocalizer vocalizer) {
-
-                }
-
-                @Override
-                public void onVocalizerError(Vocalizer vocalizer, Error error) {
-
-                }
-            });
-            vocalizer.start();
-
-            new Thread() {
-                @Override
-                public void run() {
-                    try {
-                        this.sleep(TIMEOUT);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-
-                    if(!started[0]){
-                        vocalizer.cancel();
-                        instance.speak(text, true);
-
-                    }
-
-                }
-            }.start();
-
-
-            return;
-        }
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+            tts.speak(text, TextToSpeech.QUEUE_FLUSH,null, null);
         } else {
             tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
         }
@@ -134,16 +98,35 @@ public class TTS {
     public void speak(String text){
         speak(text, false);
     }
-    public File speakToFile(String text){
-        File file = mfs.getAudioFile();
+    public void stop(){
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.synthesizeToFile(text, null, file,null);
+    }
+    public void speakToFile(final String text){
+        mfs.getAudioFile(new FileStorage.OnAudioFile(){
+            @Override
+            public void onCreate(File file) {
+                super.onCreate(file);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    tts.synthesizeToFile(text, null, file,null);
 
-        }else {
-            tts.synthesizeToFile(text, null, file.getAbsolutePath());
-        }
-        return file;
+                }else {
+                    tts.synthesizeToFile(text, null, file.getAbsolutePath());
+                }
+
+                Intent shareIntent = new Intent();
+                shareIntent.setAction(Intent.ACTION_SEND);
+                shareIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("file:///"+file.getAbsolutePath()));
+                shareIntent.setType("audio/*");
+                MainActivity.activity.startActivity(Intent.createChooser(shareIntent, MainActivity.activity.getResources().getText(R.string.send_to)));
+
+            }
+
+            @Override
+            public void onFail() {
+                super.onFail();
+                Toast.makeText(MainActivity.activity, R.string.fail, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     public String[] getAvailableVoices() {

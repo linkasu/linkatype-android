@@ -13,6 +13,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import ru.ibakaidov.distypepro.ui.SpotlightActivity;
+
 /**
  * Created by aacidov on 29.05.16.
  */
@@ -25,6 +27,7 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
     private CategoryController categoryController;
     private ListView wordsLV;
     private String addStatement;
+    private String show;
 
     public WordsController(Context context, ListView wordsLV, CategoryController categoryController) {
         this.mContext = context;
@@ -34,6 +37,7 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
         this.addStatement = context.getString(R.string.add_statement);
         this.editStatement = context.getString(R.string.edit_statement);
         this.delete = context.getString(R.string.delete);
+        this.show = context.getString(R.string.show);
     }
 
     @Override
@@ -52,10 +56,12 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
         final ListView lv = new ListView(mContext);
         lv.setAdapter(new ArrayAdapter<>(mContext, R.layout.support_simple_spinner_dropdown_item, mDatabaseManager.getCategories().toArray(new String[]{})));
 
-        String[] managerStrings = new String[]{editStatement, delete};
+        String[] managerStrings = new String[]{show, editStatement, delete};
         final ListView managerLV = new ListView(mContext);
 
         managerLV.setAdapter(new ArrayAdapter<>(mContext, R.layout.support_simple_spinner_dropdown_item, managerStrings));
+
+
 
         ll.addView(titleBox);
         ll.addView(lv);
@@ -83,6 +89,10 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
 
                 switch (position) {
                     case 0:
+                        //show
+                        SpotlightActivity.show( selected);
+                        break;
+                    case 1:
                         //edit statement
                         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
                         builder.setTitle(R.string.edit_statement);
@@ -110,7 +120,7 @@ public class WordsController implements AdapterView.OnItemLongClickListener, Ada
                         editDialog.show();
 
                         break;
-                    case 1:
+                    case 2:
                         //delete statement
 
                         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {

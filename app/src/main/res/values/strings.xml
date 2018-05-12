@@ -2,7 +2,7 @@
     <string name="speechKitApiKey" translatable="false">bbe234a6-edf0-45ee-bb92-169fccfb8653</string>
     <string name="metrikaKey" translatable="false">74b3edb9-a12c-4ec6-96e2-817e75e03941</string>
 
-    <string name="app_name" translatable="false">DisType Pro</string>
+    <string name="app_name">LINKa: type</string>
     <string name="action_settings">Settings</string>
     <string name="choose_voice">Choose voice</string>
     <string name="cancel">Cancel</string>
@@ -26,6 +26,11 @@
     <string name="bell">Call attation</string>
     <string name="synth_to_file">Say to file</string>
     <string name="input_text_for_synth">Input text for record to file</string>
+    <string name="show">Show</string>
+    <string name="tts_settings">Open tts settings</string>
+    <string name="install_tts">Please, install the speech synth from the Play Store.</string>
+    <string name="lang_doesnt_support">I can\'t speak</string>
+    <string name="send_to">Share an audio file</string>
 
     <string-array name="voices">
         <item>ALYSS</item>

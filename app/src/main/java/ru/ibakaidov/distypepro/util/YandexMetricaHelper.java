@@ -18,6 +18,17 @@ public class YandexMetricaHelper {
         YandexMetrica.reportEvent("said", "{\"text\":\"" + text + "\"}");
     }
 
+
+    public static void showTextEvent(String text) {
+        YandexMetrica.reportEvent("show", "{\"text\":\"" + text + "\"}");
+    }
+
+    public static void  openTTSSettings(){
+        YandexMetrica.reportEvent("Open TTS Settings");
+    }
+    public static void  openTTSInstall(){
+        YandexMetrica.reportEvent("Open TTS install");
+    }
     public static void categoryEvent(String label) {
         YandexMetrica.reportEvent("create category", "{\"text\":\"" + label + "\"}");
     }

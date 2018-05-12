@@ -75,4 +75,7 @@ public class SpeechFragment extends Fragment {
     public void clearText() {
         mAutoCompleteTextView.setText("");
     }
+    public String getText() {
+        return mAutoCompleteTextView.getText().toString();
+    }
 }

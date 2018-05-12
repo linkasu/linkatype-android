@@ -2,34 +2,12 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context=".ui.MainActivity">
-    <item
-            android:id="@+id/choose_voice"
-            android:orderInCategory="100"
-            android:title="@string/choose_voice"
-            app:showAsAction="never"/>
-    <item
-            android:id="@+id/is_online_voice"
-            android:orderInCategory="100"
-            android:title="@string/is_online_voice"
-            android:checkable="true"
-            android:checked="true"
-            app:showAsAction="never"/>
-    <item
+     <item
             android:id="@+id/say_after_word_input"
             android:orderInCategory="100"
             android:title="@string/say_after_word_input"
             android:checkable="true"
             app:showAsAction="never"/>
-    <item
-            android:id="@+id/removeSpeech"
-            android:icon="@android:drawable/ic_menu_close_clear_cancel"
-            android:title="@string/remove_speech"
-            app:showAsAction="always"/>
-    <item
-            android:id="@+id/addSpeech"
-            android:icon="@android:drawable/ic_menu_add"
-            android:title="@string/add_speech"
-            app:showAsAction="always"/>
 
     <item
             android:id="@+id/clear"
@@ -41,12 +19,21 @@
         android:icon="@android:drawable/ic_menu_call"
         android:title="@string/bell"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_show"
+        android:icon="@drawable/ic_show"
+        android:title="@string/show"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/synth_to_file"
         android:icon="@android:drawable/ic_menu_call"
         android:title="@string/synth_to_file"
         app:showAsAction="never"/>
+    <item
+    android:id="@+id/tts_settings"
+    android:title="@string/tts_settings"
+    app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_feedback"

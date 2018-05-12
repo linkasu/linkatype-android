@@ -31,4 +31,10 @@
     <string name="bell">Подать сигнал</string>
     <string name="input_text_for_synth">Введите текст для записи в файл</string>
     <string name="synth_to_file">Записать голос в файл</string>
+    <string name="app_name">LINKa: напиши</string>
+    <string name="show">Показать</string>
+    <string name="tts_settings">Открыть настройки синтезатора речи</string>
+    <string name="install_tts">Пожалуйста, установите синтезатор речи из Play Маркета.</string>
+    <string name="lang_doesnt_support">Не могу говорить</string>
+    <string name="send_to">Поделиться аудио файлом</string>
 </resources>
