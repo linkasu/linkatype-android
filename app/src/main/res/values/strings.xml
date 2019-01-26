@@ -31,6 +31,8 @@
     <string name="install_tts">Please, install the speech synth from the Play Store.</string>
     <string name="lang_doesnt_support">I can\'t speak</string>
     <string name="send_to">Share an audio file</string>
+    <string name="paste">Paste</string>
+    <string name="save">Save</string>
 
     <string-array name="voices">
         <item>ALYSS</item>

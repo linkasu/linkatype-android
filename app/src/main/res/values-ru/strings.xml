@@ -37,4 +37,6 @@
     <string name="install_tts">Пожалуйста, установите синтезатор речи из Play Маркета.</string>
     <string name="lang_doesnt_support">Не могу говорить</string>
     <string name="send_to">Поделиться аудио файлом</string>
+    <string name="paste">Вставить</string>
+    <string name="save">Сохранить</string>
 </resources>

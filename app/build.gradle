@@ -10,8 +10,8 @@ android {
         applicationId "ru.ibakaidov.distypepro"
         minSdkVersion 14
         targetSdkVersion 26
-        versionCode 17
-        versionName "2.12.2"
+        versionCode 20
+        versionName "2.13.2"
     }
     buildTypes {
         release {
@@ -28,8 +28,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support:design:26.1.0'
     compile 'com.android.support:support-annotations:27.1.1'
-    compile 'com.yandex.android:mobmetricalib:2.80'
-    compile 'com.google.firebase:firebase-messaging:12.0.1'
+   // compile 'com.yandex.android:mobmetricalib:2.80'
+    //compile 'com.google.firebase:firebase-messaging:12.0.1'
     testCompile 'junit:junit:4.12'
 }
 

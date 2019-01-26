@@ -48,6 +48,7 @@
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         activity=this;
+
         fb = new FeedBack(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -92,6 +93,10 @@
             return true;
         }
 
+        if(id==R.id.action_save){
+            getCurrentSpeechFragment().save();
+            return true;
+        }
 
         if (id==R.id.bell){
             try {
@@ -142,7 +147,7 @@
             intent.setAction("com.android.settings.TTS_SETTINGS");
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             this.startActivity(intent);
-            YandexMetricaHelper.openTTSSettings();
+            //YandexMetricaHelper.openTTSSettings();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -167,8 +172,7 @@
     }
 
     private void clearTextPressed() {
-        int index = mViewPager.getCurrentItem();
-        SpeechFragment speechFragment = (SpeechFragment) ((ViewPagerAdapter) mViewPager.getAdapter()).getItem(index);
+        SpeechFragment speechFragment = getCurrentSpeechFragment();
         speechFragment.clearText();
     }
     private String getInputText() {
@@ -177,4 +181,8 @@
         return speechFragment.getText();
     }
 
-}
+     public SpeechFragment getCurrentSpeechFragment() {
+         int index = mViewPager.getCurrentItem();
+         return (SpeechFragment) ((ViewPagerAdapter) mViewPager.getAdapter()).getItem(index);
+     }
+ }

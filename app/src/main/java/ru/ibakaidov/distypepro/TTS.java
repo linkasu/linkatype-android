@@ -5,15 +5,22 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Debug;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 
 import ru.ibakaidov.distypepro.ui.MainActivity;
@@ -38,6 +45,7 @@ public class TTS {
 
     private static volatile TTS instance;
     private FileStorage mfs;
+    private MediaPlayer mp;
 
     public static TTS getInstance() {
         TTS localInstance = instance;
@@ -53,6 +61,7 @@ public class TTS {
     }
 
     private TTS() {
+        mp = new MediaPlayer();
         mfs = FileStorage.getInstance();
 
         tts = new TextToSpeech(DisTypePro.getAppContext(), new TextToSpeech.OnInitListener() {
@@ -66,7 +75,7 @@ public class TTS {
                         dlgAlert.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                YandexMetricaHelper.openTTSInstall();
+                       //         YandexMetricaHelper.openTTSInstall();
                                 final String appPackageName = "com.google.android.tts";
                                 try {
                                     MainActivity.activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
@@ -88,12 +97,61 @@ public class TTS {
 
 
     public void speak(final String text, boolean primaryOffline) {
+        File file = null;
+        try {
+           file = File.createTempFile(System.currentTimeMillis()+"", ".wav");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH,null, null);
-        } else {
-            tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+            file.setReadable(true);
+            file.setWritable(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                tts.synthesizeToFile(text, null, file, null);
+            } else {
+                tts.synthesizeToFile(text, null, file.getAbsolutePath());
+            }
+
+        } catch (IOException e) {
+            Log.e("synth to file error", e.getMessage());
+            e.printStackTrace();
         }
+            Uri alarmSound = null;
+            Uri ringtoneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+
+
+            try{
+                assert file != null;
+                Log.d("file path", file.getAbsolutePath());
+                alarmSound = Uri.fromFile(file);
+            }catch(Exception e){
+                alarmSound = ringtoneUri;
+            }
+            finally{
+                if(alarmSound == null){
+                    alarmSound = ringtoneUri;
+                }
+            }
+
+            try {
+                Log.d("alarm sound uri", "path: "+alarmSound.getPath());
+                if(!mp.isPlaying()){
+                    FileInputStream fisAudio = new FileInputStream(file);
+                    mp.setDataSource(fisAudio.getFD());
+                    mp.setAudioStreamType(AudioManager.STREAM_ALARM);
+                    mp.setLooping(true);
+                    mp.prepare();
+                    mp.start();
+                }
+
+
+            } catch (IOException e) {
+                Log.e("tts", e.getLocalizedMessage());
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH,null, null);
+                } else {
+                    tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
+                }
+            }
+
+
     }
     public void speak(String text){
         speak(text, false);

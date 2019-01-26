@@ -37,4 +37,6 @@
     <string name="tts_settings">Відкрити параметри синтезатора мови</string>
     <string name="lang_doesnt_support">Не можу говорити</string>
     <string name="send_to">Поділитися аудіо файлом</string>
+    <string name="paste">Вставить</string>
+    <string name="save">Сохранить</string>
 </resources>

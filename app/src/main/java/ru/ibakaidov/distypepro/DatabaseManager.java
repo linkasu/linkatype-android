@@ -52,7 +52,7 @@ public class DatabaseManager {
         ContentValues cv = new ContentValues();
         cv.put("label", label);
         db.insert("categories", null, cv);
-        YandexMetricaHelper.categoryEvent(label);
+        //YandexMetricaHelper.categoryEvent(label);
     }
 
 
@@ -76,7 +76,7 @@ public class DatabaseManager {
         cv.put("category", category);
         db.insert("statements", null, cv);
         db.close();
-        YandexMetricaHelper.statementEvent(statement);
+        //YandexMetricaHelper.statementEvent(statement);
     }
 
     public void updateRating(String statement) {
@@ -146,7 +146,7 @@ public class DatabaseManager {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.update("statements", cv, "text='" + statement + "'", null);
         db.close();
-        YandexMetricaHelper.changeCategoryEvent(statement);
+        //YandexMetricaHelper.changeCategoryEvent(statement);
 
     }
 

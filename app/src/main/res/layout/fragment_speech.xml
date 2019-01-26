@@ -51,7 +51,7 @@
                 android:layout_marginStart="16dp"
                 android:layout_marginLeft="16dp"
                 android:id="@+id/wordsListView"
-                android:layout_weight="1" />
+                android:layout_weight="0.4" />
         </LinearLayout>
 
     </LinearLayout>

@@ -24,6 +24,11 @@
         android:icon="@drawable/ic_show"
         android:title="@string/show"
         app:showAsAction="always"/>
+    <item
+        android:id="@+id/action_save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/save"
+        app:showAsAction="always"/>
 
     <item
         android:id="@+id/synth_to_file"

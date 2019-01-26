@@ -62,21 +62,8 @@ public class SayButtonController implements View.OnClickListener {
             return;
         }
 
-        mDatabaseManager.createStatement(tfs, 0);
 
-        //Updating statements containing in adapter
-        ArrayAdapter<String> adapter = (ArrayAdapter<String>) mAutoCompleteTextView.getAdapter();
-        adapter.clear();
-        List<String> updatedStatements = mDatabaseManager.getStatements();
-        for (String statement : updatedStatements) {
-            adapter.add(statement);
-        }
-
-        if (mCategoryController.currentCategory == 0) {
-            mWordsController.loadStatements();
-        }
-
-        YandexMetricaHelper.pronouncedTextEvent(tfs);
+        //YandexMetricaHelper.pronouncedTextEvent(tfs);
         TTS.getInstance().speak(tfs);
     }
 }

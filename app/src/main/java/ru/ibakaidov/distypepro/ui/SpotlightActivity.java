@@ -23,7 +23,6 @@ public class SpotlightActivity extends AppCompatActivity implements View.OnClick
         super.onCreate(savedInstanceState);
         setContentView(R.layout.spotlight);
 
-        ((ViewGroup) getWindow().getDecorView()).getChildAt(0).setOnClickListener(this);
 
         TextView textView = (TextView) findViewById(R.id.textView);
 
@@ -32,7 +31,7 @@ public class SpotlightActivity extends AppCompatActivity implements View.OnClick
         String text = bundle.getString("text");
         textView.setText(text);
         textView.setOnClickListener(this);
-        YandexMetricaHelper.showTextEvent(text);
+  //      YandexMetricaHelper.showTextEvent(text);
 
     }
 

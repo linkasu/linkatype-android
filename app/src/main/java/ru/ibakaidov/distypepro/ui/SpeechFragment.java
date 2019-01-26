@@ -20,12 +20,14 @@ import ru.ibakaidov.distypepro.WordsController;
 /**
  * Created by v.tanakov on 9/13/16.
  */
-public class SpeechFragment extends Fragment {
+public class    SpeechFragment extends Fragment {
 
     private Button mButtonSay;
     private ListView mListViewWords;
     private ListView mListViewCategories;
     private AutoCompleteTextView mAutoCompleteTextView;
+    private CategoryController cc;
+    private WordsController wc;
 
     public static SpeechFragment newInstance() {
 
@@ -56,9 +58,8 @@ public class SpeechFragment extends Fragment {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_dropdown_item_1line, DatabaseManager.getInstance()
                 .getStatements());
         mAutoCompleteTextView.setAdapter(adapter);
-
-        final CategoryController cc = new CategoryController(getContext(), mListViewCategories);
-        final WordsController wc = new WordsController(getContext(), mListViewWords, cc);
+         cc = new CategoryController(getContext(), mListViewCategories);
+         wc = new WordsController(getContext(), mListViewWords, cc);
         cc.setWC(wc);
 
         mButtonSay.setOnClickListener(new SayButtonController(mAutoCompleteTextView, cc, wc));
@@ -77,5 +78,16 @@ public class SpeechFragment extends Fragment {
     }
     public String getText() {
         return mAutoCompleteTextView.getText().toString();
+    }
+
+    public void pasteText(String s) {
+        int selectionStart = mAutoCompleteTextView.getSelectionStart();
+        mAutoCompleteTextView.setText(mAutoCompleteTextView.getText().insert(selectionStart, s).toString());
+        mAutoCompleteTextView.setSelection(selectionStart + s.length());
+    }
+
+    public void save() {
+        DatabaseManager.getInstance().createStatement(mAutoCompleteTextView.getText().toString().trim(), cc.currentCategory);
+        wc.loadStatements();
     }
 }

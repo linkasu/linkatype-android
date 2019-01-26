@@ -19,7 +19,7 @@ public class DisTypePro extends Application {
 
         appContext = this;
 
-        YandexMetricaHelper.activate(this, getString(R.string.metrikaKey));
+ //       YandexMetricaHelper.activate(this, getString(R.string.metrikaKey));
     }
 
     @NonNull
