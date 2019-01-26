@@ -19,7 +19,15 @@
           "client_type": 1,
           "android_info": {
             "package_name": "ru.ibakaidov.distypepro",
-            "certificate_hash": "46C6B789F46199DF6B7706029EE7D0C72C1674FF"
+            "certificate_hash": "46c6b789f46199df6b7706029ee7d0c72c1674ff"
+          }
+        },
+        {
+          "client_id": "800888317067-i91mbc3etv34tu07k5n8h4l58f0kohuj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ru.ibakaidov.distypepro",
+            "certificate_hash": "bc06b3414b7fab8d58e8a710ee23e0c6e2a3963a"
           }
         },
         {

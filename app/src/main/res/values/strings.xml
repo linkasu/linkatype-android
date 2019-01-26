@@ -33,6 +33,8 @@
     <string name="send_to">Share an audio file</string>
     <string name="paste">Paste</string>
     <string name="save">Save</string>
+    <string name="ok">OK</string>
+    <string name="fail">Fail</string>
 
     <string-array name="voices">
         <item>ALYSS</item>

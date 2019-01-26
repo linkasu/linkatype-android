@@ -21,7 +21,6 @@
  import java.io.File;
  import java.io.IOException;
 
- import ru.aacidov.disfeedback.FeedBack;
  import ru.ibakaidov.distypepro.BellButtonController;
  import ru.ibakaidov.distypepro.FileStorage;
  import ru.ibakaidov.distypepro.IsOnlineVoiceController;
@@ -42,14 +41,12 @@
     private ViewPager mViewPager;
     private SharedPreferences mSharedPreferences;
     private BellButtonController mBellButtonController;
-    private FeedBack fb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         activity=this;
 
-        fb = new FeedBack(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -107,8 +104,8 @@
             return true;
         }
 
-        if(id==R.id.synth_to_file){
-            String text="";
+        if(id==R.id.synth_to_file) {
+            String text = "";
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle(R.string.input_text_for_synth);
@@ -121,7 +118,7 @@
                 public void onClick(DialogInterface dialog, int id) {
                     String text = input.getText().toString();
                     TTS.getInstance().speakToFile(text);
-                    }
+                }
             });
             builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
@@ -134,10 +131,7 @@
 
             return true;
         }
-        if (id==R.id.action_feedback){
-            fb.openFeedbackForm();
-            return true;
-        }
+
         if(id==R.id.action_show){
             SpotlightActivity.show( getInputText());
             return true;
