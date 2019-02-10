@@ -43,4 +43,16 @@
         <item>OMAZH</item>
         <item>ZAHAR</item>
     </string-array>
+    <string-array name="edit_category_menu">
+        <item>Rename the category</item>
+        <item>Delete the category</item>
+    </string-array>
+    <string-array name="edit_statement_menu">
+        <item>Put the statement to the saybox</item>
+        <item>Rename the statement</item>
+        <item>Change the statement\'s category</item>
+        <item>Delete the statement</item>
+    </string-array>
+    <string name="stop">Stop speaking</string>
+    <string name="action_signout">Sign out</string>
 </resources>

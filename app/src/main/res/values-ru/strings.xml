@@ -28,6 +28,28 @@
         <item>Ома</item>
         <item>Захар</item>
     </string-array>
+
+
+    <string-array name="edit_category_menu">
+                
+        <item>Переименовать категорию </item>
+                
+        <item> Удалить категорию </item>
+            
+    </string-array>
+        
+    <string-array name="edit_statement_menu">
+                
+        <item> Вставить высказывание в поле ввода </item>
+                
+        <item> Переименовать высказывание </item>
+                
+        <item> Изменить категорию высказывания </item>
+                
+        <item> Удалить высказывание </item>
+            
+    </string-array>
+
     <string name="bell">Подать сигнал</string>
     <string name="input_text_for_synth">Введите текст для записи в файл</string>
     <string name="synth_to_file">Записать голос в файл</string>
@@ -39,4 +61,8 @@
     <string name="send_to">Поделиться аудио файлом</string>
     <string name="paste">Вставить</string>
     <string name="save">Сохранить</string>
+    <string name="ok">Готово</string>
+    <string name="fail">Не удалось</string>
+    <string name="stop">Остановить речь</string>
+    <string name="action_signout">Выйти</string>
 </resources>

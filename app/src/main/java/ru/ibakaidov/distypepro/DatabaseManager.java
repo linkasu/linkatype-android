@@ -1,5 +1,6 @@
 package ru.ibakaidov.distypepro;
 
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,9 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
-
-import ru.ibakaidov.distypepro.util.Logger;
-import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
 
 /**
  * Created by aacidov on 28.05.16.
@@ -22,22 +20,10 @@ public class DatabaseManager {
 
     private static volatile DatabaseManager instance;
 
-    public static DatabaseManager getInstance() {
-        DatabaseManager localInstance = instance;
-        if (localInstance == null) {
-            synchronized (DatabaseManager.class) {
-                localInstance = instance;
-                if (localInstance == null) {
-                    instance = localInstance = new DatabaseManager();
-                }
-            }
-        }
-        return localInstance;
-    }
 
-    private DatabaseManager() {
-        withoutCategory = DisTypePro.getAppContext().getString(R.string.withoutCategory);
-        dbHelper = new DBHelper(DisTypePro.getAppContext());
+    public DatabaseManager(Activity activity) {
+        withoutCategory = activity.getString(R.string.withoutCategory);
+        dbHelper = new DBHelper(activity);
 
     }
 
@@ -58,7 +44,7 @@ public class DatabaseManager {
 
     public void createStatement(String statement, int category) {
         if (statement == null || statement.length() == 0) {
-            Logger.log("Trying to add empty statement.");
+//            Logger.log("Trying to add empty statement.");
             return;
         }
 
@@ -158,7 +144,7 @@ public class DatabaseManager {
 
     public void editStatement(String old, String newText) {
         if (newText == null || newText.length() == 0) {
-            Logger.log("Trying to empty statement.");
+//            Logger.log("Trying to empty statement.");
             return;
         }
 

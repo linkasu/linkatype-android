@@ -1,4 +1,4 @@
-package ru.ibakaidov.distypepro.ui;
+package ru.ibakaidov.distypepro.screens;
 
 import android.content.Context;
 import android.content.Intent;
@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ru.ibakaidov.distypepro.R;
-import ru.ibakaidov.distypepro.util.YandexMetricaHelper;
-
 /**
  * Created by aacidov on 01.04.2018.
  */
@@ -31,14 +29,11 @@ public class SpotlightActivity extends AppCompatActivity implements View.OnClick
         String text = bundle.getString("text");
         textView.setText(text);
         textView.setOnClickListener(this);
-  //      YandexMetricaHelper.showTextEvent(text);
-
     }
 
 
 
-    public static void show( String text) {
-        Context cxt = MainActivity.activity;
+    public static void show(Context cxt, String text) {
         Intent intent = new Intent(cxt, SpotlightActivity.class);
         Bundle bundle = new Bundle();
         bundle.putString("text", text);
