@@ -24,3 +24,8 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Archive Production Artifact
+      uses: actions/upload-artifact@master
+      with:
+          name: apk
+          path: app/build/outputs/apk/release/app-release-unsigned.apk
