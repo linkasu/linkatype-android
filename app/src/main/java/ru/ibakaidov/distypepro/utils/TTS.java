@@ -1,7 +1,6 @@
 package ru.ibakaidov.distypepro.utils;
 
 import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +9,8 @@ import android.os.Build;
 import android.os.Environment;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
-import android.support.annotation.RequiresApi;
-import android.util.Log;
-import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;

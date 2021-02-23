@@ -2,11 +2,12 @@ package ru.ibakaidov.distypepro.components;
 
 import android.os.Build;
 import android.speech.tts.UtteranceProgressListener;
-import android.support.annotation.RequiresApi;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import ru.ibakaidov.distypepro.R;
 import ru.ibakaidov.distypepro.utils.TTS;

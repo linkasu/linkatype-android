@@ -41,20 +41,20 @@
         }
       ],
       "services": {
-        "analytics_service": {
-          "status": 1
-        },
         "appinvite_service": {
-          "status": 2,
           "other_platform_oauth_client": [
             {
               "client_id": "800888317067-nbq3g1ghp4gsn2rmg5hanhckb6glafjn.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "800888317067-gm7td75tp9i7o1bn94cskpibetbs9r59.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.linka.linkaType"
+              }
             }
           ]
-        },
-        "ads_service": {
-          "status": 2
         }
       }
     }
