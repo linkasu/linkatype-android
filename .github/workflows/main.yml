@@ -28,7 +28,7 @@ jobs:
       uses: actions/upload-artifact@master
       with:
           name: apk
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          path: app/build/outputs/apk/release/
   signin:
     
     runs-on: ubuntu-latest
@@ -39,7 +39,7 @@ jobs:
        uses: actions/download-artifact@master
        with:
           name: apk
-          path: app/build/outputs/apk/release/app-release-unsigned.apk
+          path: app/build/outputs/apk/release/
      
      - uses: r0adkll/sign-android-release@v1
        name: Sign app APK
