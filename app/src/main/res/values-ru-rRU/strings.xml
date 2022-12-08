@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LINKa напиши</string>
+
+    <string name="say">Сказать</string>
+    <string name="settings">Настройки</string>
+    <string name="clear">Очистить</string>
+    <string name="voice">Голос</string>
+    <string name="stop">Остановить</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="edit" > Изменить</string>
+    <string name="remove">Удалить</string>
+    <string name="create">Создать</string>
+</resources>
