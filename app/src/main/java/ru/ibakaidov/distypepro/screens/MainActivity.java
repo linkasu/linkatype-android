@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Spinner;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.database.FirebaseDatabase;
 
 import ru.ibakaidov.distypepro.R;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         FirebaseDatabase
                 .getInstance()
                 .setPersistenceEnabled(true);
+        FirebaseAnalytics
+                .getInstance(this);
         setContentView(R.layout.activity_main);
         TTS tts = new TTS(this);
         inputGroup = findViewById(R.id.input_group);

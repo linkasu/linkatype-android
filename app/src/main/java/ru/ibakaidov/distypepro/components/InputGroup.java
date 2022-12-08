@@ -13,6 +13,8 @@ import android.widget.Spinner;
 
 import androidx.annotation.Nullable;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import ru.ibakaidov.distypepro.R;
 import ru.ibakaidov.distypepro.screens.SpotlightActivity;
 import ru.ibakaidov.distypepro.utils.Callback;
@@ -91,6 +93,10 @@ public class InputGroup extends Component {
     private void spotlight() {
         SpotlightActivity
                 .show(getContext(), getText());
+
+        FirebaseAnalytics
+                .getInstance(getContext())
+                .logEvent("spotlight", null);
     }
 
     @Override
@@ -101,6 +107,9 @@ public class InputGroup extends Component {
     private void say() {
         String text = getText();
         tts.speak(text);
+        FirebaseAnalytics
+                .getInstance(getContext())
+                .logEvent("say", null);
     }
 
     private String getText() {
