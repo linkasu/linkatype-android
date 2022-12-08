@@ -1,58 +1,30 @@
 <resources>
-    <string name="speechKitApiKey" translatable="false">bbe234a6-edf0-45ee-bb92-169fccfb8653</string>
-    <string name="metrikaKey" translatable="false">74b3edb9-a12c-4ec6-96e2-817e75e03941</string>
-
-    <string name="app_name">LINKa: type</string>
-    <string name="action_settings">Settings</string>
-    <string name="choose_voice">Choose voice</string>
-    <string name="cancel">Cancel</string>
+    <string name="app_name">LINKa type</string>
     <string name="say">Say</string>
-    <string name="withoutCategory">Without category</string>
-    <string name="add_statement">Add statement</string>
-    <string name="add_category">Add category</string>
-    <string name="delete">Delete</string>
-    <string name="edit_statement">Edit statement</string>
-    <string name="change_category">Change category</string>
-    <string name="yes">yes</string>
-    <string name="no">No</string>
-    <string name="add_speech">Add speech</string>
-    <string name="remove_speech">Remove speech</string>
+    <string name="title_activity_spotlight">SpotlightActivity</string>
+    <string name="settings">Settings</string>
     <string name="clear">Clear</string>
-    <string name="is_online_voice">Is online voice</string>
-    <string name="edit_category">Edit category</string>
-    <string name="say_after_word_input">Say after ever word</string>
+    <string name="title_activity_settings">SettingsActivity</string>
 
-    <string name="chat">Chat</string>
-    <string name="bell">Call attation</string>
-    <string name="synth_to_file">Say to file</string>
-    <string name="input_text_for_synth">Input text for record to file</string>
-    <string name="show">Show</string>
-    <string name="tts_settings">Open tts settings</string>
-    <string name="install_tts">Please, install the speech synth from the Play Store.</string>
-    <string name="lang_doesnt_support">I can\'t speak</string>
-    <string name="send_to">Share an audio file</string>
-    <string name="paste">Paste</string>
-    <string name="save">Save</string>
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="voice">Voice</string>
+    <string name="stop">Stop</string>
     <string name="ok">OK</string>
-    <string name="fail">Fail</string>
-
-    <string-array name="voices">
-        <item>ALYSS</item>
-        <item>ERMIL</item>
-        <item>JANE</item>
-        <item>OMAZH</item>
-        <item>ZAHAR</item>
-    </string-array>
-    <string-array name="edit_category_menu">
-        <item>Rename the category</item>
-        <item>Delete the category</item>
-    </string-array>
-    <string-array name="edit_statement_menu">
-        <item>Put the statement to the saybox</item>
-        <item>Rename the statement</item>
-        <item>Change the statement\'s category</item>
-        <item>Delete the statement</item>
-    </string-array>
-    <string name="stop">Stop speaking</string>
-    <string name="action_signout">Sign out</string>
+    <string name="cancel">Cancel</string>
+    <string name="edit" >Edit</string>
+    <string name="remove">Remove</string>
+    <string name="create">Create</string>
 </resources>
