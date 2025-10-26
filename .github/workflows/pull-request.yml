@@ -70,7 +70,7 @@ jobs:
 
       - name: Upload lint results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: lint-report
           path: app/build/reports/lint-results-debug.html

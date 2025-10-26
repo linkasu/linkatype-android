@@ -34,7 +34,7 @@ jobs:
 
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-results
           path: |
@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload test reports on failure
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: test-reports-failure
           path: app/build/reports/
@@ -77,7 +77,7 @@ jobs:
 
       - name: Upload lint results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: lint-results
           path: app/build/reports/lint-results-debug.html
@@ -110,7 +110,7 @@ jobs:
         run: ./gradlew assembleRelease --stacktrace
 
       - name: Upload unsigned APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: apk-unsigned
           path: app/build/outputs/apk/release/
@@ -144,7 +144,7 @@ jobs:
           BUILD_TOOLS_VERSION: "35.0.1"
 
       - name: Upload signed APK
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: app-release-signed
           path: ${{ steps.sign_app.outputs.signedReleaseFile }}
