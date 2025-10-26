@@ -10,14 +10,14 @@ import ru.ibakaidov.distypepro.R
 
 class HashMapAdapter(
     private val context: Context,
-    private val data: Map<String, String>
+    private val data: Map<String, String?>
 ) : BaseAdapter() {
 
     private val keys: List<String> = data.keys.toList()
 
     override fun getCount(): Int = data.size
 
-    fun getEntry(position: Int): Pair<String, String> = getKey(position) to getItem(position)
+    fun getEntry(position: Int): Pair<String, String?> = getKey(position) to data[getKey(position)]
 
     override fun getItem(position: Int): String = data[keys[position]].orEmpty()
 

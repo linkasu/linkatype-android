@@ -16,11 +16,11 @@ abstract class Component @JvmOverloads constructor(
     }
 
     @LayoutRes
-    protected abstract fun layoutId(): Int
+    abstract fun layoutId(): Int
 
-    protected abstract fun initUi()
+    abstract fun initUi()
 
-    override fun onFinishInflate() {
+    public override fun onFinishInflate() {
         super.onFinishInflate()
         initUi()
     }

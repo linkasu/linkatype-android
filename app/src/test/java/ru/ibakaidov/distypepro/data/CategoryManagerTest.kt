@@ -8,6 +8,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.DatabaseException
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -115,7 +116,7 @@ class CategoryManagerTest {
   fun getList_onError_callsCallback() {
     val listenerSlot = slot<ValueEventListener>()
     val mockError = mockk<DatabaseError>()
-    val testException = Exception("Database error")
+    val testException = DatabaseException("Database error")
 
     every { mockCategoryRef.orderByChild("created") } returns mockCategoryRef
     every { mockCategoryRef.addValueEventListener(capture(listenerSlot)) } returns mockk()
@@ -230,7 +231,7 @@ class CategoryManagerTest {
     val completionSlot = slot<DatabaseReference.CompletionListener>()
     val mockPushRef = mockk<DatabaseReference>(relaxed = true)
     val mockError = mockk<DatabaseError>()
-    val testException = Exception("Create failed")
+    val testException = DatabaseException("Create failed")
 
     every { mockCategoryRef.push() } returns mockPushRef
     every { mockPushRef.key } returns "key"

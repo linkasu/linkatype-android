@@ -6,7 +6,7 @@ import ru.ibakaidov.distypepro.utils.Callback
 abstract class Manager<T> {
 
     abstract fun getList(callback: Callback<Map<String, String>>)
-    protected abstract fun getRoot(): DatabaseReference
+    abstract fun getRoot(): DatabaseReference
 
     fun remove(key: String, callback: Callback<Unit>) {
         getRoot().child(key).removeValue { error, _ ->

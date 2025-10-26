@@ -17,12 +17,12 @@ import ru.ibakaidov.distypepro.R
 class HashMapAdapterTest {
 
   private lateinit var context: Context
-  private lateinit var testData: Map<String, String>
+  private lateinit var testData: Map<String, String?>
 
   @Before
   fun setUp() {
     context = RuntimeEnvironment.getApplication()
-    testData = mapOf(
+    testData = mapOf<String, String?>(
       "key1" to "value1",
       "key2" to "value2",
       "key3" to "value3"
@@ -38,7 +38,7 @@ class HashMapAdapterTest {
 
   @Test
   fun getCount_withEmptyMap_returnsZero() {
-    val adapter = HashMapAdapter(context, emptyMap())
+    val adapter = HashMapAdapter(context, emptyMap<String, String?>())
 
     assertEquals(0, adapter.count)
   }
@@ -55,7 +55,7 @@ class HashMapAdapterTest {
 
   @Test
   fun getItem_withInvalidKey_returnsEmpty() {
-    val dataWithNull = mapOf("key1" to "value1", "key2" to null)
+    val dataWithNull = mapOf<String, String?>("key1" to "value1", "key2" to null)
     val adapter = HashMapAdapter(context, dataWithNull)
 
     assertEquals("", adapter.getItem(1))
@@ -117,7 +117,7 @@ class HashMapAdapterTest {
 
   @Test
   fun adapter_withSingleEntry_worksCorrectly() {
-    val singleData = mapOf("singleKey" to "singleValue")
+    val singleData = mapOf<String, String?>("singleKey" to "singleValue")
     val adapter = HashMapAdapter(context, singleData)
 
     assertEquals(1, adapter.count)
@@ -127,7 +127,7 @@ class HashMapAdapterTest {
 
   @Test
   fun adapter_maintainsKeyOrder() {
-    val orderedData = linkedMapOf(
+    val orderedData = linkedMapOf<String, String?>(
       "first" to "1",
       "second" to "2",
       "third" to "3"
