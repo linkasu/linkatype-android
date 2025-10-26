@@ -18,10 +18,13 @@ class ManagerTest {
 
   private lateinit var testManager: TestManager
   private lateinit var mockDbRef: DatabaseReference
+  private lateinit var childDbRef: DatabaseReference
 
   @Before
   fun setUp() {
     mockDbRef = mockk(relaxed = true)
+    childDbRef = mockk(relaxed = true)
+    every { mockDbRef.child(any()) } returns childDbRef
     testManager = TestManager(mockDbRef)
   }
 
@@ -31,7 +34,7 @@ class ManagerTest {
     val callbackSlot = slot<DatabaseReference.CompletionListener>()
 
     every {
-      mockDbRef.child(key).removeValue(capture(callbackSlot))
+      childDbRef.removeValue(capture(callbackSlot))
     } returns mockk()
 
     val callback = object : Callback<Unit> {
@@ -40,7 +43,8 @@ class ManagerTest {
 
     testManager.remove(key, callback)
 
-    verify { mockDbRef.child(key).removeValue(any()) }
+    verify { mockDbRef.child(key) }
+    verify { childDbRef.removeValue(any()) }
   }
 
   @Test
@@ -50,7 +54,7 @@ class ManagerTest {
     var doneCalled = false
 
     every {
-      mockDbRef.child(key).removeValue(capture(callbackSlot))
+      childDbRef.removeValue(capture(callbackSlot))
     } answers {
       callbackSlot.captured.onComplete(null, mockk())
       mockk()
@@ -79,7 +83,7 @@ class ManagerTest {
     every { dbError.toException() } returns testException
 
     every {
-      mockDbRef.child(key).removeValue(capture(callbackSlot))
+      childDbRef.removeValue(capture(callbackSlot))
     } answers {
       callbackSlot.captured.onComplete(dbError, mockk())
       mockk()
@@ -110,8 +114,10 @@ class ManagerTest {
       }
 
       testManager.remove(key, callback)
-      verify { mockDbRef.child(key).removeValue(any()) }
     }
+
+    keys.forEach { key -> verify { mockDbRef.child(key) } }
+    verify(exactly = keys.size) { childDbRef.removeValue(any()) }
   }
 
   @Test
@@ -163,7 +169,7 @@ class ManagerTest {
     val results = mutableListOf<String>()
 
     every {
-      mockDbRef.child(key).removeValue(capture(callbackSlot))
+      childDbRef.removeValue(capture(callbackSlot))
     } answers {
       callbackSlot.captured.onComplete(null, mockk())
       mockk()
