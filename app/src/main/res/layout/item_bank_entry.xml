@@ -7,22 +7,22 @@
     android:minHeight="72dp"
     android:padding="@dimen/spacing_medium"
     android:stateListAnimator="@null"
-    app:cardElevation="0dp"
+    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+    app:cardElevation="@dimen/elevation_small"
     app:cardPreventCornerOverlap="true"
-    app:shapeAppearanceOverlay="@style/ShapeAppearance.LinkaType.Medium"
-    app:strokeColor="@color/colorOutlineVariant"
-    app:strokeWidth="1dp">
+    app:shapeAppearanceOverlay="@style/ShapeAppearance.LinkaType.Medium">
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:gravity="center"
         android:maxLines="3"
+        android:padding="@dimen/spacing_small"
         android:textAlignment="center"
+        android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
         android:textColor="?attr/colorOnSurface"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif-medium"
         android:ellipsize="end" />
 
 </com.google.android.material.card.MaterialCardView>

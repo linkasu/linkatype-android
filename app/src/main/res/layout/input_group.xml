@@ -23,6 +23,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/say_button"
+                style="@style/Widget.LinkaType.Button.Tonal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_medium"
@@ -30,17 +31,17 @@
                 android:contentDescription="@string/say"
                 android:text="@string/say"
                 app:icon="@drawable/ic_baseline_volume_up_24"
-                app:iconPadding="@dimen/spacing_small"
-                app:iconTint="?attr/colorOnPrimary" />
+                app:iconGravity="textStart"
+                app:iconPadding="@dimen/spacing_small" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/text_input_layout"
                 style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:hintEnabled="false"
                 app:boxStrokeColor="@color/colorOutline"
-                app:boxStrokeWidthFocused="2dp">
+                app:boxStrokeWidthFocused="2dp"
+                app:hintEnabled="false">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/text_to_speech_edittext"
@@ -50,8 +51,8 @@
                     android:hint="@string/input_hint"
                     android:imeOptions="actionDone"
                     android:inputType="textCapSentences|textMultiLine"
-                    android:minLines="3"
                     android:maxLines="6"
+                    android:minLines="3"
                     android:overScrollMode="never"
                     android:paddingTop="@dimen/spacing_small"
                     android:paddingBottom="@dimen/spacing_small"
@@ -70,15 +71,15 @@
                     style="@style/Widget.Material3.Button.TextButton"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:contentDescription="@string/chat_slot_button_description"
                     android:minWidth="0dp"
                     android:text="@string/chat_slot_one"
                     android:textAllCaps="false"
                     android:textColor="@color/colorPrimary"
-                    android:contentDescription="@string/chat_slot_button_description"
                     app:icon="@drawable/ic_baseline_expand_more_24"
-                    app:iconTint="@color/colorPrimary"
                     app:iconGravity="end"
-                    app:iconPadding="@dimen/spacing_xs" />
+                    app:iconPadding="@dimen/spacing_xs"
+                    app:iconTint="@color/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/spotlight_button"

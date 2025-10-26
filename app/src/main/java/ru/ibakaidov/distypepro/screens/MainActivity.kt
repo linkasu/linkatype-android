@@ -3,23 +3,28 @@ package ru.ibakaidov.distypepro.screens
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.google.android.material.color.DynamicColors
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityMainBinding
 import ru.ibakaidov.distypepro.utils.Tts
+import ru.ibakaidov.distypepro.utils.TtsHolder
 
 class MainActivity : AppCompatActivity() {
 
@@ -47,9 +52,10 @@ class MainActivity : AppCompatActivity() {
             controller.isAppearanceLightNavigationBars = true
         }
 
-        tts = Tts(this)
+        tts = TtsHolder.get(this)
         binding.inputGroup.setTts(tts)
         binding.bankGroup.setTts(tts)
+        observeTtsEvents()
 
         onBackPressedDispatcher.addCallback(this) {
             binding.inputGroup.back()
@@ -68,11 +74,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         R.id.settings_menu_item -> {
-            val intent = Intent().apply {
-                action = "com.android.settings.TTS_SETTINGS"
-                flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-            startActivity(intent)
+            startActivity(Intent(this, SettingsActivity::class.java))
             true
         }
         R.id.logout_menu_item -> {
@@ -90,8 +92,9 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (::tts.isInitialized) {
+        if (::tts.isInitialized && isFinishing) {
             tts.shutdown()
+            TtsHolder.clear()
         }
     }
 
@@ -130,5 +133,29 @@ class MainActivity : AppCompatActivity() {
         }
 
         ViewCompat.requestApplyInsets(binding.root)
+    }
+
+    private fun observeTtsEvents() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                tts.events().collect { event ->
+                    when (event) {
+                        is Tts.TtsEvent.DownloadCompleted -> {
+                            val message = event.path?.let {
+                                getString(R.string.tts_download_saved, it)
+                            } ?: getString(R.string.tts_download_finished)
+                            Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+                        }
+
+                        is Tts.TtsEvent.Error -> {
+                            val text = getString(R.string.tts_status_error, event.message)
+                            Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG).show()
+                        }
+
+                        else -> Unit
+                    }
+                }
+            }
+        }
     }
 }
