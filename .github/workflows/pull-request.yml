@@ -33,7 +33,7 @@ jobs:
 
       - name: Comment test results
         if: always()
-        uses: mikepenz/action-junit-report@v4
+        uses: mikepenz/action-junit-report@v5
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
           check_name: 'Unit Test Results'
