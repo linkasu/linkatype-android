@@ -12,5 +12,8 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "LINKa type"
+rootProject.name = "LINKaType"
 include ':app'
+include ':shared'
+include ':iosApp'
+include ':desktopApp'
