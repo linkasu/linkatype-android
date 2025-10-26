@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="AppTheme.Base" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="BaseAppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorPrimaryContainer">@color/colorPrimaryContainer</item>
@@ -42,7 +42,7 @@
         <item name="materialCardViewStyle">@style/Widget.LinkaType.Card</item>
     </style>
 
-    <style name="AppTheme" parent="@style/AppTheme.Base" />
+    <style name="AppTheme" parent="@style/BaseAppTheme" />
 
     <style name="AppTheme.NoActionBar" parent="@style/AppTheme">
         <item name="windowActionBar">false</item>
