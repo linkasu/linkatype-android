@@ -5,7 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.AdapterView
 import android.widget.GridView
-import android.widget.ImageButton
+import com.google.android.material.button.MaterialButton
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.data.CategoryManager
 import ru.ibakaidov.distypepro.data.StatementManager
@@ -27,8 +27,8 @@ class BankGroup @JvmOverloads constructor(
     private val categoryManager = CategoryManager()
     private var statementManager: StatementManager? = null
     private lateinit var gridView: GridView
-    private lateinit var backButton: ImageButton
-    private lateinit var addButton: ImageButton
+    private lateinit var backButton: MaterialButton
+    private lateinit var addButton: MaterialButton
     private var tts: Tts? = null
     private var showingStatements = false
 
@@ -54,6 +54,7 @@ class BankGroup @JvmOverloads constructor(
         }
 
         showCategories()
+        refreshAddButtonLabel()
     }
 
     fun setTts(tts: Tts) {
@@ -133,6 +134,7 @@ class BankGroup @JvmOverloads constructor(
     private fun setState(statements: Boolean) {
         showingStatements = statements
         backButton.visibility = if (statements) View.VISIBLE else View.GONE
+        refreshAddButtonLabel()
         if (statements) {
             showStatements()
         } else {
@@ -145,6 +147,7 @@ class BankGroup @JvmOverloads constructor(
             override fun onDone(result: Map<String, String>) {
                 if (showingStatements) return
                 gridView.adapter = HashMapAdapter(context, result)
+                gridView.scheduleLayoutAnimation()
             }
         })
     }
@@ -154,7 +157,17 @@ class BankGroup @JvmOverloads constructor(
         statementManager?.getList(object : Callback<Map<String, String>> {
             override fun onDone(result: Map<String, String>) {
                 gridView.adapter = HashMapAdapter(context, result)
+                gridView.scheduleLayoutAnimation()
             }
         })
+    }
+
+    private fun refreshAddButtonLabel() {
+        val textRes = if (showingStatements) {
+            R.string.bank_add_phrase
+        } else {
+            R.string.bank_add_category
+        }
+        addButton.setText(textRes)
     }
 }

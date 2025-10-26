@@ -1,13 +1,19 @@
 package ru.ibakaidov.distypepro.screens
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.provider.Settings
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Spinner
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
+import com.google.android.material.color.DynamicColors
+import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -22,11 +28,24 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        DynamicColors.applyToActivityIfAvailable(this)
+        window.statusBarColor = Color.TRANSPARENT
+        window.navigationBarColor = Color.TRANSPARENT
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         enableOfflinePersistence()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = getString(R.string.app_name)
+
+        binding.toolbar.subtitle = ""
+        applyWindowInsets()
+
+        WindowCompat.getInsetsController(window, binding.root)?.let { controller ->
+            controller.isAppearanceLightStatusBars = false
+            controller.isAppearanceLightNavigationBars = true
+        }
 
         tts = Tts(this)
         binding.inputGroup.setTts(tts)
@@ -39,8 +58,6 @@ class MainActivity : AppCompatActivity() {
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
-        val spinner = menu.findItem(R.id.chats_spinner).actionView as? Spinner
-        spinner?.let(binding.inputGroup::setChatSpinner)
         return true
     }
 
@@ -56,6 +73,15 @@ class MainActivity : AppCompatActivity() {
                 flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
             startActivity(intent)
+            true
+        }
+        R.id.logout_menu_item -> {
+            Firebase.auth.signOut()
+            val intent = Intent(this, AuthActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            startActivity(intent)
+            finish()
             true
         }
 
@@ -75,5 +101,34 @@ class MainActivity : AppCompatActivity() {
         } catch (e: DatabaseException) {
             // Firebase throws if persistence was already enabled; ignore to keep idempotent.
         }
+    }
+
+    private fun applyWindowInsets() {
+        val appBar = binding.appBar
+        val content = binding.contentContainer
+        val appBarInitialTop = appBar.paddingTop
+        val contentInitialLeft = content.paddingLeft
+        val contentInitialTop = content.paddingTop
+        val contentInitialRight = content.paddingRight
+        val contentInitialBottom = content.paddingBottom
+
+        ViewCompat.setOnApplyWindowInsetsListener(appBar) { view, insets ->
+            val statusBars = insets.getInsets(WindowInsetsCompat.Type.statusBars())
+            view.updatePadding(top = appBarInitialTop + statusBars.top)
+            insets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(content) { view, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            view.updatePadding(
+                left = contentInitialLeft + systemBars.left,
+                top = contentInitialTop,
+                right = contentInitialRight + systemBars.right,
+                bottom = contentInitialBottom + systemBars.bottom
+            )
+            insets
+        }
+
+        ViewCompat.requestApplyInsets(binding.root)
     }
 }

@@ -2,14 +2,11 @@ package ru.ibakaidov.distypepro.components
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
+import android.view.Menu
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.Button
 import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.Spinner
-import android.widget.AdapterView
+import androidx.appcompat.widget.PopupMenu
+import com.google.android.material.button.MaterialButton
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import ru.ibakaidov.distypepro.R
@@ -27,15 +24,22 @@ class InputGroup @JvmOverloads constructor(
 
     private lateinit var tts: Tts
     private lateinit var ttsEditText: EditText
-    private lateinit var sayButton: Button
-    private lateinit var spotlightButton: ImageButton
-    private var previousSpinnerIndex: Int = 0
+    private lateinit var sayButton: MaterialButton
+    private lateinit var spotlightButton: MaterialButton
+    private lateinit var chatSelectorButton: MaterialButton
+    private var previousSlotIndex: Int = 0
     private val textCache = arrayOf("", "", "")
+    private val slotLabels = intArrayOf(
+        R.string.chat_slot_one,
+        R.string.chat_slot_two,
+        R.string.chat_slot_three
+    )
 
     override fun initUi() {
         ttsEditText = findViewById(R.id.text_to_speech_edittext)
         sayButton = findViewById(R.id.say_button)
         spotlightButton = findViewById(R.id.spotlight_button)
+        chatSelectorButton = findViewById(R.id.chat_selector_button)
 
         setOnClickListener {
             if (ttsEditText.hasFocus()) {
@@ -52,6 +56,7 @@ class InputGroup @JvmOverloads constructor(
 
         sayButton.setOnClickListener { say() }
         spotlightButton.setOnClickListener { spotlight() }
+        setupChatSelector()
     }
 
     fun setTts(tts: Tts) {
@@ -64,21 +69,31 @@ class InputGroup @JvmOverloads constructor(
         })
     }
 
-    fun setChatSpinner(spinner: Spinner) {
-        spinner.adapter = ArrayAdapter(
-            context,
-            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
-            listOf("1", "2", "3")
-        )
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                textCache[previousSpinnerIndex] = currentText
-                setText(textCache[position])
-                previousSpinnerIndex = position
-            }
+    private fun setupChatSelector() {
+        chatSelectorButton.text = context.getString(slotLabels[previousSlotIndex])
+        chatSelectorButton.setOnClickListener { showChatMenu() }
+    }
 
-            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+    private fun showChatMenu() {
+        val popup = PopupMenu(context, chatSelectorButton)
+        slotLabels.forEachIndexed { index, labelRes ->
+            popup.menu.add(Menu.NONE, index, index, labelRes)
         }
+
+        popup.setOnMenuItemClickListener { item ->
+            val newIndex = item.itemId
+            if (newIndex in slotLabels.indices) {
+                if (newIndex != previousSlotIndex) {
+                    textCache[previousSlotIndex] = currentText
+                    previousSlotIndex = newIndex
+                    setText(textCache[newIndex])
+                }
+                chatSelectorButton.text = context.getString(slotLabels[newIndex])
+            }
+            true
+        }
+
+        popup.show()
     }
 
     fun clear() {

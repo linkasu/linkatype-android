@@ -1,11 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Widget.Theme.AppCompat.Light.DarkActionBar.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">@color/black_overlay</item>
+    <style name="Widget.LinkaType.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:paddingStart">@dimen/spacing_medium</item>
+        <item name="android:paddingEnd">@dimen/spacing_medium</item>
+        <item name="android:elevation">@dimen/elevation_small</item>
+        <item name="titleTextAppearance">@style/TextAppearance.LinkaType.ToolbarTitle</item>
+        <item name="subtitleTextAppearance">@style/TextAppearance.LinkaType.ToolbarSubtitle</item>
+        <item name="titleTextColor">@color/colorOnPrimary</item>
+        <item name="subtitleTextColor">@color/colorOnPrimary</item>
+        <item name="navigationIconTint">@color/colorOnPrimary</item>
     </style>
 
-    <style name="Widget.Theme.AppCompat.Light.DarkActionBar.ButtonBar.Fullscreen" parent="">
-        <item name="android:background">@color/black_overlay</item>
-        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    <style name="ThemeOverlay.LinkaType.Toolbar" parent="ThemeOverlay.Material3.Dark.ActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
+        <item name="colorSurface">@color/colorPrimary</item>
+        <item name="colorOnSurface">@color/colorOnPrimary</item>
+        <item name="colorControlNormal">@color/colorOnPrimary</item>
     </style>
+
+    <style name="Widget.LinkaType.Button" parent="Widget.Material3.Button">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="Widget.LinkaType.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="strokeColor">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
+    <style name="Widget.LinkaType.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="backgroundTint">@color/colorSecondary</item>
+        <item name="android:textColor">@color/colorOnSecondary</item>
+        <item name="iconTint">@color/colorOnSecondary</item>
+    </style>
+
+    <style name="Widget.LinkaType.Button.Icon" parent="Widget.Material3.Button.IconButton">
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="android:minWidth">@dimen/button_icon_min_size</item>
+        <item name="android:minHeight">@dimen/button_icon_min_size</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+    </style>
+
+    <style name="Widget.LinkaType.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="android:clipToPadding">false</item>
+        <item name="android:clipChildren">false</item>
+        <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Medium</item>
+    </style>
+
+    <style name="ShapeAppearance.LinkaType.Button" parent="ShapeAppearance.Material3.Corner.Medium" />
+
+    <style name="ShapeAppearance.LinkaType.Medium" parent="ShapeAppearance.Material3.MediumComponent" />
+
+    <style name="TextAppearance.LinkaType.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textColor">@color/colorOnPrimary</item>
+    </style>
+
+    <style name="TextAppearance.LinkaType.ToolbarSubtitle" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textColor">@color/colorOnPrimary</item>
+    </style>
+
 </resources>

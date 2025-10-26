@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
-        <item
-            android:id="@+id/chats_spinner"
-            android:title="ActionBar Spinner"
-            app:actionViewClass="android.widget.Spinner"
-            android:background="#ff00"
-            app:showAsAction="always" />
 
     <item
         android:id="@+id/clear_menu_item"
@@ -17,4 +11,7 @@
     <item
         android:id="@+id/settings_menu_item"
         android:title="@string/settings" />
+    <item
+        android:id="@+id/logout_menu_item"
+        android:title="@string/logout" />
 </menu>

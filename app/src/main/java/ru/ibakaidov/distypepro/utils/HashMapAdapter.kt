@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.TextView
+import ru.ibakaidov.distypepro.R
 
 class HashMapAdapter(
     private val context: Context,
@@ -24,12 +25,13 @@ class HashMapAdapter(
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         val view = convertView ?: LayoutInflater.from(context).inflate(
-            androidx.appcompat.R.layout.support_simple_spinner_dropdown_item,
+            R.layout.item_bank_entry,
             parent,
             false
         )
 
-        (view as TextView).text = getItem(position)
+        val titleView: TextView = view.findViewById(R.id.title)
+        titleView.text = getItem(position)
         return view
     }
 

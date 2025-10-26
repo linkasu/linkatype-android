@@ -17,7 +17,7 @@
             android:name=".screens.SpotlightActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:exported="false"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".screens.MainActivity"
             android:exported="false">

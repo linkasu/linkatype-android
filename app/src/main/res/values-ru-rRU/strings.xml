@@ -9,7 +9,36 @@
     <string name="stop">Остановить</string>
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
-    <string name="edit" > Изменить</string>
+    <string name="edit">Изменить</string>
     <string name="remove">Удалить</string>
     <string name="create">Создать</string>
+    <string name="input_hint">Введите фразу для озвучивания</string>
+    <string name="content_description_spotlight">Показать фразу на весь экран</string>
+    <string name="bank_back">Назад</string>
+    <string name="bank_add_category">Добавить категорию</string>
+    <string name="bank_add_phrase">Добавить фразу</string>
+    <string name="transition_input_card">input_card</string>
+    <string name="transition_bank_card">bank_card</string>
+
+    <string name="auth_title">С возвращением</string>
+    <string name="auth_subtitle_sign_in">Войдите, чтобы продолжить</string>
+    <string name="auth_subtitle_sign_up">Создайте аккаунт, чтобы начать</string>
+    <string name="auth_email_hint">Электронная почта</string>
+    <string name="auth_password_hint">Пароль</string>
+    <string name="auth_confirm_password_hint">Повторите пароль</string>
+    <string name="auth_action_sign_in">Войти</string>
+    <string name="auth_action_sign_up">Создать аккаунт</string>
+    <string name="auth_toggle_to_sign_up">Впервые? Создайте аккаунт</string>
+    <string name="auth_toggle_to_sign_in">Уже есть аккаунт? Войдите</string>
+    <string name="auth_error_invalid_email">Введите корректный e-mail</string>
+    <string name="auth_error_password_length">Пароль должен быть не короче 6 символов</string>
+    <string name="auth_error_password_mismatch">Пароли не совпадают</string>
+    <string name="auth_error_generic">Что-то пошло не так. Попробуйте ещё раз.</string>
+    <string name="auth_message_account_created">Аккаунт успешно создан</string>
+    <string name="auth_illustration_content_description">Логотип приложения</string>
+    <string name="logout">Выйти</string>
+    <string name="chat_slot_button_description">Выбрать сохранённый слот чата</string>
+    <string name="chat_slot_one">Слот 1</string>
+    <string name="chat_slot_two">Слот 2</string>
+    <string name="chat_slot_three">Слот 3</string>
 </resources>
