@@ -38,6 +38,7 @@ class AuthActivity : AppCompatActivity() {
     private fun setupListeners() = with(binding) {
         authPrimaryButton.setOnClickListener { attemptAuth() }
         toggleAuthMode.setOnClickListener { toggleMode() }
+        resetPasswordButton.setOnClickListener { attemptPasswordReset() }
         passwordInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 attemptAuth()
@@ -67,6 +68,7 @@ class AuthActivity : AppCompatActivity() {
         authPrimaryButton.setText(if (isSignUp) R.string.auth_action_sign_up else R.string.auth_action_sign_in)
         toggleAuthMode.setText(if (isSignUp) R.string.auth_toggle_to_sign_in else R.string.auth_toggle_to_sign_up)
         confirmPasswordLayout.isVisible = isSignUp
+        resetPasswordButton.isVisible = !isSignUp
         if (!isSignUp) {
             confirmPasswordInput.text = null
             confirmPasswordLayout.error = null
@@ -123,6 +125,32 @@ class AuthActivity : AppCompatActivity() {
         }
     }
 
+    private fun attemptPasswordReset() {
+        clearErrors()
+
+        val email = binding.emailInput.text?.toString()?.trim().orEmpty()
+
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.emailLayout.error = getString(R.string.auth_error_invalid_email)
+            return
+        }
+
+        setLoading(true)
+
+        Firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+            setLoading(false)
+            if (task.isSuccessful) {
+                Snackbar.make(binding.root, R.string.auth_message_password_reset_sent, Snackbar.LENGTH_LONG).show()
+            } else {
+                Snackbar.make(
+                    binding.root,
+                    task.exception?.localizedMessage ?: getString(R.string.auth_error_generic),
+                    Snackbar.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
     private fun clearErrors() {
         binding.emailLayout.error = null
         binding.passwordLayout.error = null
@@ -135,6 +163,8 @@ class AuthActivity : AppCompatActivity() {
         emailLayout.isEnabled = !isLoading
         passwordLayout.isEnabled = !isLoading
         confirmPasswordLayout.isEnabled = !isLoading
+        resetPasswordButton.isEnabled = !isLoading
+        toggleAuthMode.isEnabled = !isLoading
     }
 
     private fun navigateToMain() {

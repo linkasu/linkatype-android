@@ -30,6 +30,7 @@
     <string name="auth_confirm_password_hint">Confirm password</string>
     <string name="auth_action_sign_in">Sign in</string>
     <string name="auth_action_sign_up">Create account</string>
+    <string name="auth_action_reset_password">Forgot password?</string>
     <string name="auth_toggle_to_sign_up">New here? Create an account</string>
     <string name="auth_toggle_to_sign_in">Already have an account? Sign in</string>
     <string name="auth_error_invalid_email">Enter a valid email address</string>
@@ -37,6 +38,7 @@
     <string name="auth_error_password_mismatch">Passwords do not match</string>
     <string name="auth_error_generic">Something went wrong. Please try again.</string>
     <string name="auth_message_account_created">Account created successfully</string>
+    <string name="auth_message_password_reset_sent">Password reset link sent. Check your inbox.</string>
     <string name="auth_illustration_content_description">App logo</string>
     <string name="logout">Log out</string>
     <string name="chat_slot_button_description">Switch saved chat slot</string>
