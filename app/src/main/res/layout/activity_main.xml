@@ -24,11 +24,13 @@
             android:background="@android:color/transparent"
             android:contentInsetStart="0dp"
             android:contentInsetStartWithNavigation="0dp"
+            android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
             app:popupTheme="@style/AppTheme.PopupOverlay"
             app:title="@string/app_name"
             app:titleCentered="true"
-            app:titleTextColor="@color/colorOnPrimary"
-            app:subtitleTextColor="@color/colorOnPrimary" />
+            app:titleTextColor="@color/colorButtonBlack"
+            app:subtitleTextColor="@color/colorButtonBlack"
+            app:navigationIconTint="@color/colorButtonBlack" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout

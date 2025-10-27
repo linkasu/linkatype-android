@@ -11,8 +11,11 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         android:navigationIcon="@drawable/ic_baseline_arrow_back_24"
-        android:theme="@style/ThemeOverlay.Material3.Dark.ActionBar"
-        app:title="@string/settings" />
+        android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
+        app:navigationIconTint="@color/colorButtonBlack"
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        app:title="@string/settings"
+        app:titleTextColor="@color/colorButtonBlack" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -123,16 +126,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_large"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/buttonTest"
                             style="@style/Widget.LinkaType.Button.Tonal"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/spacing_small"
-                            android:layout_weight="1"
+                            android:layout_marginBottom="@dimen/spacing_small"
                             android:text="@string/settings_test_tts"
                             app:icon="@drawable/ic_baseline_volume_up_24"
                             app:iconGravity="textStart"
@@ -141,10 +142,9 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/buttonStop"
                             style="@style/Widget.LinkaType.Button.Outlined"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/spacing_small"
-                            android:layout_weight="1"
+                            android:layout_marginBottom="@dimen/spacing_small"
                             android:text="@string/settings_stop_tts"
                             app:icon="@drawable/ic_baseline_clear_24"
                             app:iconGravity="textStart"
@@ -153,9 +153,8 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/buttonPlayLast"
                             style="@style/Widget.LinkaType.Button.Outlined"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:text="@string/settings_play_last"
                             app:icon="@drawable/ic_baseline_play_arrow_24"
                             app:iconGravity="textStart"
@@ -222,16 +221,14 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/spacing_large"
-                        android:gravity="center"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/buttonClearCache"
                             style="@style/Widget.LinkaType.Button.Tonal"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginEnd="@dimen/spacing_small"
-                            android:layout_weight="1"
+                            android:layout_marginBottom="@dimen/spacing_small"
                             android:text="@string/settings_clear_cache"
                             app:icon="@drawable/ic_baseline_clear_24"
                             app:iconGravity="textStart"
@@ -240,9 +237,8 @@
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/buttonRefreshCache"
                             style="@style/Widget.LinkaType.Button.Outlined"
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
                             android:text="@string/settings_refresh_cache"
                             app:icon="@drawable/ic_baseline_refresh_24"
                             app:iconGravity="textStart"

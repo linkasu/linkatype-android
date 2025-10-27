@@ -21,14 +21,17 @@
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/bank_toolbar"
-                style="@style/Widget.Material3.Toolbar"
+                style="@style/Widget.LinkaType.Toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:paddingStart="@dimen/spacing_small"
                 android:paddingEnd="@dimen/spacing_small"
-                android:theme="@style/ThemeOverlay.Material3.ActionBar"
+                android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
                 app:contentInsetStartWithNavigation="0dp"
-                app:titleTextColor="?attr/colorOnSurface" />
+                app:navigationIconTint="@color/colorButtonBlack"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:titleTextColor="@color/colorButtonBlack"
+                app:subtitleTextColor="@color/colorButtonBlack" />
 
             <GridView
                 android:id="@+id/gridview"

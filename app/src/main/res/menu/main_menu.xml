@@ -7,7 +7,7 @@
         android:title="@string/clear"
         app:showAsAction="always"
         android:icon="@drawable/ic_baseline_clear_24"
-        />
+        app:iconTint="@color/colorButtonBlack" />
     <item
         android:id="@+id/settings_menu_item"
         android:title="@string/settings" />

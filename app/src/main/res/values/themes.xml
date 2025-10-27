@@ -51,7 +51,13 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.LinkaType.Toolbar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3">
+        <item name="colorOnSurface">@color/colorButtonBlack</item>
+        <item name="android:textColor">@color/colorButtonBlack</item>
+        <item name="android:textColorPrimary">@color/colorButtonBlack</item>
+        <item name="android:textColorSecondary">@color/colorButtonBlack</item>
+        <item name="android:itemTextAppearance">@style/TextAppearance.LinkaType.MenuItem</item>
+    </style>
 
     <style name="ThemeOverlay.LINKaType.FullscreenContainer" parent="">
         <item name="fullscreenBackgroundColor">@color/spotlight_background</item>

@@ -6,23 +6,27 @@
         android:id="@+id/action_sort"
         android:title="@string/bank_action_sort"
         android:icon="@drawable/ic_baseline_sort_24"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:iconTint="@color/colorButtonBlack" />
 
     <item
         android:id="@+id/action_add_category"
         android:title="@string/bank_add_category"
         android:icon="@drawable/ic_baseline_add_24"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:iconTint="@color/colorButtonBlack" />
 
     <item
         android:id="@+id/action_add_statement"
         android:title="@string/bank_add_phrase"
         android:icon="@drawable/ic_baseline_add_24"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:iconTint="@color/colorButtonBlack" />
 
     <item
         android:id="@+id/action_download_cache"
         android:title="@string/bank_download_cache"
         android:icon="@drawable/ic_baseline_download_24"
-        app:showAsAction="always" />
+        app:showAsAction="always"
+        app:iconTint="@color/colorButtonBlack" />
 </menu>

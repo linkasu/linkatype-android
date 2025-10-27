@@ -23,7 +23,7 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/say_button"
-                style="@style/Widget.LinkaType.Button.Tonal"
+                style="@style/Widget.LinkaType.Button.Say"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_medium"
@@ -68,18 +68,17 @@
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/chat_selector_button"
-                    style="@style/Widget.Material3.Button.TextButton"
+                    style="@style/Widget.LinkaType.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:contentDescription="@string/chat_slot_button_description"
                     android:minWidth="0dp"
                     android:text="@string/chat_slot_one"
                     android:textAllCaps="false"
-                    android:textColor="@color/colorPrimary"
                     app:icon="@drawable/ic_baseline_expand_more_24"
                     app:iconGravity="end"
                     app:iconPadding="@dimen/spacing_xs"
-                    app:iconTint="@color/colorPrimary" />
+                    app:iconTint="@color/colorOnButtonBlack" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/spotlight_button"
@@ -88,8 +87,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/spacing_small"
                     android:contentDescription="@string/content_description_spotlight"
-                    app:icon="@drawable/ic_baseline_remove_red_eye_24"
-                    app:iconTint="?attr/colorOnSecondaryContainer" />
+                    app:icon="@drawable/ic_baseline_remove_red_eye_24" />
             </LinearLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
