@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
@@ -64,10 +65,11 @@ class CategoryManagerTest {
     every { mockRootRef.child("users/testUserId123") } returns mockCategoryRef
     every { mockCategoryRef.child("Category") } returns mockCategoryRef
 
-    val root = categoryManager.getRoot()
+    val root = categoryManager.getRootForTest()
 
     verify { mockRootRef.child("users/testUserId123") }
     verify(atLeast = 1) { mockCategoryRef.child("Category") }
+    assertNotNull(root)
   }
 
   @Test
@@ -115,7 +117,7 @@ class CategoryManagerTest {
   fun getList_onError_callsCallback() {
     val listenerSlot = slot<ValueEventListener>()
     val mockError = mockk<DatabaseError>()
-    val testException = Exception("Database error")
+    val testException = DatabaseException("Database error")
 
     every { mockCategoryRef.orderByChild("created") } returns mockCategoryRef
     every { mockCategoryRef.addValueEventListener(capture(listenerSlot)) } returns mockk()
@@ -230,7 +232,7 @@ class CategoryManagerTest {
     val completionSlot = slot<DatabaseReference.CompletionListener>()
     val mockPushRef = mockk<DatabaseReference>(relaxed = true)
     val mockError = mockk<DatabaseError>()
-    val testException = Exception("Create failed")
+    val testException = DatabaseException("Create failed")
 
     every { mockCategoryRef.push() } returns mockPushRef
     every { mockPushRef.key } returns "key"
@@ -289,5 +291,10 @@ class CategoryManagerTest {
     assertEquals("c3", keys?.get(1))
     assertEquals("c1", keys?.get(2))
   }
-}
 
+  private fun CategoryManager.getRootForTest(): DatabaseReference {
+    val method = CategoryManager::class.java.getDeclaredMethod("getRoot")
+    method.isAccessible = true
+    return method.invoke(this) as DatabaseReference
+  }
+}

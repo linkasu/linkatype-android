@@ -1,6 +1,7 @@
 package ru.ibakaidov.distypepro.data
 
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.DatabaseReference
 import io.mockk.every
 import io.mockk.mockk
@@ -74,7 +75,7 @@ class ManagerTest {
     var receivedException: Exception? = null
 
     val dbError = mockk<DatabaseError>()
-    val testException = Exception("Database error")
+    val testException = DatabaseException("Database error")
     every { dbError.toException() } returns testException
 
     every {
@@ -122,13 +123,17 @@ class ManagerTest {
     testManager.getList(callback)
     assertTrue(testManager.getListCalled)
 
-    testManager.edit("key", "value", mockk())
+    val unitCallback = object : Callback<Unit> {
+      override fun onDone(result: Unit) {}
+    }
+
+    testManager.edit("key", "value", unitCallback)
     assertTrue(testManager.editCalled)
 
-    testManager.create("value", mockk())
+    testManager.create("value", unitCallback)
     assertTrue(testManager.createCalled)
 
-    val root = testManager.getRoot()
+    val root = testManager.getRootForTest()
     assertNotNull(root)
   }
 
@@ -153,6 +158,8 @@ class ManagerTest {
       createCalled = true
       callback.onDone(Unit)
     }
+
+    fun getRootForTest(): DatabaseReference = getRoot()
   }
 
   @Test
@@ -180,4 +187,3 @@ class ManagerTest {
     assertEquals(3, results.size)
   }
 }
-

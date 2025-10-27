@@ -5,6 +5,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.DatabaseException
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
@@ -70,10 +71,11 @@ class StatementManagerTest {
     every { mockRootRef.child("users/userId456") } returns mockStatementRef
     every { mockStatementRef.child("Category/$testCategoryId/statements") } returns mockStatementRef
 
-    val root = statementManager.getRoot()
+    val root = statementManager.getRootForTest()
 
     verify { mockRootRef.child("users/userId456") }
     verify(atLeast = 1) { mockStatementRef.child(match { it.contains(testCategoryId) }) }
+    assertNotNull(root)
   }
 
   @Test
@@ -159,7 +161,7 @@ class StatementManagerTest {
   fun getList_onError_callsCallback() {
     val listenerSlot = slot<ValueEventListener>()
     val mockError = mockk<DatabaseError>()
-    val testException = Exception("Database error")
+    val testException = DatabaseException("Database error")
 
     every { mockStatementRef.orderByChild("created") } returns mockStatementRef
     every { mockStatementRef.addValueEventListener(capture(listenerSlot)) } returns mockk()
@@ -274,7 +276,7 @@ class StatementManagerTest {
     val completionSlot = slot<DatabaseReference.CompletionListener>()
     val mockPushRef = mockk<DatabaseReference>(relaxed = true)
     val mockError = mockk<DatabaseError>()
-    val testException = Exception("Create failed")
+    val testException = DatabaseException("Create failed")
 
     every { mockStatementRef.push() } returns mockPushRef
     every { mockPushRef.key } returns "key"
@@ -330,5 +332,10 @@ class StatementManagerTest {
 
     assertTrue(manager1 !== manager2)
   }
-}
 
+  private fun StatementManager.getRootForTest(): DatabaseReference {
+    val method = StatementManager::class.java.getDeclaredMethod("getRoot")
+    method.isAccessible = true
+    return method.invoke(this) as DatabaseReference
+  }
+}
