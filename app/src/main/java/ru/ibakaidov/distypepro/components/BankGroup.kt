@@ -14,9 +14,9 @@ import androidx.preference.PreferenceManager
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
-import java.util.LinkedHashMap
-import java.util.Locale
 import ru.ibakaidov.distypepro.R
+import ru.ibakaidov.distypepro.bank.SortMode
+import ru.ibakaidov.distypepro.bank.sortEntries
 import ru.ibakaidov.distypepro.data.CategoryManager
 import ru.ibakaidov.distypepro.data.StatementManager
 import ru.ibakaidov.distypepro.dialogs.ConfirmDialog
@@ -48,14 +48,9 @@ class BankGroup @JvmOverloads constructor(
 
     private val preferences = PreferenceManager.getDefaultSharedPreferences(context.applicationContext)
     private var sortMode: SortMode =
-        SortMode.values().getOrElse(preferences.getInt(PREF_SORT_MODE, SortMode.ALPHABET_ASC.ordinal)) {
+        SortMode.entries.getOrElse(preferences.getInt(PREF_SORT_MODE, SortMode.ALPHABET_ASC.ordinal)) {
             SortMode.ALPHABET_ASC
         }
-
-    private enum class SortMode {
-        ALPHABET_ASC,
-        ALPHABET_DESC
-    }
 
     override fun initUi() {
         toolbar = findViewById(R.id.bank_toolbar)
@@ -226,7 +221,7 @@ class BankGroup @JvmOverloads constructor(
         categoryManager.getList(object : Callback<Map<String, String>> {
             override fun onDone(result: Map<String, String>) {
                 if (showingStatements) return
-                val sorted = applySort(result)
+                val sorted = sortEntries(result, sortMode)
                 gridView.adapter = HashMapAdapter(context, sorted)
                 gridView.scheduleLayoutAnimation()
             }
@@ -237,22 +232,11 @@ class BankGroup @JvmOverloads constructor(
         if (!showingStatements) return
         statementManager?.getList(object : Callback<Map<String, String>> {
             override fun onDone(result: Map<String, String>) {
-                currentStatements = applySort(result)
+                currentStatements = sortEntries(result, sortMode)
                 gridView.adapter = HashMapAdapter(context, currentStatements)
                 gridView.scheduleLayoutAnimation()
             }
         })
-    }
-
-    private fun applySort(data: Map<String, String>): Map<String, String> {
-        val entries = data.entries.toList()
-        val sortedEntries = when (sortMode) {
-            SortMode.ALPHABET_ASC -> entries.sortedBy { it.value.lowercase(Locale.getDefault()) }
-            SortMode.ALPHABET_DESC -> entries.sortedByDescending { it.value.lowercase(Locale.getDefault()) }
-        }
-        val linked = LinkedHashMap<String, String>()
-        sortedEntries.forEach { linked[it.key] = it.value }
-        return linked
     }
 
     private fun showSortDialog() {
@@ -263,7 +247,7 @@ class BankGroup @JvmOverloads constructor(
         AlertDialog.Builder(context)
             .setTitle(R.string.bank_action_sort)
             .setSingleChoiceItems(options, sortMode.ordinal) { dialog, which ->
-                sortMode = SortMode.values()[which]
+                sortMode = SortMode.entries[which]
                 preferences.edit().putInt(PREF_SORT_MODE, sortMode.ordinal).apply()
                 dialog.dismiss()
                 if (showingStatements) {

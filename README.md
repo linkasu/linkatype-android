@@ -27,6 +27,13 @@
 ./gradlew lintDebug
 ```
 
+## Kotlin Multiplatform
+
+- Общий код вынесен в модуль `shared` (KMP) и используется Android-приложением.
+- Для интеграции на iOS собирайте XCFramework: `./gradlew :shared:assembleSharedDebugXCFramework`.
+- Готовый артефакт появится в `shared/build/XCFrameworks/debug/Shared.xcframework` и может быть подключен в Xcode напрямую или через Swift Package Manager.
+- Для релизной сборки используйте `./gradlew :shared:assembleSharedReleaseXCFramework`.
+
 Покрытие тестами:
 - Структуры данных: Category, Statement
 - Менеджеры данных: CategoryManager, StatementManager
