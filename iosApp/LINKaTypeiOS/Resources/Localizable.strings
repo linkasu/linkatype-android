@@ -1,0 +1,82 @@
+/* English Localization */
+
+"app_name" = "LINKa type";
+"say" = "Say";
+"settings" = "Settings";
+"clear" = "Clear";
+"voice" = "Voice";
+"stop" = "Stop";
+"ok" = "OK";
+"cancel" = "Cancel";
+"edit" = "Edit";
+"remove" = "Remove";
+"create" = "Create";
+"input_hint" = "Type a phrase to speak";
+
+"bank_back" = "Back";
+"bank_add_category" = "Add category";
+"bank_add_phrase" = "Add phrase";
+"bank_toolbar_title_categories" = "Choose a category";
+"bank_toolbar_title_statements" = "Phrases: %@";
+"bank_action_sort" = "Sort";
+"bank_sort_alpha_asc" = "Alphabetical (A-Z)";
+"bank_sort_alpha_desc" = "Alphabetical (Z-A)";
+
+"auth_title" = "Welcome back";
+"auth_subtitle_sign_in" = "Sign in to continue";
+"auth_subtitle_sign_up" = "Create an account to get started";
+"auth_email_hint" = "Email";
+"auth_password_hint" = "Password";
+"auth_confirm_password_hint" = "Confirm password";
+"auth_action_sign_in" = "Sign in";
+"auth_action_sign_up" = "Create account";
+"auth_action_reset_password" = "Forgot password?";
+"auth_toggle_to_sign_up" = "New here? Create an account";
+"auth_toggle_to_sign_in" = "Already have an account? Sign in";
+"auth_error_invalid_email" = "Enter a valid email address";
+"auth_error_password_length" = "Password must be at least 6 characters";
+"auth_error_password_mismatch" = "Passwords do not match";
+"auth_error_generic" = "Something went wrong. Please try again.";
+"auth_message_account_created" = "Account created successfully";
+"auth_message_password_reset_sent" = "Password reset link sent. Check your inbox.";
+
+"logout" = "Log out";
+"welcome_back" = "Welcome back";
+
+"chat_slot_one" = "Slot 1";
+"chat_slot_two" = "Slot 2";
+"chat_slot_three" = "Slot 3";
+
+"tts_status_ready" = "Ready";
+"tts_status_speaking" = "Speaking...";
+"tts_status_error" = "Error: %@";
+"tts_status_download" = "Downloading...";
+"tts_status_download_progress" = "Downloading %d of %d";
+"tts_download_saved" = "Audio saved to %@";
+"tts_download_finished" = "Audio downloaded";
+
+"settings_section_tts" = "Text-to-speech";
+"settings_use_yandex" = "Use Yandex online TTS";
+"settings_voice" = "Voice";
+"settings_volume" = "Volume";
+"settings_rate" = "Rate";
+"settings_pitch" = "Pitch";
+"settings_test_tts" = "Test";
+"settings_stop_tts" = "Stop";
+"settings_play_last" = "Play last";
+
+"settings_section_cache" = "TTS cache";
+"settings_cache_enabled" = "Enable caching";
+"settings_cache_limit" = "Maximum cache size (MB)";
+"settings_clear_cache" = "Clear cache";
+"settings_refresh_cache" = "Refresh";
+"settings_test_phrase" = "Hello! This is a test phrase.";
+"settings_cache_info" = "Files: %d, Used: %.1f MB of %d MB";
+"settings_cache_limit_value" = "Limit: %d MB";
+"settings_cache_cleared" = "Cache cleared";
+
+"bank_download_cache" = "Download cache";
+"bank_download_cache_title" = "Download phrases";
+"bank_download_cache_progress" = "%d of %d";
+"bank_download_cache_done" = "Phrases cached";
+
