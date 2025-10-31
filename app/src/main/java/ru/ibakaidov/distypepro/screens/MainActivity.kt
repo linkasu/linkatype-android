@@ -30,6 +30,12 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var tts: Tts
+    private var currentSlotIndex: Int = 0
+    private val slotLabels = intArrayOf(
+        R.string.chat_slot_one,
+        R.string.chat_slot_two,
+        R.string.chat_slot_three
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +74,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
+        R.id.chat_selector_menu_item -> {
+            showChatSelectorPopup()
+            true
+        }
+
+        R.id.spotlight_menu_item -> {
+            binding.inputGroup.spotlight()
+            true
+        }
+
         R.id.clear_menu_item -> {
             binding.inputGroup.clear()
             true
@@ -88,6 +104,37 @@ class MainActivity : AppCompatActivity() {
         }
 
         else -> super.onOptionsItemSelected(item)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val chatSelectorItem = menu.findItem(R.id.chat_selector_menu_item)
+        chatSelectorItem?.title = getString(slotLabels[currentSlotIndex])
+        return super.onPrepareOptionsMenu(menu)
+    }
+
+    private fun showChatSelectorPopup() {
+        val popup = androidx.appcompat.widget.PopupMenu(this, binding.toolbar)
+        slotLabels.forEachIndexed { index, labelRes ->
+            popup.menu.add(0, index, index, labelRes)
+        }
+        popup.setOnMenuItemClickListener { item ->
+            val slotIndex = item.itemId
+            if (slotIndex in slotLabels.indices && slotIndex != currentSlotIndex) {
+                binding.inputGroup.switchSlot(currentSlotIndex, slotIndex)
+                currentSlotIndex = slotIndex
+                invalidateOptionsMenu()
+            }
+            true
+        }
+        popup.show()
+    }
+
+    private fun switchChatSlot(slotIndex: Int) {
+        if (slotIndex in slotLabels.indices && slotIndex != currentSlotIndex) {
+            binding.inputGroup.switchSlot(currentSlotIndex, slotIndex)
+            currentSlotIndex = slotIndex
+            invalidateOptionsMenu()
+        }
     }
 
     override fun onDestroy() {
