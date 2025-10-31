@@ -21,8 +21,30 @@ enum VoiceProvider {
     case offline
 }
 
-struct YandexVoice {
+struct YandexVoice: Codable {
     let voiceURI: String
     let text: String
+    let langCode: String?
+    let lang: String?
+    let gender: String?
+    let role: [String]?
+    
+    enum CodingKeys: String, CodingKey {
+        case voiceURI = "id"
+        case text = "name"
+        case langCode = "lang_code"
+        case lang
+        case gender
+        case role
+    }
+    
+    init(voiceURI: String, text: String, langCode: String? = nil, lang: String? = nil, gender: String? = nil, role: [String]? = nil) {
+        self.voiceURI = voiceURI
+        self.text = text
+        self.langCode = langCode
+        self.lang = lang
+        self.gender = gender
+        self.role = role
+    }
 }
 

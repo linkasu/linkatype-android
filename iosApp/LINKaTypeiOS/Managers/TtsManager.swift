@@ -28,6 +28,7 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
     
     private let defaultYandexVoice = "zahar"
     private let ttsEndpoint = "https://tts.linka.su/tts"
+    private let voicesEndpoint = "https://tts.linka.su/voices"
     
     private let yandexVoices = [
         YandexVoice(voiceURI: "zahar", text: "Захар"),
@@ -39,9 +40,13 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
         YandexVoice(voiceURI: "omazh", text: "Ома")
     ]
     
+    private var cachedYandexVoices: [YandexVoice]?
+    private var voicesLoadingInProgress = false
+    
     override init() {
         super.init()
         synthesizer.delegate = self
+        loadYandexVoicesAsync()
     }
     
     func getVolume() -> Float {
@@ -84,8 +89,49 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
         userDefaults.set(value, forKey: voiceIdKey)
     }
     
+    private func loadYandexVoicesAsync() {
+        guard !voicesLoadingInProgress else { return }
+        voicesLoadingInProgress = true
+        
+        Task {
+            do {
+                let voices = try await fetchVoicesFromApi()
+                if !voices.isEmpty {
+                    await MainActor.run {
+                        self.cachedYandexVoices = voices
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    self.lastErrorMessage = "Ошибка загрузки голосов: \(error.localizedDescription)"
+                }
+            }
+            await MainActor.run {
+                self.voicesLoadingInProgress = false
+            }
+        }
+    }
+    
+    private func fetchVoicesFromApi() async throws -> [YandexVoice] {
+        guard let url = URL(string: voicesEndpoint) else {
+            return []
+        }
+        
+        let (data, response) = try await URLSession.shared.data(from: url)
+        
+        guard let httpResponse = response as? HTTPURLResponse,
+              httpResponse.statusCode == 200 else {
+            return []
+        }
+        
+        let decoder = JSONDecoder()
+        let voices = try decoder.decode([YandexVoice].self, from: data)
+        return voices
+    }
+    
     func getYandexVoices() -> [TtsVoice] {
-        return yandexVoices.map { voice in
+        let voices = cachedYandexVoices ?? yandexVoices
+        return voices.map { voice in
             TtsVoice(
                 id: voice.voiceURI,
                 title: voice.text,

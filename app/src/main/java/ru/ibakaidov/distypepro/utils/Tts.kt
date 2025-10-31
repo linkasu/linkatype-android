@@ -33,6 +33,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import org.json.JSONArray
 
 class Tts(
     context: Context,
@@ -58,9 +59,12 @@ class Tts(
     private var lastErrorMessage: String? = null
 
     private val ttsReady = CompletableDeferred<Boolean>()
+    private var cachedYandexVoices: List<YandexVoice>? = null
+    private var voicesLoadingInProgress = false
 
     init {
         initializeTextToSpeech()
+        loadYandexVoicesAsync()
     }
 
     private fun initializeTextToSpeech() {
@@ -223,7 +227,70 @@ class Tts(
 
     suspend fun clearCache() = cacheManager.clearCache()
 
-    fun getYandexVoices(): List<YandexVoice> = YANDEX_VOICES
+    private fun loadYandexVoicesAsync() {
+        if (voicesLoadingInProgress) return
+        voicesLoadingInProgress = true
+
+        ioScope.launch {
+            try {
+                val voices = fetchVoicesFromApi()
+                if (voices.isNotEmpty()) {
+                    cachedYandexVoices = voices
+                }
+            } catch (e: Exception) {
+                lastErrorMessage = "Ошибка загрузки голосов: ${e.localizedMessage}"
+            } finally {
+                voicesLoadingInProgress = false
+            }
+        }
+    }
+
+    private suspend fun fetchVoicesFromApi(): List<YandexVoice> {
+        return withContext(Dispatchers.IO) {
+            try {
+                val request = Request.Builder()
+                    .url(VOICES_ENDPOINT)
+                    .get()
+                    .build()
+
+                okHttpClient.newCall(request).execute().use { response ->
+                    if (!response.isSuccessful) {
+                        return@withContext emptyList()
+                    }
+
+                    val body = response.body?.string() ?: return@withContext emptyList()
+                    val jsonArray = JSONArray(body)
+                    val voices = mutableListOf<YandexVoice>()
+
+                    for (i in 0 until jsonArray.length()) {
+                        val voiceObj = jsonArray.getJSONObject(i)
+                        val roleArray = voiceObj.optJSONArray("role")
+                        val roles = if (roleArray != null) {
+                            List(roleArray.length()) { idx -> roleArray.getString(idx) }
+                        } else {
+                            null
+                        }
+
+                        voices.add(
+                            YandexVoice(
+                                voiceURI = voiceObj.getString("id"),
+                                text = voiceObj.getString("name"),
+                                langCode = voiceObj.optString("lang_code", null),
+                                lang = voiceObj.optString("lang", null),
+                                gender = voiceObj.optString("gender", null),
+                                role = roles
+                            )
+                        )
+                    }
+                    voices
+                }
+            } catch (e: Exception) {
+                emptyList()
+            }
+        }
+    }
+
+    fun getYandexVoices(): List<YandexVoice> = cachedYandexVoices ?: YANDEX_VOICES
 
     suspend fun getOfflineVoices(): List<TtsVoice> {
         ensureTtsReady()
@@ -605,7 +672,11 @@ class Tts(
 
     data class YandexVoice(
         val voiceURI: String,
-        val text: String
+        val text: String,
+        val langCode: String? = null,
+        val lang: String? = null,
+        val gender: String? = null,
+        val role: List<String>? = null
     )
 
     data class TtsVoice(
@@ -639,6 +710,7 @@ class Tts(
         private const val PREF_VOICE_URI = "voiceuri"
         private const val DEFAULT_YANDEX_VOICE = "zahar"
         private const val TTS_ENDPOINT = "https://tts.linka.su/tts"
+        private const val VOICES_ENDPOINT = "https://tts.linka.su/voices"
 
         private val YANDEX_VOICES = listOf(
             YandexVoice(voiceURI = "zahar", text = "Захар"),
