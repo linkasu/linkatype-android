@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SettingsView: View {
     @ObservedObject var ttsManager: TtsManager
+    @EnvironmentObject var authManager: FirebaseAuthManager
     @Environment(\.dismiss) var dismiss
     
     @State private var useYandex = true
@@ -14,6 +15,9 @@ struct SettingsView: View {
     @State private var cacheInfo = ""
     @State private var statusText = "tts_status_ready"
     @State private var availableVoices: [TtsVoice] = []
+    @State private var showDeleteAccountAlert = false
+    @State private var isDeleting = false
+    @State private var deleteAccountError: String?
     
     var body: some View {
         Form {
@@ -121,6 +125,29 @@ struct SettingsView: View {
                     }
                 }
             }
+            
+            Section(header: Text(NSLocalizedString("settings_section_account", comment: ""))) {
+                Button(role: .destructive) {
+                    showDeleteAccountAlert = true
+                } label: {
+                    HStack {
+                        if isDeleting {
+                            ProgressView()
+                                .frame(maxWidth: .infinity)
+                        } else {
+                            Text(NSLocalizedString("settings_delete_account", comment: ""))
+                                .frame(maxWidth: .infinity)
+                        }
+                    }
+                }
+                .disabled(isDeleting)
+                
+                if let error = deleteAccountError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundColor(.red)
+                }
+            }
         }
         .navigationTitle(NSLocalizedString("settings", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
@@ -137,6 +164,14 @@ struct SettingsView: View {
         }
         .onReceive(ttsManager.eventPublisher) { event in
             handleTtsEvent(event)
+        }
+        .alert(NSLocalizedString("settings_delete_account_title", comment: ""), isPresented: $showDeleteAccountAlert) {
+            Button(NSLocalizedString("settings_delete_account_confirm", comment: ""), role: .destructive) {
+                deleteAccount()
+            }
+            Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
+        } message: {
+            Text(NSLocalizedString("settings_delete_account_message", comment: ""))
         }
     }
     
@@ -191,6 +226,26 @@ struct SettingsView: View {
             statusText = String(format: NSLocalizedString("tts_status_download_progress", comment: ""), current, total)
         case .downloadCompleted:
             statusText = NSLocalizedString("tts_status_ready", comment: "")
+        }
+    }
+    
+    private func deleteAccount() {
+        deleteAccountError = nil
+        isDeleting = true
+        
+        Task {
+            do {
+                try await authManager.deleteAccount()
+                await MainActor.run {
+                    isDeleting = false
+                    dismiss()
+                }
+            } catch {
+                await MainActor.run {
+                    isDeleting = false
+                    deleteAccountError = error.localizedDescription
+                }
+            }
         }
     }
 }

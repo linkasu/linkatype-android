@@ -10,6 +10,7 @@ struct AuthView: View {
     @State private var errorMessage: String?
     @State private var showResetPasswordAlert = false
     @State private var resetPasswordMessage: String?
+    @State private var agreedToPrivacy = false
     
     var body: some View {
         ZStack {
@@ -50,6 +51,20 @@ struct AuthView: View {
                             .textFieldStyle(AuthTextFieldStyle())
                             .textContentType(.password)
                     }
+                    
+                    HStack(alignment: .top, spacing: 12) {
+                        Button(action: { agreedToPrivacy.toggle() }) {
+                            Image(systemName: agreedToPrivacy ? "checkmark.square.fill" : "square")
+                                .font(.system(size: 22))
+                                .foregroundColor(.white)
+                        }
+                        
+                        Text(NSLocalizedString("auth_tracking_agreement", comment: ""))
+                            .font(.system(size: 13))
+                            .foregroundColor(.white.opacity(0.9))
+                            .multilineTextAlignment(.leading)
+                    }
+                    .padding(.top, 8)
                     
                     if let error = errorMessage {
                         Text(error)
@@ -129,9 +144,18 @@ struct AuthView: View {
             return
         }
         
+        if !agreedToPrivacy {
+            errorMessage = NSLocalizedString("auth_error_tracking_not_agreed", comment: "")
+            return
+        }
+        
         isLoading = true
         
         Task {
+            if agreedToPrivacy {
+                AppTrackingManager.shared.requestTrackingAuthorizationSync()
+            }
+            
             do {
                 if isSignUpMode {
                     try await authManager.signUp(email: email, password: password)

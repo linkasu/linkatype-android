@@ -7,8 +7,6 @@ struct LINKaTypeiOSApp: App {
     @StateObject private var authManager = FirebaseAuthManager.shared
     
     init() {
-        AppTrackingManager.shared.requestTrackingAuthorizationSync()
-        
         FirebaseApp.configure()
         
         Database.database().isPersistenceEnabled = true

@@ -1,20 +1,27 @@
 package ru.ibakaidov.distypepro.screens
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivitySettingsBinding
 import ru.ibakaidov.distypepro.utils.Tts
@@ -125,6 +132,10 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.buttonRefreshCache.setOnClickListener {
             lifecycleScope.launch { updateCacheInfo() }
+        }
+
+        binding.buttonDeleteAccount.setOnClickListener {
+            showDeleteAccountConfirmation()
         }
     }
 
@@ -245,6 +256,46 @@ class SettingsActivity : AppCompatActivity() {
 
     private fun showSnackbar(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun showDeleteAccountConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.settings_delete_account_title)
+            .setMessage(R.string.settings_delete_account_message)
+            .setPositiveButton(R.string.settings_delete_account_confirm) { _, _ ->
+                deleteAccount()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun deleteAccount() {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId == null) {
+            showSnackbar(getString(R.string.auth_error_generic))
+            return
+        }
+
+        binding.buttonDeleteAccount.isEnabled = false
+        binding.deleteAccountProgress.isVisible = true
+
+        lifecycleScope.launch {
+            try {
+                val database = Firebase.database.reference.child("users/$userId")
+                database.removeValue().await()
+
+                Firebase.auth.currentUser?.delete()?.await()
+
+                val intent = Intent(this@SettingsActivity, AuthActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+                finish()
+            } catch (e: Exception) {
+                binding.buttonDeleteAccount.isEnabled = true
+                binding.deleteAccountProgress.isVisible = false
+                showSnackbar(e.localizedMessage ?: getString(R.string.auth_error_generic))
+            }
+        }
     }
 
     override fun onDestroy() {

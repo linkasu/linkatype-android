@@ -20,7 +20,7 @@ class FirebaseStatementManager: ObservableObject {
         ref = Database.database().reference().child("users/\(userId)/Statement/\(categoryId)")
         
         handle = ref?.observe(.value) { [weak self] snapshot in
-            guard let self = self else { 
+            guard let self = self else {
                 dispatchGroup.leave()
                 return 
             }

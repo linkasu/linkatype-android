@@ -1,5 +1,6 @@
 import Foundation
 import FirebaseAuth
+import FirebaseDatabase
 import Combine
 
 class FirebaseAuthManager: ObservableObject {
@@ -44,6 +45,17 @@ class FirebaseAuthManager: ObservableObject {
     
     func getUserId() -> String? {
         return Auth.auth().currentUser?.uid
+    }
+    
+    func deleteAccount() async throws {
+        guard let userId = getUserId() else {
+            throw NSError(domain: "FirebaseAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No user logged in"])
+        }
+        
+        let ref = Database.database().reference().child("users/\(userId)")
+        try await ref.removeValue()
+        
+        try await Auth.auth().currentUser?.delete()
     }
 }
 
