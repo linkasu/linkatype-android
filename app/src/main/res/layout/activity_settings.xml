@@ -246,6 +246,54 @@
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_large"
+                app:cardElevation="@dimen/elevation_small">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_large">
+
+                    <TextView
+                        android:id="@+id/accountSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_section_account"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+                    <TextView
+                        android:id="@+id/deleteAccountWarningText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:text="@string/settings_delete_account_message"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                        android:textColor="?android:attr/textColorSecondary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/buttonDeleteAccount"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        android:text="@string/settings_delete_account"
+                        android:textColor="?attr/colorError"
+                        app:iconTint="?attr/colorError" />
+
+                    <ProgressBar
+                        android:id="@+id/deleteAccountProgress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </LinearLayout>

@@ -1,0 +1,90 @@
+/* Russian Localization */
+
+"app_name" = "LINKa. напиши";
+"say" = "Сказать";
+"settings" = "Настройки";
+"clear" = "Очистить";
+"voice" = "Голос";
+"stop" = "Стоп";
+"ok" = "ОК";
+"cancel" = "Отмена";
+"edit" = "Изменить";
+"remove" = "Удалить";
+"create" = "Создать";
+"input_hint" = "Введите фразу для озвучивания";
+
+"bank_back" = "Назад";
+"bank_add_category" = "Добавить категорию";
+"bank_add_phrase" = "Добавить фразу";
+"bank_toolbar_title_categories" = "Выберите категорию";
+"bank_toolbar_title_statements" = "Фразы: %@";
+"bank_action_sort" = "Сортировка";
+"bank_sort_alpha_asc" = "По алфавиту (А-Я)";
+"bank_sort_alpha_desc" = "По алфавиту (Я-А)";
+
+"auth_title" = "Добро пожаловать";
+"auth_subtitle_sign_in" = "Войдите для продолжения";
+"auth_subtitle_sign_up" = "Создайте аккаунт для начала";
+"auth_email_hint" = "Электронная почта";
+"auth_password_hint" = "Пароль";
+"auth_confirm_password_hint" = "Подтвердите пароль";
+"auth_action_sign_in" = "Войти";
+"auth_action_sign_up" = "Создать аккаунт";
+"auth_action_reset_password" = "Забыли пароль?";
+"auth_toggle_to_sign_up" = "Впервые здесь? Создайте аккаунт";
+"auth_toggle_to_sign_in" = "Уже есть аккаунт? Войдите";
+"auth_error_invalid_email" = "Введите правильный адрес электронной почты";
+"auth_error_password_length" = "Пароль должен быть не менее 6 символов";
+"auth_error_password_mismatch" = "Пароли не совпадают";
+"auth_error_tracking_not_agreed" = "Подтвердите согласие на отслеживание";
+"auth_error_generic" = "Что-то пошло не так. Попробуйте снова.";
+"auth_message_account_created" = "Аккаунт успешно создан";
+"auth_message_password_reset_sent" = "Ссылка для сброса пароля отправлена. Проверьте почту.";
+"auth_tracking_agreement" = "Я согласен на сбор анонимных данных об использовании (нажатия кнопок, использование функций) через Firebase Analytics для улучшения приложения. Личная информация не собирается.";
+
+"logout" = "Выйти";
+"welcome_back" = "С возвращением";
+
+"chat_slot_one" = "Слот 1";
+"chat_slot_two" = "Слот 2";
+"chat_slot_three" = "Слот 3";
+
+"tts_status_ready" = "Готов";
+"tts_status_speaking" = "Говорю...";
+"tts_status_error" = "Ошибка: %@";
+"tts_status_download" = "Загрузка...";
+"tts_status_download_progress" = "Загрузка %d из %d";
+"tts_download_saved" = "Аудио сохранено в %@";
+"tts_download_finished" = "Аудио загружено";
+
+"settings_section_tts" = "Синтез речи";
+"settings_use_yandex" = "Использовать Яндекс TTS онлайн";
+"settings_voice" = "Голос";
+"settings_volume" = "Громкость";
+"settings_rate" = "Скорость";
+"settings_pitch" = "Тон";
+"settings_test_tts" = "Тест";
+"settings_stop_tts" = "Стоп";
+"settings_play_last" = "Воспроизвести последнее";
+
+"settings_section_cache" = "Кеш TTS";
+"settings_cache_enabled" = "Включить кеширование";
+"settings_cache_limit" = "Максимальный размер кеша (МБ)";
+"settings_clear_cache" = "Очистить кеш";
+"settings_refresh_cache" = "Обновить";
+"settings_test_phrase" = "Привет! Это тестовая фраза.";
+"settings_cache_info" = "Файлов: %d, Использовано: %.1f МБ из %d МБ";
+"settings_cache_limit_value" = "Лимит: %d МБ";
+"settings_cache_cleared" = "Кеш очищен";
+
+"bank_download_cache" = "Загрузить кеш";
+"bank_download_cache_title" = "Загрузка фраз";
+"bank_download_cache_progress" = "%d из %d";
+"bank_download_cache_done" = "Фразы закешированы";
+
+"settings_section_account" = "Аккаунт";
+"settings_delete_account" = "Удалить аккаунт";
+"settings_delete_account_title" = "Удалить аккаунт?";
+"settings_delete_account_message" = "Это действие нельзя отменить. Все ваши данные, включая категории и фразы, будут безвозвратно удалены.";
+"settings_delete_account_confirm" = "Удалить";
+

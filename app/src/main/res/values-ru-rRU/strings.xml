@@ -85,4 +85,9 @@
     <string name="bank_download_cache_done">Фразы добавлены в кеш</string>
     <string name="bank_download_cache_empty">В категории пока нет фраз</string>
     <string name="bank_download_cache_error_tts">Сервис синтеза речи недоступен</string>
+    <string name="settings_section_account">Аккаунт</string>
+    <string name="settings_delete_account">Удалить аккаунт</string>
+    <string name="settings_delete_account_title">Удалить аккаунт?</string>
+    <string name="settings_delete_account_message">Это действие нельзя отменить. Все ваши данные, включая категории и фразы, будут безвозвратно удалены.</string>
+    <string name="settings_delete_account_confirm">Удалить</string>
 </resources>

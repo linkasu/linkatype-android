@@ -82,4 +82,9 @@
     <string name="bank_download_cache_done">Phrases cached</string>
     <string name="bank_download_cache_empty">No phrases in this category yet</string>
     <string name="bank_download_cache_error_tts">Speech engine is not available right now</string>
+    <string name="settings_section_account">Account</string>
+    <string name="settings_delete_account">Delete Account</string>
+    <string name="settings_delete_account_title">Delete Account?</string>
+    <string name="settings_delete_account_message">This action cannot be undone. All your data including categories and phrases will be permanently deleted.</string>
+    <string name="settings_delete_account_confirm">Delete</string>
 </resources>
