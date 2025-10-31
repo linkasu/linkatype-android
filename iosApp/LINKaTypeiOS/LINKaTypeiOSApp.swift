@@ -5,12 +5,12 @@ import FirebaseDatabase
 @main
 struct LINKaTypeiOSApp: App {
     @StateObject private var authManager = FirebaseAuthManager.shared
-    @State private var hasRequestedTracking = false
     
     init() {
+        AppTrackingManager.shared.requestTrackingAuthorizationSync()
+        
         FirebaseApp.configure()
         
-        // ВАЖНО: setPersistenceEnabled должен вызываться ДО любого использования Database
         Database.database().isPersistenceEnabled = true
     }
     
@@ -18,14 +18,6 @@ struct LINKaTypeiOSApp: App {
         WindowGroup {
             ContentView()
                 .environmentObject(authManager)
-                .onAppear {
-                    if !hasRequestedTracking {
-                        hasRequestedTracking = true
-                        Task {
-                            _ = await AppTrackingManager.shared.requestTrackingAuthorization()
-                        }
-                    }
-                }
         }
     }
 }

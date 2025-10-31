@@ -7,6 +7,13 @@ class AppTrackingManager {
   
   private init() {}
   
+  func requestTrackingAuthorizationSync() {
+    if #available(iOS 14, *) {
+      ATTrackingManager.requestTrackingAuthorization { status in
+      }
+    }
+  }
+  
   func requestTrackingAuthorization() async -> Bool {
     if #available(iOS 14, *) {
       let status = await ATTrackingManager.requestTrackingAuthorization()

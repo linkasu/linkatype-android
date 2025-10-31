@@ -242,6 +242,8 @@ struct BankGroupView: View {
         let phrases = Array(statementManager.statements.values)
         guard !phrases.isEmpty else { return }
         
+        FirebaseAnalyticsManager.shared.logDownloadCategoryCacheEvent()
+        
         isDownloading = true
         downloadProgress = 0
         downloadTotal = phrases.count
