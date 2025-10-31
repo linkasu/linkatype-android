@@ -231,6 +231,59 @@ class Tts(
         return voices.map { voice ->
             TtsVoice(
                 voiceId = voice.name,
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
                 title = voice.name,
                 locale = voice.locale?.toLanguageTag(),
                 provider = VoiceProvider.OFFLINE,

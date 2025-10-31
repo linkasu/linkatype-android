@@ -40,7 +40,7 @@
                 android:layout_weight="1"
                 android:clipToPadding="false"
                 android:horizontalSpacing="@dimen/spacing_small"
-                android:numColumns="2"
+                android:numColumns="@integer/bank_grid_columns"
                 android:padding="@dimen/spacing_small"
                 android:stretchMode="columnWidth"
                 android:scrollbars="none"

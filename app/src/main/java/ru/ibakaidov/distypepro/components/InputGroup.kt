@@ -2,13 +2,11 @@ package ru.ibakaidov.distypepro.components
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.Menu
 import android.widget.EditText
 import android.widget.Toast
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.analytics.ktx.analytics
@@ -33,23 +31,13 @@ class InputGroup @JvmOverloads constructor(
     private lateinit var tts: Tts
     private lateinit var ttsEditText: EditText
     private lateinit var sayButton: MaterialButton
-    private lateinit var spotlightButton: MaterialButton
-    private lateinit var chatSelectorButton: MaterialButton
-    private var previousSlotIndex: Int = 0
     private val textCache = arrayOf("", "", "")
-    private val slotLabels = intArrayOf(
-        R.string.chat_slot_one,
-        R.string.chat_slot_two,
-        R.string.chat_slot_three
-    )
     private var eventsJob: Job? = null
     private var isSpeaking: Boolean = false
 
     override fun initUi() {
         ttsEditText = findViewById(R.id.text_to_speech_edittext)
         sayButton = findViewById(R.id.say_button)
-        spotlightButton = findViewById(R.id.spotlight_button)
-        chatSelectorButton = findViewById(R.id.chat_selector_button)
 
         setOnClickListener {
             if (ttsEditText.hasFocus()) {
@@ -58,8 +46,6 @@ class InputGroup @JvmOverloads constructor(
         }
 
         sayButton.setOnClickListener { say() }
-        spotlightButton.setOnClickListener { spotlight() }
-        setupChatSelector()
 
         ttsEditText.addTextChangedListener(object : SimpleTextWatcher() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -91,31 +77,9 @@ class InputGroup @JvmOverloads constructor(
         observeTtsEvents()
     }
 
-    private fun setupChatSelector() {
-        chatSelectorButton.text = context.getString(slotLabels[previousSlotIndex])
-        chatSelectorButton.setOnClickListener { showChatMenu() }
-    }
-
-    private fun showChatMenu() {
-        val popup = PopupMenu(context, chatSelectorButton)
-        slotLabels.forEachIndexed { index, labelRes ->
-            popup.menu.add(Menu.NONE, index, index, labelRes)
-        }
-
-        popup.setOnMenuItemClickListener { item ->
-            val newIndex = item.itemId
-            if (newIndex in slotLabels.indices) {
-                if (newIndex != previousSlotIndex) {
-                    textCache[previousSlotIndex] = currentText
-                    previousSlotIndex = newIndex
-                    setText(textCache[newIndex])
-                }
-                chatSelectorButton.text = context.getString(slotLabels[newIndex])
-            }
-            true
-        }
-
-        popup.show()
+    fun switchSlot(fromSlot: Int, toSlot: Int) {
+        textCache[fromSlot] = currentText
+        setText(textCache[toSlot])
     }
 
     fun clear() {
@@ -133,7 +97,7 @@ class InputGroup @JvmOverloads constructor(
     }
 
 
-    private fun spotlight() {
+    fun spotlight() {
         SpotlightActivity.show(context, currentText)
         Firebase.analytics.logEvent("spotlight", null)
     }

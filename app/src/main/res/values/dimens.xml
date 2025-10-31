@@ -13,4 +13,6 @@
     <dimen name="elevation_medium">8dp</dimen>
 
     <dimen name="button_icon_min_size">48dp</dimen>
+    
+    <dimen name="input_card_max_height">180dp</dimen>
 </resources>
