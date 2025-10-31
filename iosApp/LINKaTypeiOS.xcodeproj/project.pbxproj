@@ -32,6 +32,8 @@
 		A0000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000601 /* Assets.xcassets */; };
 		A0000014 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000701 /* Localizable.strings */; };
 		A0000015 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0000801 /* GoogleService-Info.plist */; };
+		A0000017 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000703 /* InfoPlist.strings */; };
+		A0000016 /* AppTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000306 /* AppTrackingManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,6 +49,7 @@
 		A0000303 /* FirebaseStatementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStatementManager.swift; sourceTree = "<group>"; };
 		A0000304 /* TtsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TtsManager.swift; sourceTree = "<group>"; };
 		A0000305 /* TtsCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TtsCacheManager.swift; sourceTree = "<group>"; };
+		A0000306 /* AppTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTrackingManager.swift; sourceTree = "<group>"; };
 		A0000401 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		A0000402 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		A0000403 /* InputGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputGroupView.swift; sourceTree = "<group>"; };
@@ -56,6 +59,7 @@
 		A0000501 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		A0000601 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A0000702 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		A0000704 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A0000801 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A0000802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -126,6 +130,7 @@
 				A0000303 /* FirebaseStatementManager.swift */,
 				A0000304 /* TtsManager.swift */,
 				A0000305 /* TtsCacheManager.swift */,
+				A0000306 /* AppTrackingManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -156,6 +161,7 @@
 			children = (
 				A0000601 /* Assets.xcassets */,
 				A0000701 /* Localizable.strings */,
+				A0000703 /* InfoPlist.strings */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -230,6 +236,7 @@
 				A0000013 /* Assets.xcassets in Resources */,
 				A0000014 /* Localizable.strings in Resources */,
 				A0000015 /* GoogleService-Info.plist in Resources */,
+				A0000017 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +265,7 @@
 				A0000010 /* SettingsView.swift in Sources */,
 				A0000011 /* SpotlightView.swift in Sources */,
 				A0000012 /* View+Extensions.swift in Sources */,
+				A0000016 /* AppTrackingManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,6 +278,14 @@
 				A0000702 /* ru */,
 			);
 			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		A0000703 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A0000704 /* ru */,
+			);
+			name = InfoPlist.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

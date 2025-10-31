@@ -1,0 +1,8 @@
+/* Russian Localization for Info.plist */
+
+NSUserTrackingUsageDescription = "Это приложение использует ваши данные для улучшения пользовательского опыта и предоставления лучшего сервиса.";
+NSSpeechRecognitionUsageDescription = "Это приложение использует синтез речи для помощи людям с нарушениями речи в общении.";
+
+
+
+

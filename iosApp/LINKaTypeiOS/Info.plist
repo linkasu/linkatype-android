@@ -51,6 +51,8 @@
 	</dict>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>This app uses speech synthesis to help people with speech difficulties communicate.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This app uses your data to improve the user experience and provide better service.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

@@ -62,13 +62,15 @@ struct AuthView: View {
                         if isLoading {
                             ProgressView()
                                 .tint(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
                         } else {
                             Text(NSLocalizedString(isSignUpMode ? "auth_action_sign_up" : "auth_action_sign_in", comment: ""))
                                 .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
                         }
                     }
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
                     .background(Color.white)
                     .foregroundColor(.blue)
                     .cornerRadius(12)

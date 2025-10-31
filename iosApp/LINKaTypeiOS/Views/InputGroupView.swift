@@ -1,11 +1,15 @@
 import SwiftUI
 
+struct SpotlightTextItem: Identifiable {
+    let id = UUID()
+    let text: String
+}
+
 struct InputGroupView: View {
     @ObservedObject var ttsManager: TtsManager
     @State private var textSlots = ["", "", ""]
     @State private var currentSlot = 0
-    @State private var showSpotlight = false
-    @State private var spotlightText = ""
+    @State private var spotlightItem: SpotlightTextItem?
     
     private let slotLabels = ["chat_slot_one", "chat_slot_two", "chat_slot_three"]
     
@@ -45,8 +49,7 @@ struct InputGroupView: View {
                 .disabled(textSlots[currentSlot].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !ttsManager.isSpeaking)
                 
                 Button(action: {
-                    spotlightText = textSlots[currentSlot]
-                    showSpotlight = true
+                    spotlightItem = SpotlightTextItem(text: textSlots[currentSlot])
                 }) {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
                         .padding()
@@ -60,8 +63,11 @@ struct InputGroupView: View {
         .onReceive(NotificationCenter.default.publisher(for: .clearInput)) { _ in
             textSlots[currentSlot] = ""
         }
-        .fullScreenCover(isPresented: $showSpotlight) {
-            SpotlightView(text: spotlightText, isPresented: $showSpotlight)
+        .fullScreenCover(item: $spotlightItem) { item in
+            SpotlightView(text: item.text, isPresented: Binding(
+                get: { spotlightItem != nil },
+                set: { if !$0 { spotlightItem = nil } }
+            ))
         }
     }
     
