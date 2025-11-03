@@ -321,19 +321,30 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
-            
+
             if let httpResponse = response as? HTTPURLResponse {
                 if httpResponse.statusCode == 200 || httpResponse.statusCode == 201 {
                     return data
                 } else {
                     lastErrorMessage = "HTTP \(httpResponse.statusCode)"
+                    if (500...599).contains(httpResponse.statusCode) {
+                        await notifyTemporarilyUnavailable()
+                    }
                     return nil
                 }
             }
             return nil
         } catch {
             lastErrorMessage = error.localizedDescription
+            await notifyTemporarilyUnavailable()
             return nil
+        }
+    }
+
+    private func notifyTemporarilyUnavailable() async {
+        let message = NSLocalizedString("tts_temporarily_unavailable", comment: "")
+        await MainActor.run {
+            self.eventSubject.send(.temporarilyUnavailable(message))
         }
     }
     
@@ -426,4 +437,3 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
         eventSubject.send(.error(error?.localizedDescription ?? "Ошибка декодирования"))
     }
 }
-

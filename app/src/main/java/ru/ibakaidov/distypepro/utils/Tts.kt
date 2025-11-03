@@ -34,6 +34,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import org.json.JSONArray
+import ru.ibakaidov.distypepro.R
 
 class Tts(
     context: Context,
@@ -494,6 +495,11 @@ class Tts(
         eventsFlow.tryEmit(TtsEvent.Error(message))
     }
 
+    private fun emitTemporarilyUnavailable() {
+        val message = appContext.getString(R.string.tts_temporarily_unavailable)
+        eventsFlow.tryEmit(TtsEvent.TemporarilyUnavailable(message))
+    }
+
     private suspend fun requestYandexAudio(text: String, voice: String): ByteArray? {
         return withContext(Dispatchers.IO) {
             try {
@@ -509,6 +515,9 @@ class Tts(
                     .build()
                 okHttpClient.newCall(request).execute().use { response ->
                     if (!response.isSuccessful) {
+                        if (response.code in 500..599) {
+                            emitTemporarilyUnavailable()
+                        }
                         lastErrorMessage = "HTTP ${response.code}"
                         eventsFlow.tryEmit(TtsEvent.Status("HTTP ${response.code}"))
                         null
@@ -517,8 +526,10 @@ class Tts(
                     }
                 }
             } catch (error: IOException) {
-                lastErrorMessage = error.localizedMessage ?: "network error"
-                eventsFlow.tryEmit(TtsEvent.Status("Ошибка сети: ${error.localizedMessage}"))
+                val message = error.localizedMessage ?: "network error"
+                lastErrorMessage = message
+                emitTemporarilyUnavailable()
+                eventsFlow.tryEmit(TtsEvent.Status("Ошибка сети: $message"))
                 null
             }
         }
@@ -697,6 +708,7 @@ class Tts(
         object SpeakingCompleted : TtsEvent()
         data class Error(val message: String) : TtsEvent()
         data class Status(val message: String) : TtsEvent()
+        data class TemporarilyUnavailable(val message: String) : TtsEvent()
         object DownloadStarted : TtsEvent()
         data class DownloadProgress(val current: Int, val total: Int) : TtsEvent()
         data class DownloadCompleted(val path: String?) : TtsEvent()

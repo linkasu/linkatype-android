@@ -52,6 +52,7 @@
 "tts_status_ready" = "Готов";
 "tts_status_speaking" = "Говорю...";
 "tts_status_error" = "Ошибка: %@";
+"tts_temporarily_unavailable" = "Синтез речи временно недоступен. Проверьте интернет-соединение или попробуйте позже.";
 "tts_status_download" = "Загрузка...";
 "tts_status_download_progress" = "Загрузка %d из %d";
 "tts_download_saved" = "Аудио сохранено в %@";
@@ -87,4 +88,3 @@
 "settings_delete_account_title" = "Удалить аккаунт?";
 "settings_delete_account_message" = "Это действие нельзя отменить. Все ваши данные, включая категории и фразы, будут безвозвратно удалены.";
 "settings_delete_account_confirm" = "Удалить";
-

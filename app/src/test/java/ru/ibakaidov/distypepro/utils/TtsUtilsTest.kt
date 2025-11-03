@@ -89,6 +89,13 @@ class TtsUtilsTest {
   }
 
   @Test
+  fun ttsEvent_temporarilyUnavailable_containsMessage() {
+    val event = Tts.TtsEvent.TemporarilyUnavailable("Unavailable")
+
+    assertEquals("Unavailable", event.message)
+  }
+
+  @Test
   fun ttsEvent_downloadProgress_containsValues() {
     val progressEvent = Tts.TtsEvent.DownloadProgress(5, 10)
 
@@ -151,4 +158,3 @@ class TtsUtilsTest {
     assertEquals(ProgressState.ERROR, error)
   }
 }
-

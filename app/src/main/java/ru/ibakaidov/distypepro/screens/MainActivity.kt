@@ -194,6 +194,10 @@ class MainActivity : AppCompatActivity() {
                             Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
                         }
 
+                        is Tts.TtsEvent.TemporarilyUnavailable -> {
+                            Snackbar.make(binding.root, event.message, Snackbar.LENGTH_LONG).show()
+                        }
+
                         is Tts.TtsEvent.Error -> {
                             val text = getString(R.string.tts_status_error, event.message)
                             Snackbar.make(binding.root, text, Snackbar.LENGTH_LONG).show()

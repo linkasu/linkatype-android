@@ -53,6 +53,7 @@
     <string name="tts_status_ready">Готов</string>
     <string name="tts_status_speaking">Говорит...</string>
     <string name="tts_status_error">Ошибка: %1$s</string>
+    <string name="tts_temporarily_unavailable">Синтез речи временно недоступен. Проверьте интернет-соединение или попробуйте позже.</string>
     <string name="tts_status_download">Скачивание...</string>
     <string name="tts_status_download_progress">Скачивание %1$d из %2$d</string>
     <string name="tts_download_saved">Аудио сохранено: %1$s</string>

@@ -218,6 +218,8 @@ struct SettingsView: View {
             statusText = NSLocalizedString("tts_status_ready", comment: "")
         case .error(let message):
             statusText = String(format: NSLocalizedString("tts_status_error", comment: ""), message)
+        case .temporarilyUnavailable(let message):
+            statusText = message
         case .status(let message):
             statusText = message
         case .downloadStarted:

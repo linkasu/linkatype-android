@@ -75,6 +75,8 @@ struct MainView: View {
         case .error(let message):
             let format = NSLocalizedString("tts_status_error", comment: "")
             showSnackbarMessage(String(format: format, message))
+        case .temporarilyUnavailable(let message):
+            showSnackbarMessage(message)
         default:
             break
         }

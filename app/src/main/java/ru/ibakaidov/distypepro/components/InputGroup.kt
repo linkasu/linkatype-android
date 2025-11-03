@@ -147,6 +147,12 @@ class InputGroup @JvmOverloads constructor(
                 updateActionButtonsState()
             }
 
+            is TtsEvent.TemporarilyUnavailable -> {
+                isSpeaking = false
+                Toast.makeText(context, event.message, Toast.LENGTH_LONG).show()
+                updateActionButtonsState()
+            }
+
             is TtsEvent.Status -> Unit
 
             TtsEvent.DownloadStarted -> Unit

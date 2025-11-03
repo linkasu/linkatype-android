@@ -209,6 +209,9 @@ class SettingsActivity : AppCompatActivity() {
                         is Tts.TtsEvent.Error ->
                             binding.ttsStatusText.text = getString(R.string.tts_status_error, event.message)
 
+                        is Tts.TtsEvent.TemporarilyUnavailable ->
+                            binding.ttsStatusText.text = event.message
+
                         is Tts.TtsEvent.Status ->
                             binding.ttsStatusText.text = event.message
 

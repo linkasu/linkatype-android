@@ -52,6 +52,7 @@
 "tts_status_ready" = "Ready";
 "tts_status_speaking" = "Speaking...";
 "tts_status_error" = "Error: %@";
+"tts_temporarily_unavailable" = "Text-to-speech is temporarily unavailable. Check your internet connection or try again later.";
 "tts_status_download" = "Downloading...";
 "tts_status_download_progress" = "Downloading %d of %d";
 "tts_download_saved" = "Audio saved to %@";
@@ -87,4 +88,3 @@
 "settings_delete_account_title" = "Delete Account?";
 "settings_delete_account_message" = "This action cannot be undone. All your data including categories and phrases will be permanently deleted.";
 "settings_delete_account_confirm" = "Delete";
-
