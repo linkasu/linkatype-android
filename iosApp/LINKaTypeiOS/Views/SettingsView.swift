@@ -13,7 +13,7 @@ struct SettingsView: View {
     @State private var cacheEnabled = false
     @State private var cacheSizeLimitMb: Double = 1000
     @State private var cacheInfo = ""
-    @State private var statusText = "tts_status_ready"
+    @State private var statusText = NSLocalizedString("tts_status_ready", comment: "")
     @State private var availableVoices: [TtsVoice] = []
     @State private var showDeleteAccountAlert = false
     @State private var isDeleting = false
@@ -249,4 +249,3 @@ struct SettingsView: View {
         }
     }
 }
-

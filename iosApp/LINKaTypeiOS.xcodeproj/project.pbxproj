@@ -12,6 +12,7 @@
 		6547FF732EB14BDE00275311 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 6547FF722EB14BDE00275311 /* FirebaseCore */; };
 		6547FF752EB14BDE00275311 /* FirebaseDatabase in Frameworks */ = {isa = PBXBuildFile; productRef = 6547FF742EB14BDE00275311 /* FirebaseDatabase */; };
 		6547FF772EB14BDE00275311 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 6547FF762EB14BDE00275311 /* FirebaseAnalytics */; };
+		656AE01A2EB8E62900106D96 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 656AE0192EB8E62900106D96 /* GoogleService-Info.plist */; };
 		65F394BF2EB4E78F0046A99F /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 65F394BE2EB4E78F0046A99F /* FirebaseAnalyticsCore */; };
 		65F394C12EB4E78F0046A99F /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 65F394C02EB4E78F0046A99F /* FirebaseAnalyticsIdentitySupport */; };
 		A0000001 /* LINKaTypeiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000101 /* LINKaTypeiOSApp.swift */; };
@@ -34,13 +35,13 @@
 		A0000012 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000501 /* View+Extensions.swift */; };
 		A0000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000601 /* Assets.xcassets */; };
 		A0000014 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000701 /* Localizable.strings */; };
-		A0000015 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = A0000801 /* GoogleService-Info.plist */; };
 		A0000016 /* AppTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000306 /* AppTrackingManager.swift */; };
 		A0000017 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000703 /* InfoPlist.strings */; };
 		A0000018 /* FirebaseAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000307 /* FirebaseAnalyticsManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		656AE0192EB8E62900106D96 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		A0000100 /* LINKa type.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LINKa type.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0000101 /* LINKaTypeiOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LINKaTypeiOSApp.swift; sourceTree = "<group>"; };
 		A0000102 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -65,7 +66,7 @@
 		A0000601 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A0000702 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A0000704 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/InfoPlist.strings; sourceTree = "<group>"; };
-		A0000801 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		A0000705 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A0000802 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -105,8 +106,8 @@
 				A0000400 /* Views */,
 				A0000500 /* Extensions */,
 				A0000600 /* Resources */,
-				A0000801 /* GoogleService-Info.plist */,
 				A0000802 /* Info.plist */,
+				656AE0192EB8E62900106D96 /* GoogleService-Info.plist */,
 			);
 			path = LINKaTypeiOS;
 			sourceTree = "<group>";
@@ -246,8 +247,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				A0000013 /* Assets.xcassets in Resources */,
+				656AE01A2EB8E62900106D96 /* GoogleService-Info.plist in Resources */,
 				A0000014 /* Localizable.strings in Resources */,
-				A0000015 /* GoogleService-Info.plist in Resources */,
 				A0000017 /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -288,6 +289,7 @@
 		A0000701 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
+				A0000705 /* en */,
 				A0000702 /* ru */,
 			);
 			name = Localizable.strings;

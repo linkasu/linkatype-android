@@ -67,12 +67,14 @@ struct MainView: View {
         switch event {
         case .downloadCompleted(let path):
             if let path = path {
-                showSnackbarMessage("tts_download_saved \(path)")
+                let format = NSLocalizedString("tts_download_saved", comment: "")
+                showSnackbarMessage(String(format: format, path))
             } else {
-                showSnackbarMessage("tts_download_finished")
+                showSnackbarMessage(NSLocalizedString("tts_download_finished", comment: ""))
             }
         case .error(let message):
-            showSnackbarMessage("tts_status_error \(message)")
+            let format = NSLocalizedString("tts_status_error", comment: "")
+            showSnackbarMessage(String(format: format, message))
         default:
             break
         }
@@ -107,4 +109,3 @@ struct SnackbarView: View {
 extension Notification.Name {
     static let clearInput = Notification.Name("clearInput")
 }
-
