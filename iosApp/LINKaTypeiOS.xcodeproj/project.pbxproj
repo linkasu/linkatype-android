@@ -38,6 +38,7 @@
 		A0000016 /* AppTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000306 /* AppTrackingManager.swift */; };
 		A0000017 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000703 /* InfoPlist.strings */; };
 		A0000018 /* FirebaseAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000307 /* FirebaseAnalyticsManager.swift */; };
+		A0000019 /* TrackingConsentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000308 /* TrackingConsentManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -56,6 +57,7 @@
 		A0000305 /* TtsCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TtsCacheManager.swift; sourceTree = "<group>"; };
 		A0000306 /* AppTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTrackingManager.swift; sourceTree = "<group>"; };
 		A0000307 /* FirebaseAnalyticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAnalyticsManager.swift; sourceTree = "<group>"; };
+		A0000308 /* TrackingConsentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingConsentManager.swift; sourceTree = "<group>"; };
 		A0000401 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		A0000402 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		A0000403 /* InputGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputGroupView.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 				A0000305 /* TtsCacheManager.swift */,
 				A0000306 /* AppTrackingManager.swift */,
 				A0000307 /* FirebaseAnalyticsManager.swift */,
+				A0000308 /* TrackingConsentManager.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 				A0000012 /* View+Extensions.swift in Sources */,
 				A0000016 /* AppTrackingManager.swift in Sources */,
 				A0000018 /* FirebaseAnalyticsManager.swift in Sources */,
+				A0000019 /* TrackingConsentManager.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

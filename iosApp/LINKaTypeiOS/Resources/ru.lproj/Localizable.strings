@@ -40,6 +40,7 @@
 "auth_error_generic" = "Что-то пошло не так. Попробуйте снова.";
 "auth_message_account_created" = "Аккаунт успешно создан";
 "auth_message_password_reset_sent" = "Ссылка для сброса пароля отправлена. Проверьте почту.";
+"auth_tracking_toggle" = "Разрешить аналитику и отслеживание";
 "auth_tracking_agreement" = "Я согласен на сбор анонимных данных об использовании (нажатия кнопок, использование функций) через Firebase Analytics для улучшения приложения. Личная информация не собирается.";
 
 "logout" = "Выйти";
@@ -77,6 +78,9 @@
 "settings_cache_info" = "Файлов: %d, Использовано: %.1f МБ из %d МБ";
 "settings_cache_limit_value" = "Лимит: %d МБ";
 "settings_cache_cleared" = "Кеш очищен";
+"settings_section_privacy" = "Конфиденциальность";
+"settings_allow_tracking" = "Разрешить аналитику и отслеживание";
+"settings_tracking_description" = "Дополнительная аналитика помогает улучшать приложение. Вы можете изменить это в любое время.";
 
 "bank_download_cache" = "Загрузить кеш";
 "bank_download_cache_title" = "Загрузка фраз";

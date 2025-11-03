@@ -40,6 +40,7 @@
 "auth_error_generic" = "Something went wrong. Please try again.";
 "auth_message_account_created" = "Account created successfully";
 "auth_message_password_reset_sent" = "Password reset link sent. Check your inbox.";
+"auth_tracking_toggle" = "Allow analytics & tracking";
 "auth_tracking_agreement" = "I agree to the collection of anonymous usage data (button taps, feature usage) via Firebase Analytics to improve the app. No personal information is collected.";
 
 "logout" = "Log out";
@@ -84,6 +85,9 @@
 "bank_download_cache_done" = "Phrases cached";
 
 "settings_section_account" = "Account";
+"settings_section_privacy" = "Privacy";
+"settings_allow_tracking" = "Allow analytics & tracking";
+"settings_tracking_description" = "Optional analytics help us improve the app. You can change this any time.";
 "settings_delete_account" = "Delete Account";
 "settings_delete_account_title" = "Delete Account?";
 "settings_delete_account_message" = "This action cannot be undone. All your data including categories and phrases will be permanently deleted.";

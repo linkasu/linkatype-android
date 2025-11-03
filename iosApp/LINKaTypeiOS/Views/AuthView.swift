@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AuthView: View {
     @EnvironmentObject var authManager: FirebaseAuthManager
+    @ObservedObject private var trackingConsentManager = TrackingConsentManager.shared
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -10,7 +11,6 @@ struct AuthView: View {
     @State private var errorMessage: String?
     @State private var showResetPasswordAlert = false
     @State private var resetPasswordMessage: String?
-    @State private var agreedToPrivacy = false
     
     var body: some View {
         ZStack {
@@ -52,12 +52,16 @@ struct AuthView: View {
                             .textContentType(.password)
                     }
                     
-                    HStack(alignment: .top, spacing: 12) {
-                        Button(action: { agreedToPrivacy.toggle() }) {
-                            Image(systemName: agreedToPrivacy ? "checkmark.square.fill" : "square")
-                                .font(.system(size: 22))
+                    VStack(alignment: .leading, spacing: 8) {
+                        Toggle(isOn: Binding(
+                            get: { trackingConsentManager.isTrackingEnabled },
+                            set: { trackingConsentManager.setTrackingEnabled($0) }
+                        )) {
+                            Text(NSLocalizedString("auth_tracking_toggle", comment: ""))
+                                .font(.system(size: 15, weight: .semibold))
                                 .foregroundColor(.white)
                         }
+                        .tint(.white)
                         
                         Text(NSLocalizedString("auth_tracking_agreement", comment: ""))
                             .font(.system(size: 13))
@@ -144,18 +148,9 @@ struct AuthView: View {
             return
         }
         
-        if !agreedToPrivacy {
-            errorMessage = NSLocalizedString("auth_error_tracking_not_agreed", comment: "")
-            return
-        }
-        
         isLoading = true
         
         Task {
-            if agreedToPrivacy {
-                AppTrackingManager.shared.requestTrackingAuthorizationSync()
-            }
-            
             do {
                 if isSignUpMode {
                     try await authManager.signUp(email: email, password: password)
@@ -211,4 +206,3 @@ struct AuthTextFieldStyle: TextFieldStyle {
             .accentColor(.white)
     }
 }
-

@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @ObservedObject var ttsManager: TtsManager
     @EnvironmentObject var authManager: FirebaseAuthManager
+    @ObservedObject private var trackingConsentManager = TrackingConsentManager.shared
     @Environment(\.dismiss) var dismiss
     
     @State private var useYandex = true
@@ -124,6 +125,19 @@ struct SettingsView: View {
                         }
                     }
                 }
+            }
+
+            Section(header: Text(NSLocalizedString("settings_section_privacy", comment: ""))) {
+                Toggle(isOn: Binding(
+                    get: { trackingConsentManager.isTrackingEnabled },
+                    set: { trackingConsentManager.setTrackingEnabled($0) }
+                )) {
+                    Text(NSLocalizedString("settings_allow_tracking", comment: ""))
+                }
+                Text(NSLocalizedString("settings_tracking_description", comment: ""))
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             
             Section(header: Text(NSLocalizedString("settings_section_account", comment: ""))) {
