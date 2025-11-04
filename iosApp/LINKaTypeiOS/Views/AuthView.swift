@@ -2,7 +2,6 @@ import SwiftUI
 
 struct AuthView: View {
     @EnvironmentObject var authManager: FirebaseAuthManager
-    @ObservedObject private var trackingConsentManager = TrackingConsentManager.shared
     @State private var email = ""
     @State private var password = ""
     @State private var confirmPassword = ""
@@ -51,24 +50,6 @@ struct AuthView: View {
                             .textFieldStyle(AuthTextFieldStyle())
                             .textContentType(.password)
                     }
-                    
-                    VStack(alignment: .leading, spacing: 8) {
-                        Toggle(isOn: Binding(
-                            get: { trackingConsentManager.isTrackingEnabled },
-                            set: { trackingConsentManager.setTrackingEnabled($0) }
-                        )) {
-                            Text(NSLocalizedString("auth_tracking_toggle", comment: ""))
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundColor(.white)
-                        }
-                        .tint(.white)
-                        
-                        Text(NSLocalizedString("auth_tracking_agreement", comment: ""))
-                            .font(.system(size: 13))
-                            .foregroundColor(.white.opacity(0.9))
-                            .multilineTextAlignment(.leading)
-                    }
-                    .padding(.top, 8)
                     
                     if let error = errorMessage {
                         Text(error)

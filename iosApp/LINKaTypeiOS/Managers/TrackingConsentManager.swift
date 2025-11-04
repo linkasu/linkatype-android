@@ -8,6 +8,7 @@ class TrackingConsentManager: ObservableObject {
   @Published private(set) var isTrackingEnabled: Bool
   
   private let userDefaultsKey = "tracking_consent_enabled"
+  private let attRequestedKey = "att_request_shown"
   private let userDefaults: UserDefaults
   
   private init(userDefaults: UserDefaults = .standard) {
@@ -17,13 +18,18 @@ class TrackingConsentManager: ObservableObject {
       self.isTrackingEnabled = storedValue
       Analytics.setAnalyticsCollectionEnabled(storedValue)
     } else {
-      self.isTrackingEnabled = true
-      userDefaults.set(true, forKey: userDefaultsKey)
-      Analytics.setAnalyticsCollectionEnabled(true)
-      Task { @MainActor in
-        _ = await AppTrackingManager.shared.requestTrackingAuthorization()
-      }
+      self.isTrackingEnabled = false
+      userDefaults.set(false, forKey: userDefaultsKey)
+      Analytics.setAnalyticsCollectionEnabled(false)
     }
+  }
+  
+  var hasShownATTRequest: Bool {
+    return userDefaults.bool(forKey: attRequestedKey)
+  }
+  
+  func markATTRequestShown() {
+    userDefaults.set(true, forKey: attRequestedKey)
   }
   
   func setTrackingEnabled(_ enabled: Bool) {
@@ -32,11 +38,5 @@ class TrackingConsentManager: ObservableObject {
     userDefaults.set(enabled, forKey: userDefaultsKey)
     isTrackingEnabled = enabled
     Analytics.setAnalyticsCollectionEnabled(enabled)
-    
-    if enabled {
-      Task { @MainActor in
-        _ = await AppTrackingManager.shared.requestTrackingAuthorization()
-      }
-    }
   }
 }
