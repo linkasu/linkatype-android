@@ -1,6 +1,7 @@
 package ru.ibakaidov.distypepro.screens
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
@@ -55,7 +56,7 @@ class MainActivity : AppCompatActivity() {
 
         WindowCompat.getInsetsController(window, binding.root)?.let { controller ->
             controller.isAppearanceLightStatusBars = false
-            controller.isAppearanceLightNavigationBars = true
+            controller.isAppearanceLightNavigationBars = !isNightMode()
         }
 
         tts = TtsHolder.get(this)
@@ -208,5 +209,10 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun isNightMode(): Boolean {
+        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
     }
 }

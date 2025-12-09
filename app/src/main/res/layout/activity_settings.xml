@@ -12,10 +12,10 @@
         android:background="?attr/colorPrimary"
         android:navigationIcon="@drawable/ic_baseline_arrow_back_24"
         android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
-        app:navigationIconTint="@color/colorButtonBlack"
+        app:navigationIconTint="?attr/colorOnPrimary"
         app:popupTheme="@style/AppTheme.PopupOverlay"
         app:title="@string/settings"
-        app:titleTextColor="@color/colorButtonBlack" />
+        app:titleTextColor="?attr/colorOnPrimary" />
 
     <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"

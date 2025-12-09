@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#197377</color>
+    <color name="colorOnPrimary">#FFFFFF</color>
+    <color name="colorPrimaryContainer">#2F8B8F</color>
+    <color name="colorOnPrimaryContainer">#FFFFFF</color>
+
+    <color name="colorPrimaryDark">#BED64F</color>
+    <color name="colorSecondary">#BED64F</color>
+    <color name="colorOnSecondary">#11210A</color>
+    <color name="colorSecondaryContainer">#D6E97A</color>
+    <color name="colorOnSecondaryContainer">#11210A</color>
+
+    <color name="colorTertiary">#FBCC30</color>
+    <color name="colorOnTertiary">#1F1600</color>
+    <color name="colorTertiaryContainer">#FFE68A</color>
+    <color name="colorOnTertiaryContainer">#1F1600</color>
+
+    <color name="colorAccent">#FBCC30</color>
+
+    <color name="colorError">#FFB4AB</color>
+    <color name="colorOnError">#690005</color>
+    <color name="colorErrorContainer">#93000A</color>
+    <color name="colorOnErrorContainer">#FFDAD6</color>
+
+    <color name="colorBackground">#0F1211</color>
+    <color name="colorOnBackground">#E2E4E1</color>
+    <color name="colorSurface">#0F1211</color>
+    <color name="colorOnSurface">#E2E4E1</color>
+    <color name="colorSurfaceVariant">#303634</color>
+    <color name="colorOnSurfaceVariant">#C3CDC7</color>
+    <color name="colorSurfaceInverse">#E2E4E1</color>
+    <color name="colorOnSurfaceInverse">#1A1C1A</color>
+    <color name="colorOutline">#8D9590</color>
+    <color name="colorOutlineVariant">#424944</color>
+    <color name="colorPrimaryInverse">#9CD3D6</color>
+
+    <color name="spotlight_background">#000000</color>
+    <color name="spotlight_text">#FFFFFF</color>
+    <color name="colorButtonBlack">#FFFFFF</color>
+    <color name="colorOnButtonBlack">#000000</color>
+    <color name="light_blue_600">#FF039BE5</color>
+    <color name="light_blue_900">#FF01579B</color>
+    <color name="light_blue_A200">#FF40C4FF</color>
+    <color name="light_blue_A400">#FF00B0FF</color>
+    <color name="black_overlay">#66000000</color>
+</resources>

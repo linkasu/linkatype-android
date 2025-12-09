@@ -28,10 +28,10 @@
                 android:paddingEnd="@dimen/spacing_small"
                 android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
                 app:contentInsetStartWithNavigation="0dp"
-                app:navigationIconTint="@color/colorButtonBlack"
+                app:navigationIconTint="?attr/colorOnPrimary"
                 app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:titleTextColor="@color/colorButtonBlack"
-                app:subtitleTextColor="@color/colorButtonBlack" />
+                app:titleTextColor="?attr/colorOnPrimary"
+                app:subtitleTextColor="?attr/colorOnPrimary" />
 
             <GridView
                 android:id="@+id/gridview"

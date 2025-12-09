@@ -8,20 +8,20 @@
         <item name="android:elevation">@dimen/elevation_small</item>
         <item name="titleTextAppearance">@style/TextAppearance.LinkaType.ToolbarTitle</item>
         <item name="subtitleTextAppearance">@style/TextAppearance.LinkaType.ToolbarSubtitle</item>
-        <item name="titleTextColor">@color/colorButtonBlack</item>
-        <item name="subtitleTextColor">@color/colorButtonBlack</item>
-        <item name="navigationIconTint">@color/colorButtonBlack</item>
-        <item name="colorControlNormal">@color/colorButtonBlack</item>
+        <item name="titleTextColor">@color/colorOnPrimary</item>
+        <item name="subtitleTextColor">@color/colorOnPrimary</item>
+        <item name="navigationIconTint">@color/colorOnPrimary</item>
+        <item name="colorControlNormal">@color/colorOnPrimary</item>
     </style>
 
     <style name="ThemeOverlay.LinkaType.Toolbar" parent="ThemeOverlay.Material3.ActionBar">
         <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorOnPrimary">@color/colorButtonBlack</item>
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorSurface">@color/colorPrimary</item>
-        <item name="colorOnSurface">@color/colorButtonBlack</item>
-        <item name="colorControlNormal">@color/colorButtonBlack</item>
-        <item name="android:textColorPrimary">@color/colorButtonBlack</item>
-        <item name="android:textColorSecondary">@color/colorButtonBlack</item>
+        <item name="colorOnSurface">@color/colorOnPrimary</item>
+        <item name="colorControlNormal">@color/colorOnPrimary</item>
+        <item name="android:textColorPrimary">@color/colorOnPrimary</item>
+        <item name="android:textColorSecondary">@color/colorOnPrimary</item>
     </style>
 
     <style name="Widget.LinkaType.Button" parent="Widget.Material3.Button">
@@ -81,15 +81,15 @@
     <style name="ShapeAppearance.LinkaType.Medium" parent="ShapeAppearance.Material3.MediumComponent" />
 
     <style name="TextAppearance.LinkaType.ToolbarTitle" parent="TextAppearance.Material3.TitleLarge">
-        <item name="android:textColor">@color/colorButtonBlack</item>
+        <item name="android:textColor">@color/colorOnPrimary</item>
     </style>
 
     <style name="TextAppearance.LinkaType.ToolbarSubtitle" parent="TextAppearance.Material3.BodyMedium">
-        <item name="android:textColor">@color/colorButtonBlack</item>
+        <item name="android:textColor">@color/colorOnPrimary</item>
     </style>
 
     <style name="TextAppearance.LinkaType.MenuItem" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">@color/colorButtonBlack</item>
+        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
 </resources>
