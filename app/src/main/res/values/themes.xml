@@ -52,11 +52,14 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.LinkaType.Toolbar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3">
-        <item name="colorOnSurface">?attr/colorOnSurface</item>
-        <item name="android:textColor">?attr/colorOnSurface</item>
-        <item name="android:textColorPrimary">?attr/colorOnSurface</item>
-        <item name="android:textColorSecondary">?attr/colorOnSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorSurface">@color/colorSurface</item>
+        <item name="android:textColor">@color/colorOnSurface</item>
+        <item name="android:textColorPrimary">@color/colorOnSurface</item>
+        <item name="android:textColorSecondary">@color/colorOnSurface</item>
         <item name="android:itemTextAppearance">@style/TextAppearance.LinkaType.MenuItem</item>
+        <item name="textAppearanceLargePopupMenu">@style/TextAppearance.LinkaType.MenuItem</item>
+        <item name="textAppearanceSmallPopupMenu">@style/TextAppearance.LinkaType.MenuItem</item>
     </style>
 
     <style name="ThemeOverlay.LINKaType.FullscreenContainer" parent="">
