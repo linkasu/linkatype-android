@@ -59,7 +59,7 @@ class Tts(
         prefs.getString(PREF_VOICE_URI, DEFAULT_YANDEX_VOICE) ?: DEFAULT_YANDEX_VOICE
     private var lastErrorMessage: String? = null
 
-    private val ttsReady = CompletableDeferred<Boolean>()
+    private var ttsReady = CompletableDeferred<Boolean>()
     private var cachedYandexVoices: List<YandexVoice>? = null
     private var voicesLoadingInProgress = false
 
@@ -68,13 +68,24 @@ class Tts(
         loadYandexVoicesAsync()
     }
 
-    private fun initializeTextToSpeech() {
-        if (textToSpeech != null) return
+    private fun initializeTextToSpeech(force: Boolean = false) {
+        if (textToSpeech != null && !force) return
+
+        if (force) {
+            textToSpeech?.shutdown()
+            textToSpeech = null
+        }
+
+        if (ttsReady.isCompleted) {
+            ttsReady = CompletableDeferred()
+        }
+
+        val readySignal = ttsReady
 
         textToSpeech = TextToSpeech(appContext) { status ->
             onInitCallback?.onDone(status)
-            if (!ttsReady.isCompleted) {
-                ttsReady.complete(status == TextToSpeech.SUCCESS)
+            if (!readySignal.isCompleted) {
+                readySignal.complete(status == TextToSpeech.SUCCESS)
             }
 
             if (status == TextToSpeech.SUCCESS) {
@@ -470,11 +481,13 @@ class Tts(
     }
 
     private suspend fun ensureTtsReady() {
-        if (ttsReady.isCompleted) {
-            if (!ttsReady.getCompleted()) {
-                initializeTextToSpeech()
-            }
-        } else {
+        if (textToSpeech == null) {
+            initializeTextToSpeech(force = true)
+        }
+
+        val ready = ttsReady.await()
+        if (!ready) {
+            initializeTextToSpeech(force = true)
             ttsReady.await()
         }
     }
