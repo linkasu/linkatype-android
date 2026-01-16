@@ -41,3 +41,4 @@ captures/
 *.jks
 .DS_Store
 iosApp/LINKaTypeiOS/GoogleService-Info.plist
+.kotlin/metadata/kotlinTransformedMetadataLibraries/org.jetbrains.kotlin-kotlin-stdlib-2.2.21-commonMain-Y8sbrw.klib

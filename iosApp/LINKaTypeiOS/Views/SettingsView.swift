@@ -129,8 +129,8 @@ struct SettingsView: View {
 
             Section(header: Text(NSLocalizedString("settings_section_privacy", comment: ""))) {
                 Toggle(isOn: Binding(
-                    get: { trackingConsentManager.isTrackingEnabled },
-                    set: { trackingConsentManager.setTrackingEnabled($0) }
+                    get: { trackingConsentManager.isAnalyticsEnabled },
+                    set: { trackingConsentManager.setAnalyticsEnabled($0) }
                 )) {
                     Text(NSLocalizedString("settings_allow_tracking", comment: ""))
                 }

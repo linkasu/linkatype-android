@@ -35,7 +35,6 @@
 		A0000012 /* View+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000501 /* View+Extensions.swift */; };
 		A0000013 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A0000601 /* Assets.xcassets */; };
 		A0000014 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000701 /* Localizable.strings */; };
-		A0000016 /* AppTrackingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000306 /* AppTrackingManager.swift */; };
 		A0000017 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000703 /* InfoPlist.strings */; };
 		A0000018 /* FirebaseAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000307 /* FirebaseAnalyticsManager.swift */; };
 		A0000019 /* TrackingConsentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000308 /* TrackingConsentManager.swift */; };
@@ -55,7 +54,6 @@
 		A0000303 /* FirebaseStatementManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseStatementManager.swift; sourceTree = "<group>"; };
 		A0000304 /* TtsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TtsManager.swift; sourceTree = "<group>"; };
 		A0000305 /* TtsCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TtsCacheManager.swift; sourceTree = "<group>"; };
-		A0000306 /* AppTrackingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTrackingManager.swift; sourceTree = "<group>"; };
 		A0000307 /* FirebaseAnalyticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAnalyticsManager.swift; sourceTree = "<group>"; };
 		A0000308 /* TrackingConsentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingConsentManager.swift; sourceTree = "<group>"; };
 		A0000401 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 				A0000303 /* FirebaseStatementManager.swift */,
 				A0000304 /* TtsManager.swift */,
 				A0000305 /* TtsCacheManager.swift */,
-				A0000306 /* AppTrackingManager.swift */,
 				A0000307 /* FirebaseAnalyticsManager.swift */,
 				A0000308 /* TrackingConsentManager.swift */,
 			);
@@ -281,7 +278,6 @@
 				A0000010 /* SettingsView.swift in Sources */,
 				A0000011 /* SpotlightView.swift in Sources */,
 				A0000012 /* View+Extensions.swift in Sources */,
-				A0000016 /* AppTrackingManager.swift in Sources */,
 				A0000018 /* FirebaseAnalyticsManager.swift in Sources */,
 				A0000019 /* TrackingConsentManager.swift in Sources */,
 			);

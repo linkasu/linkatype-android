@@ -1,6 +1,5 @@
 /* Russian Localization for Info.plist */
 
-NSUserTrackingUsageDescription = "Мы используем аналитику, чтобы понимать, как вы используете приложение, и улучшать его функции. Ваша конфиденциальность важна для нас.";
 NSSpeechRecognitionUsageDescription = "Это приложение использует синтез речи для помощи людям с нарушениями речи в общении.";
 
 

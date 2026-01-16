@@ -1,5 +1,4 @@
 /* English Localization for Info.plist */
 
-NSUserTrackingUsageDescription = "We use analytics to understand how you use the app and improve its features. Your privacy is important to us.";
 NSSpeechRecognitionUsageDescription = "This app uses speech synthesis to help people with speech difficulties communicate.";
 

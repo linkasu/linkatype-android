@@ -46,8 +46,6 @@
 	</array>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>This app uses speech synthesis to help people with speech difficulties communicate.</string>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>We use analytics to understand how you use the app and improve its features. Your privacy is important to us.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>
