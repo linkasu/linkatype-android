@@ -29,4 +29,9 @@
         android:icon="@drawable/ic_baseline_download_24"
         app:showAsAction="always"
         app:iconTint="?attr/colorOnPrimary" />
+
+    <item
+        android:id="@+id/action_import_global"
+        android:title="@string/global_import_title"
+        app:showAsAction="never" />
 </menu>

@@ -6,10 +6,11 @@ import android.util.Patterns
 import android.view.inputmethod.EditorInfo
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.launch
+import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityAuthBinding
 
@@ -19,6 +20,7 @@ class AuthActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAuthBinding
     private var authMode: AuthMode = AuthMode.SignIn
+    private val sdk by lazy { SharedSdkProvider.get(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,9 +28,12 @@ class AuthActivity : AppCompatActivity() {
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        if (Firebase.auth.currentUser != null) {
-            navigateToMain()
-            return
+        lifecycleScope.launch {
+            val hasRefreshToken = sdk.tokenStorage.getRefreshToken() != null
+            if (hasRefreshToken) {
+                runCatching { sdk.authRepository.refresh() }
+                    .onSuccess { navigateToMain() }
+            }
         }
 
         setupListeners()
@@ -103,22 +108,24 @@ class AuthActivity : AppCompatActivity() {
 
         setLoading(true)
 
-        val task = when (authMode) {
-            AuthMode.SignIn -> Firebase.auth.signInWithEmailAndPassword(email, password)
-            AuthMode.SignUp -> Firebase.auth.createUserWithEmailAndPassword(email, password)
-        }
+        lifecycleScope.launch {
+            val result = runCatching {
+                when (authMode) {
+                    AuthMode.SignIn -> sdk.authRepository.login(email, password)
+                    AuthMode.SignUp -> sdk.authRepository.register(email, password)
+                }
+            }
 
-        task.addOnCompleteListener { result ->
-            if (result.isSuccessful) {
+            result.onSuccess {
                 if (authMode == AuthMode.SignUp) {
                     Snackbar.make(binding.root, R.string.auth_message_account_created, Snackbar.LENGTH_SHORT).show()
                 }
                 navigateToMain()
-            } else {
+            }.onFailure { error ->
                 setLoading(false)
                 Snackbar.make(
                     binding.root,
-                    result.exception?.localizedMessage ?: getString(R.string.auth_error_generic),
+                    error.localizedMessage ?: getString(R.string.auth_error_generic),
                     Snackbar.LENGTH_LONG
                 ).show()
             }
@@ -136,15 +143,15 @@ class AuthActivity : AppCompatActivity() {
         }
 
         setLoading(true)
-
-        Firebase.auth.sendPasswordResetEmail(email).addOnCompleteListener { task ->
+        lifecycleScope.launch {
+            val result = runCatching { sdk.authRepository.resetPassword(email) }
             setLoading(false)
-            if (task.isSuccessful) {
+            result.onSuccess {
                 Snackbar.make(binding.root, R.string.auth_message_password_reset_sent, Snackbar.LENGTH_LONG).show()
-            } else {
+            }.onFailure { error ->
                 Snackbar.make(
                     binding.root,
-                    task.exception?.localizedMessage ?: getString(R.string.auth_error_generic),
+                    error.localizedMessage ?: getString(R.string.auth_error_generic),
                     Snackbar.LENGTH_LONG
                 ).show()
             }

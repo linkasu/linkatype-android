@@ -15,6 +15,15 @@
 		656AE01A2EB8E62900106D96 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 656AE0192EB8E62900106D96 /* GoogleService-Info.plist */; };
 		65F394BF2EB4E78F0046A99F /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 65F394BE2EB4E78F0046A99F /* FirebaseAnalyticsCore */; };
 		65F394C12EB4E78F0046A99F /* FirebaseAnalyticsIdentitySupport in Frameworks */ = {isa = PBXBuildFile; productRef = 65F394C02EB4E78F0046A99F /* FirebaseAnalyticsIdentitySupport */; };
+		B0000001 /* LINKaTypeiOSTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B0000101 /* LINKaTypeiOSTests.swift */; };
+		B0000002 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0000201 /* XCTest.framework */; };
+		B0000003 /* Shared.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0000202 /* Shared.xcframework */; };
+		B0000004 /* Shared.xcframework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B0000202 /* Shared.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		C0000001 /* SharedSdkProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000101 /* SharedSdkProvider.swift */; };
+		C0000002 /* DialogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000102 /* DialogView.swift */; };
+		C0000003 /* Data+Kotlin.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000103 /* Data+Kotlin.swift */; };
+		C0000004 /* GlobalImportManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000104 /* GlobalImportManager.swift */; };
+		C0000005 /* GlobalImportView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000105 /* GlobalImportView.swift */; };
 		A0000001 /* LINKaTypeiOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000101 /* LINKaTypeiOSApp.swift */; };
 		A0000002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000102 /* ContentView.swift */; };
 		A0000003 /* Category.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000201 /* Category.swift */; };
@@ -40,8 +49,28 @@
 		A0000019 /* TrackingConsentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000308 /* TrackingConsentManager.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B00000A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A0000001Project /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A0000080;
+			remoteInfo = "LINKa type";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		656AE0192EB8E62900106D96 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		B0000100 /* LINKaTypeiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LINKaTypeiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B0000101 /* LINKaTypeiOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LINKaTypeiOSTests.swift; sourceTree = "<group>"; };
+		B0000102 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B0000201 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
+		B0000202 /* Shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Shared.xcframework; sourceTree = "<group>"; };
+		C0000101 /* SharedSdkProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSdkProvider.swift; sourceTree = "<group>"; };
+		C0000102 /* DialogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DialogView.swift; sourceTree = "<group>"; };
+		C0000103 /* Data+Kotlin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Kotlin.swift"; sourceTree = "<group>"; };
+		C0000104 /* GlobalImportManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalImportManager.swift; sourceTree = "<group>"; };
+		C0000105 /* GlobalImportView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlobalImportView.swift; sourceTree = "<group>"; };
 		A0000100 /* LINKa type.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "LINKa type.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A0000101 /* LINKaTypeiOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LINKaTypeiOSApp.swift; sourceTree = "<group>"; };
 		A0000102 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -71,6 +100,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		B0000090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0000002 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A0000090 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -82,6 +119,7 @@
 				6547FF752EB14BDE00275311 /* FirebaseDatabase in Frameworks */,
 				6547FF712EB14BDE00275311 /* FirebaseAuth in Frameworks */,
 				6547FF772EB14BDE00275311 /* FirebaseAnalytics in Frameworks */,
+				B0000003 /* Shared.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +130,8 @@
 			isa = PBXGroup;
 			children = (
 				A0000050 /* LINKaTypeiOS */,
+				B0000050 /* LINKaTypeiOSTests */,
+				B0000060 /* Frameworks */,
 				A0000099 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -116,8 +156,27 @@
 			isa = PBXGroup;
 			children = (
 				A0000100 /* LINKa type.app */,
+				B0000100 /* LINKaTypeiOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		B0000050 /* LINKaTypeiOSTests */ = {
+			isa = PBXGroup;
+			children = (
+				B0000101 /* LINKaTypeiOSTests.swift */,
+				B0000102 /* Info.plist */,
+			);
+			path = LINKaTypeiOSTests;
+			sourceTree = "<group>";
+		};
+		B0000060 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B0000201 /* XCTest.framework */,
+				B0000202 /* Shared.xcframework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		A0000200 /* Models */ = {
@@ -141,6 +200,8 @@
 				A0000305 /* TtsCacheManager.swift */,
 				A0000307 /* FirebaseAnalyticsManager.swift */,
 				A0000308 /* TrackingConsentManager.swift */,
+				C0000104 /* GlobalImportManager.swift */,
+				C0000101 /* SharedSdkProvider.swift */,
 			);
 			path = Managers;
 			sourceTree = "<group>";
@@ -154,6 +215,8 @@
 				A0000404 /* BankGroupView.swift */,
 				A0000405 /* SettingsView.swift */,
 				A0000406 /* SpotlightView.swift */,
+				C0000102 /* DialogView.swift */,
+				C0000105 /* GlobalImportView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -162,6 +225,7 @@
 			isa = PBXGroup;
 			children = (
 				A0000501 /* View+Extensions.swift */,
+				C0000103 /* Data+Kotlin.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -179,12 +243,31 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		B0000080 /* LINKaTypeiOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B0000095 /* Build configuration list for PBXNativeTarget "LINKaTypeiOSTests" */;
+			buildPhases = (
+				B0000085 /* Sources */,
+				B0000090 /* Frameworks */,
+				B0000091 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B00000A0 /* PBXTargetDependency */,
+			);
+			name = LINKaTypeiOSTests;
+			productName = LINKaTypeiOSTests;
+			productReference = B0000100 /* LINKaTypeiOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		A0000080 /* LINKa type */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A0000095 /* Build configuration list for PBXNativeTarget "LINKa type" */;
 			buildPhases = (
 				A0000085 /* Sources */,
 				A0000090 /* Frameworks */,
+				B0000092 /* Embed Frameworks */,
 				A0000091 /* Resources */,
 			);
 			buildRules = (
@@ -218,6 +301,10 @@
 					A0000080 = {
 						CreatedOnToolsVersion = 15.0;
 					};
+					B0000080 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = A0000080;
+					};
 				};
 			};
 			buildConfigurationList = A0000002Project /* Build configuration list for PBXProject "LINKaTypeiOS" */;
@@ -237,11 +324,19 @@
 			projectRoot = "";
 			targets = (
 				A0000080 /* LINKa type */,
+				B0000080 /* LINKaTypeiOSTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		B0000091 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A0000091 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -255,7 +350,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		B0000092 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				B0000004 /* Shared.xcframework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		B0000085 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B0000001 /* LINKaTypeiOSTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A0000085 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -280,6 +397,11 @@
 				A0000012 /* View+Extensions.swift in Sources */,
 				A0000018 /* FirebaseAnalyticsManager.swift in Sources */,
 				A0000019 /* TrackingConsentManager.swift in Sources */,
+				C0000001 /* SharedSdkProvider.swift in Sources */,
+				C0000002 /* DialogView.swift in Sources */,
+				C0000003 /* Data+Kotlin.swift in Sources */,
+				C0000004 /* GlobalImportManager.swift in Sources */,
+				C0000005 /* GlobalImportView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +426,14 @@
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
+
+/* Begin PBXTargetDependency section */
+		B00000A0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A0000080 /* LINKa type */;
+			targetProxy = B00000A1 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		A0000093 /* Debug */ = {
@@ -494,6 +624,52 @@
 			};
 			name = Release;
 		};
+		B0000096 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 29HEQ626X2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LINKaTypeiOSTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ru.ibakaidov.distypepro.tests;
+				PRODUCT_NAME = LINKaTypeiOSTests;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LINKa type.app/LINKa type";
+			};
+			name = Debug;
+		};
+		B0000097 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 29HEQ626X2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LINKaTypeiOSTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ru.ibakaidov.distypepro.tests;
+				PRODUCT_NAME = LINKaTypeiOSTests;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/LINKa type.app/LINKa type";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -511,6 +687,15 @@
 			buildConfigurations = (
 				A0000096 /* Debug */,
 				A0000097 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B0000095 /* Build configuration list for PBXNativeTarget "LINKaTypeiOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B0000096 /* Debug */,
+				B0000097 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

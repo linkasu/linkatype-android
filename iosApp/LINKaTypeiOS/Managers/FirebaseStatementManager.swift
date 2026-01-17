@@ -1,94 +1,55 @@
 import Foundation
-import FirebaseDatabase
 import Combine
+import Shared
 
 class FirebaseStatementManager: ObservableObject {
     @Published var statements: [String: String] = [:]
-    
-    private var ref: DatabaseReference?
-    private var handle: DatabaseHandle?
+
+    private let sdk = SharedSdkProvider.shared.sdk
     private var currentCategoryId: String?
-    
+
     func startListening(userId: String, categoryId: String) {
-        stopListening()
         currentCategoryId = categoryId
-        
-        var combinedResults: [String: String] = [:]
-        let dispatchGroup = DispatchGroup()
-        
-        dispatchGroup.enter()
-        ref = Database.database().reference().child("users/\(userId)/Statement/\(categoryId)")
-        
-        handle = ref?.observe(.value) { [weak self] snapshot in
-            guard let self = self else {
-                dispatchGroup.leave()
-                return 
-            }
-            
-            for child in snapshot.children {
-                if let childSnapshot = child as? DataSnapshot,
-                   let dict = childSnapshot.value as? [String: Any],
-                   let statement = Statement(from: dict) {
-                    combinedResults[statement.id] = statement.label
-                }
-            }
-            
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.enter()
-        let categoryRef = Database.database().reference().child("users/\(userId)/Category/\(categoryId)/statements")
-        
-        categoryRef.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists() {
-                for child in snapshot.children {
-                    if let childSnapshot = child as? DataSnapshot,
-                       let dict = childSnapshot.value as? [String: Any],
-                       let statement = Statement(from: dict) {
-                        if combinedResults[statement.id] == nil {
-                            combinedResults[statement.id] = statement.label
-                        }
-                    }
-                }
-            }
-            
-            dispatchGroup.leave()
-        }
-        
-        dispatchGroup.notify(queue: .main) { [weak self] in
-            self?.statements = combinedResults
+        Task {
+            await loadStatements(categoryId: categoryId)
         }
     }
 
-    
     func stopListening() {
-        if let handle = handle {
-            ref?.removeObserver(withHandle: handle)
-        }
-        ref = nil
-        handle = nil
         currentCategoryId = nil
     }
-    
+
+    func refresh() {
+        guard let categoryId = currentCategoryId else { return }
+        Task {
+            await loadStatements(categoryId: categoryId)
+        }
+    }
+
     func create(label: String, userId: String, categoryId: String) async throws {
-        let ref = Database.database().reference().child("users/\(userId)/Statement/\(categoryId)").childByAutoId()
-        let id = ref.key ?? UUID().uuidString
-        let data: [String: Any] = [
-            "id": id,
-            "label": label,
-            "created": Int64(Date().timeIntervalSince1970 * 1000)
-        ]
-        try await ref.updateChildValues(data)
+        _ = try await sdk.statementsRepository.create(categoryId: categoryId, text: label, created: nil)
+        await loadStatements(categoryId: categoryId)
     }
-    
+
     func edit(id: String, label: String, userId: String, categoryId: String) async throws {
-        let ref = Database.database().reference().child("users/\(userId)/Statement/\(categoryId)/\(id)")
-        try await ref.updateChildValues(["label": label])
+        _ = try await sdk.statementsRepository.update(id: id, text: label)
+        await loadStatements(categoryId: categoryId)
     }
-    
+
     func remove(id: String, userId: String, categoryId: String) async throws {
-        let ref = Database.database().reference().child("users/\(userId)/Statement/\(categoryId)/\(id)")
-        try await ref.removeValue()
+        try await sdk.statementsRepository.delete(id: id)
+        await loadStatements(categoryId: categoryId)
+    }
+
+    private func loadStatements(categoryId: String) async {
+        do {
+            let list = try await sdk.statementsRepository.listByCategory(categoryId: categoryId)
+            let mapped = Dictionary(uniqueKeysWithValues: list.map { ($0.id, $0.text) })
+            await MainActor.run {
+                self.statements = mapped
+            }
+        } catch {
+            // Ignore errors; keep existing cache.
+        }
     }
 }
-

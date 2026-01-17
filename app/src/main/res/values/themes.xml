@@ -32,6 +32,10 @@
         <item name="colorErrorContainer">@color/colorErrorContainer</item>
         <item name="colorOnErrorContainer">@color/colorOnErrorContainer</item>
 
+        <item name="android:textColorPrimary">@color/colorOnSurface</item>
+        <item name="android:textColorSecondary">@color/colorOnSurfaceVariant</item>
+        <item name="android:textColorLink">@color/colorPrimary</item>
+
         <item name="android:windowBackground">@color/colorBackground</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">?attr/colorPrimary</item>
@@ -57,6 +61,7 @@
         <item name="android:textColor">@color/colorOnSurface</item>
         <item name="android:textColorPrimary">@color/colorOnSurface</item>
         <item name="android:textColorSecondary">@color/colorOnSurface</item>
+        <item name="android:textColorLink">@color/colorPrimary</item>
         <item name="android:itemTextAppearance">@style/TextAppearance.LinkaType.MenuItem</item>
         <item name="textAppearanceLargePopupMenu">@style/TextAppearance.LinkaType.MenuItem</item>
         <item name="textAppearanceSmallPopupMenu">@style/TextAppearance.LinkaType.MenuItem</item>

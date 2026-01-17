@@ -15,15 +15,14 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.delay
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivitySettingsBinding
+import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.shared.model.UserPreferences
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
 
@@ -31,9 +30,11 @@ class SettingsActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var tts: Tts
+    private val sdk by lazy { SharedSdkProvider.get(this) }
 
     private var voiceItems: List<VoiceItem> = emptyList()
     private var eventsJob: Job? = null
+    private var preferencesSyncJob: Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,29 +71,34 @@ class SettingsActivity : AppCompatActivity() {
         binding.switchUseYandex.setOnCheckedChangeListener { _, isChecked ->
             tts.setUseYandex(isChecked)
             updateVoiceList(isChecked)
+            schedulePreferencesSync()
         }
 
         binding.voiceDropdown.setOnItemClickListener { _, _, position, _ ->
             voiceItems.getOrNull(position)?.let { item ->
                 tts.setVoice(item.id)
+                schedulePreferencesSync()
             }
         }
 
         binding.volumeSlider.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 tts.setVolume(value)
+                schedulePreferencesSync()
             }
         }
 
         binding.rateSlider.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 tts.setRate(value)
+                schedulePreferencesSync()
             }
         }
 
         binding.pitchSlider.addOnChangeListener { _, value, fromUser ->
             if (fromUser) {
                 tts.setPitch(value)
+                schedulePreferencesSync()
             }
         }
 
@@ -257,6 +263,26 @@ class SettingsActivity : AppCompatActivity() {
         )
     }
 
+    private fun schedulePreferencesSync() {
+        preferencesSyncJob?.cancel()
+        preferencesSyncJob = lifecycleScope.launch {
+            delay(300)
+            val current = runCatching { sdk.userStateRepository.getState() }.getOrNull()
+            val currentPrefs = current?.preferences ?: UserPreferences()
+            val selectedVoice = tts.getSelectedVoice()
+            val useYandex = tts.getUseYandex()
+            val merged = currentPrefs.copy(
+                yandex = useYandex,
+                voiceUri = if (useYandex) currentPrefs.voiceUri else selectedVoice.voiceId,
+                yandexVoice = if (useYandex) selectedVoice.voiceId else currentPrefs.yandexVoice,
+                volume = tts.getVolume().toDouble(),
+                rate = tts.getRate().toDouble(),
+                pitch = tts.getPitch().toDouble(),
+            )
+            runCatching { sdk.userStateRepository.updateState(preferences = merged) }
+        }
+    }
+
     private fun showSnackbar(message: String) {
         Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
     }
@@ -273,21 +299,13 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun deleteAccount() {
-        val userId = Firebase.auth.currentUser?.uid
-        if (userId == null) {
-            showSnackbar(getString(R.string.auth_error_generic))
-            return
-        }
-
         binding.buttonDeleteAccount.isEnabled = false
         binding.deleteAccountProgress.isVisible = true
 
         lifecycleScope.launch {
             try {
-                val database = Firebase.database.reference.child("users/$userId")
-                database.removeValue().await()
-
-                Firebase.auth.currentUser?.delete()?.await()
+                sdk.accountRepository.deleteAccount(deleteFirebase = true)
+                sdk.authRepository.logout()
 
                 val intent = Intent(this@SettingsActivity, AuthActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -304,6 +322,7 @@ class SettingsActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         eventsJob?.cancel()
+        preferencesSyncJob?.cancel()
     }
 
     private data class VoiceItem(val id: String, val label: String)

@@ -1,300 +1,138 @@
 package ru.ibakaidov.distypepro.data
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseException
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import io.mockk.every
+import android.content.Context
 import io.mockk.mockk
-import io.mockk.mockkStatic
-import io.mockk.slot
-import io.mockk.unmockkAll
-import io.mockk.verify
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import ru.ibakaidov.distypepro.structures.Category
+import ru.ibakaidov.distypepro.shared.model.Category
+import ru.ibakaidov.distypepro.shared.repository.CategoriesRepository
 import ru.ibakaidov.distypepro.utils.Callback
 
 class CategoryManagerTest {
 
-  private lateinit var categoryManager: CategoryManager
-  private lateinit var mockDatabase: FirebaseDatabase
-  private lateinit var mockAuth: FirebaseAuth
-  private lateinit var mockUser: FirebaseUser
-  private lateinit var mockRootRef: DatabaseReference
-  private lateinit var mockCategoryRef: DatabaseReference
+    private val testDispatcher = StandardTestDispatcher()
+    private val context = mockk<Context>(relaxed = true)
 
-  @Before
-  fun setUp() {
-    mockkStatic(FirebaseDatabase::class)
-    mockkStatic(FirebaseAuth::class)
-
-    mockDatabase = mockk()
-    mockAuth = mockk()
-    mockUser = mockk()
-    mockRootRef = mockk(relaxed = true)
-    mockCategoryRef = mockk(relaxed = true)
-
-    every { FirebaseDatabase.getInstance() } returns mockDatabase
-    every { FirebaseAuth.getInstance() } returns mockAuth
-    every { mockAuth.currentUser } returns mockUser
-    every { mockUser.uid } returns "testUserId123"
-    every { mockDatabase.reference } returns mockRootRef
-    every { mockRootRef.child(any()) } returns mockCategoryRef
-    every { mockCategoryRef.child(any()) } returns mockCategoryRef
-
-    categoryManager = CategoryManager()
-  }
-
-  @After
-  fun tearDown() {
-    unmockkAll()
-  }
-
-  @Test
-  fun getRoot_returnsCorrectPath() {
-    every { mockRootRef.child("users/testUserId123") } returns mockCategoryRef
-    every { mockCategoryRef.child("Category") } returns mockCategoryRef
-
-    val root = categoryManager.getRootForTest()
-
-    verify { mockRootRef.child("users/testUserId123") }
-    verify(atLeast = 1) { mockCategoryRef.child("Category") }
-    assertNotNull(root)
-  }
-
-  @Test
-  fun getList_parsesDataCorrectly() {
-    val listenerSlot = slot<ValueEventListener>()
-    val mockSnapshot = mockk<DataSnapshot>()
-    val mockChild1 = mockk<DataSnapshot>()
-    val mockChild2 = mockk<DataSnapshot>()
-
-    every { mockCategoryRef.orderByChild("created") } returns mockCategoryRef
-    every { mockCategoryRef.addValueEventListener(capture(listenerSlot)) } returns mockk()
-
-    val categoryData1 = mapOf(
-      "id" to "cat1",
-      "label" to "Category 1",
-      "created" to 1000L
-    )
-    val categoryData2 = mapOf(
-      "id" to "cat2",
-      "label" to "Category 2",
-      "created" to 2000L
-    )
-
-    every { mockChild1.value } returns categoryData1
-    every { mockChild2.value } returns categoryData2
-    every { mockSnapshot.children } returns listOf(mockChild1, mockChild2)
-
-    var receivedResult: Map<String, String>? = null
-    val callback = object : Callback<Map<String, String>> {
-      override fun onDone(result: Map<String, String>) {
-        receivedResult = result
-      }
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
     }
 
-    categoryManager.getList(callback)
-    listenerSlot.captured.onDataChange(mockSnapshot)
-
-    assertNotNull(receivedResult)
-    assertEquals(2, receivedResult?.size)
-    assertEquals("Category 2", receivedResult?.get("cat2"))
-    assertEquals("Category 1", receivedResult?.get("cat1"))
-  }
-
-  @Test
-  fun getList_onError_callsCallback() {
-    val listenerSlot = slot<ValueEventListener>()
-    val mockError = mockk<DatabaseError>()
-    val testException = DatabaseException("Database error")
-
-    every { mockCategoryRef.orderByChild("created") } returns mockCategoryRef
-    every { mockCategoryRef.addValueEventListener(capture(listenerSlot)) } returns mockk()
-    every { mockError.toException() } returns testException
-
-    var receivedError: Exception? = null
-    val callback = object : Callback<Map<String, String>> {
-      override fun onDone(result: Map<String, String>) {}
-
-      override fun onError(exception: Exception?) {
-        receivedError = exception
-      }
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
-    categoryManager.getList(callback)
-    listenerSlot.captured.onCancelled(mockError)
+    @Test
+    fun getList_returnsSortedMap() = runTest {
+        val repo = FakeCategoriesRepository(
+            list = listOf(
+                Category(id = "c1", label = "First", created = 10),
+                Category(id = "c2", label = "Second", created = 20),
+            )
+        )
+        val manager = CategoryManager(context, repo, testDispatcher, testDispatcher)
 
-    assertEquals(testException, receivedError)
-  }
+        var result: Map<String, String>? = null
+        manager.getList(object : Callback<Map<String, String>> {
+            override fun onDone(res: Map<String, String>) {
+                result = res
+            }
+        })
 
-  @Test
-  fun edit_updatesLabel() {
-    val taskSlot = slot<Task<Void>>()
-    val mockTask = mockk<Task<Void>>(relaxed = true)
-    val key = "cat123"
-    val newLabel = "Updated Label"
+        advanceUntilIdle()
 
-    every { mockCategoryRef.updateChildren(any()) } returns mockTask
-    every { mockTask.isSuccessful } returns true
-    every { mockTask.addOnCompleteListener(any()) } answers {
-      val listener = firstArg<com.google.android.gms.tasks.OnCompleteListener<Void>>()
-      listener.onComplete(mockTask)
-      mockTask
+        assertEquals(listOf("c2", "c1"), result?.keys?.toList())
+        assertEquals("Second", result?.get("c2"))
     }
 
-    var doneCalled = false
-    val callback = object : Callback<Unit> {
-      override fun onDone(result: Unit) {
-        doneCalled = true
-      }
+    @Test
+    fun create_callsRepository() = runTest {
+        val repo = FakeCategoriesRepository()
+        val manager = CategoryManager(context, repo, testDispatcher, testDispatcher)
+
+        var done = false
+        manager.create("New", object : Callback<Unit> {
+            override fun onDone(result: Unit) {
+                done = true
+            }
+        })
+
+        advanceUntilIdle()
+
+        assertTrue(done)
+        assertEquals("New", repo.createdLabel)
     }
 
-    categoryManager.edit(key, newLabel, callback)
+    @Test
+    fun edit_callsRepository() = runTest {
+        val repo = FakeCategoriesRepository()
+        val manager = CategoryManager(context, repo, testDispatcher, testDispatcher)
 
-    verify { mockCategoryRef.child(key) }
-    verify { mockCategoryRef.updateChildren(mapOf("label" to newLabel)) }
-    assertTrue(doneCalled)
-  }
+        var done = false
+        manager.edit("id1", "Updated", object : Callback<Unit> {
+            override fun onDone(result: Unit) {
+                done = true
+            }
+        })
 
-  @Test
-  fun edit_onFailure_callsOnError() {
-    val mockTask = mockk<Task<Void>>(relaxed = true)
-    val testException = Exception("Update failed")
+        advanceUntilIdle()
 
-    every { mockCategoryRef.updateChildren(any()) } returns mockTask
-    every { mockTask.isSuccessful } returns false
-    every { mockTask.exception } returns testException
-    every { mockTask.addOnCompleteListener(any()) } answers {
-      val listener = firstArg<com.google.android.gms.tasks.OnCompleteListener<Void>>()
-      listener.onComplete(mockTask)
-      mockTask
+        assertTrue(done)
+        assertEquals("id1", repo.updatedId)
+        assertEquals("Updated", repo.updatedLabel)
     }
 
-    var receivedError: Exception? = null
-    val callback = object : Callback<Unit> {
-      override fun onDone(result: Unit) {}
+    @Test
+    fun remove_callsRepository() = runTest {
+        val repo = FakeCategoriesRepository()
+        val manager = CategoryManager(context, repo, testDispatcher, testDispatcher)
 
-      override fun onError(exception: Exception?) {
-        receivedError = exception
-      }
+        var done = false
+        manager.remove("id2", object : Callback<Unit> {
+            override fun onDone(result: Unit) {
+                done = true
+            }
+        })
+
+        advanceUntilIdle()
+
+        assertTrue(done)
+        assertEquals("id2", repo.deletedId)
     }
 
-    categoryManager.edit("key", "value", callback)
+    private class FakeCategoriesRepository(
+        private val list: List<Category> = emptyList(),
+    ) : CategoriesRepository {
+        var createdLabel: String? = null
+        var updatedId: String? = null
+        var updatedLabel: String? = null
+        var deletedId: String? = null
 
-    assertEquals(testException, receivedError)
-  }
+        override suspend fun list(): List<Category> = list
 
-  @Test
-  fun create_generatesCorrectData() {
-    val completionSlot = slot<DatabaseReference.CompletionListener>()
-    val mockPushRef = mockk<DatabaseReference>(relaxed = true)
+        override suspend fun create(label: String, created: Long?, aiUse: Boolean?): Category {
+            createdLabel = label
+            return Category(id = "temp", label = label, created = created ?: 0L)
+        }
 
-    every { mockCategoryRef.push() } returns mockPushRef
-    every { mockPushRef.key } returns "generatedKey123"
-    every { mockPushRef.updateChildren(any(), capture(completionSlot)) } answers {
-      completionSlot.captured.onComplete(null, mockPushRef)
-      Unit
+        override suspend fun update(id: String, label: String?, aiUse: Boolean?): Category {
+            updatedId = id
+            updatedLabel = label
+            return Category(id = id, label = label ?: "", created = 0L)
+        }
+
+        override suspend fun delete(id: String) {
+            deletedId = id
+        }
     }
-
-    val label = "New Category"
-    var doneCalled = false
-    val callback = object : Callback<Unit> {
-      override fun onDone(result: Unit) {
-        doneCalled = true
-      }
-    }
-
-    categoryManager.create(label, callback)
-
-    verify {
-      mockPushRef.updateChildren(match { data ->
-        data["label"] == label &&
-          data["id"] == "generatedKey123" &&
-          data["created"] is Long
-      }, any())
-    }
-    assertTrue(doneCalled)
-  }
-
-  @Test
-  fun create_onError_callsOnError() {
-    val completionSlot = slot<DatabaseReference.CompletionListener>()
-    val mockPushRef = mockk<DatabaseReference>(relaxed = true)
-    val mockError = mockk<DatabaseError>()
-    val testException = DatabaseException("Create failed")
-
-    every { mockCategoryRef.push() } returns mockPushRef
-    every { mockPushRef.key } returns "key"
-    every { mockPushRef.updateChildren(any(), capture(completionSlot)) } answers {
-      completionSlot.captured.onComplete(mockError, mockPushRef)
-      Unit
-    }
-    every { mockError.toException() } returns testException
-
-    var receivedError: Exception? = null
-    val callback = object : Callback<Unit> {
-      override fun onDone(result: Unit) {}
-
-      override fun onError(exception: Exception?) {
-        receivedError = exception
-      }
-    }
-
-    categoryManager.create("label", callback)
-
-    assertEquals(testException, receivedError)
-  }
-
-  @Test
-  fun getList_sortsDescendingByCreated() {
-    val listenerSlot = slot<ValueEventListener>()
-    val mockSnapshot = mockk<DataSnapshot>()
-    val mockChild1 = mockk<DataSnapshot>()
-    val mockChild2 = mockk<DataSnapshot>()
-    val mockChild3 = mockk<DataSnapshot>()
-
-    every { mockCategoryRef.orderByChild("created") } returns mockCategoryRef
-    every { mockCategoryRef.addValueEventListener(capture(listenerSlot)) } returns mockk()
-
-    val data1 = mapOf("id" to "c1", "label" to "First", "created" to 1000L)
-    val data2 = mapOf("id" to "c2", "label" to "Second", "created" to 3000L)
-    val data3 = mapOf("id" to "c3", "label" to "Third", "created" to 2000L)
-
-    every { mockChild1.value } returns data1
-    every { mockChild2.value } returns data2
-    every { mockChild3.value } returns data3
-    every { mockSnapshot.children } returns listOf(mockChild1, mockChild2, mockChild3)
-
-    var receivedResult: Map<String, String>? = null
-    val callback = object : Callback<Map<String, String>> {
-      override fun onDone(result: Map<String, String>) {
-        receivedResult = result
-      }
-    }
-
-    categoryManager.getList(callback)
-    listenerSlot.captured.onDataChange(mockSnapshot)
-
-    val keys = receivedResult?.keys?.toList()
-    assertEquals("c2", keys?.get(0))
-    assertEquals("c3", keys?.get(1))
-    assertEquals("c1", keys?.get(2))
-  }
-
-  private fun CategoryManager.getRootForTest(): DatabaseReference {
-    val method = CategoryManager::class.java.getDeclaredMethod("getRoot")
-    method.isAccessible = true
-    return method.invoke(this) as DatabaseReference
-  }
 }

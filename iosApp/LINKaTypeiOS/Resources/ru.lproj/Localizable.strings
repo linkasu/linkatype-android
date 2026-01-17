@@ -42,6 +42,12 @@
 "auth_message_password_reset_sent" = "Ссылка для сброса пароля отправлена. Проверьте почту.";
 "auth_tracking_toggle" = "Разрешить аналитику и отслеживание";
 "auth_tracking_agreement" = "Я согласен на сбор анонимных данных об использовании (нажатия кнопок, использование функций) через Firebase Analytics для улучшения приложения. Личная информация не собирается.";
+"dialog_title" = "Диалог";
+"dialog_message_hint" = "Введите сообщение…";
+"dialog_send" = "Отправить";
+"dialog_record" = "Запись";
+"dialog_audio_too_large" = "Запись слишком длинная. Лимит — 8 МБ.";
+"dialog_untitled" = "Новый диалог";
 
 "logout" = "Выйти";
 "welcome_back" = "С возвращением";
@@ -92,3 +98,12 @@
 "settings_delete_account_title" = "Удалить аккаунт?";
 "settings_delete_account_message" = "Это действие нельзя отменить. Все ваши данные, включая категории и фразы, будут безвозвратно удалены.";
 "settings_delete_account_confirm" = "Удалить";
+
+"global_import_title" = "Импорт фраз";
+"global_import_import" = "Импортировать";
+"global_import_importing" = "Импорт...";
+"global_import_empty" = "Нет глобальных категорий";
+"global_import_exists" = "Уже импортировано";
+"global_import_done" = "Импортировано";
+"global_import_failed" = "Не удалось импортировать";
+"global_import_count" = "%d фраз";

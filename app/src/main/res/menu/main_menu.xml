@@ -25,6 +25,9 @@
         android:id="@+id/settings_menu_item"
         android:title="@string/settings" />
     <item
+        android:id="@+id/dialog_menu_item"
+        android:title="@string/dialog_title" />
+    <item
         android:id="@+id/logout_menu_item"
         android:title="@string/logout" />
 </menu>

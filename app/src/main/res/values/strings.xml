@@ -40,6 +40,14 @@
     <string name="auth_message_account_created">Account created successfully</string>
     <string name="auth_message_password_reset_sent">Password reset link sent. Check your inbox.</string>
     <string name="auth_illustration_content_description">App logo</string>
+    <string name="dialog_title">Dialog</string>
+    <string name="dialog_message_hint">Type a message…</string>
+    <string name="dialog_send">Send</string>
+    <string name="dialog_record">Record</string>
+    <string name="dialog_recording">Recording…</string>
+    <string name="dialog_audio_too_large">Recording is too long. Please keep it under 8 MB.</string>
+    <string name="dialog_send_error">Failed to send recording</string>
+    <string name="dialog_untitled">New dialog</string>
     <string name="logout">Log out</string>
     <string name="chat_slot_button_description">Switch saved chat slot</string>
     <string name="chat_slot_one">Slot 1</string>
@@ -88,4 +96,15 @@
     <string name="settings_delete_account_title">Delete Account?</string>
     <string name="settings_delete_account_message">This action cannot be undone. All your data including categories and phrases will be permanently deleted.</string>
     <string name="settings_delete_account_confirm">Delete</string>
+    <string name="global_import_title">Import phrases</string>
+    <string name="global_import_import">Import</string>
+    <string name="global_import_importing">Importing...</string>
+    <string name="global_import_empty">No global categories yet</string>
+    <string name="global_import_failed">Import failed</string>
+    <string name="global_import_exists">Already imported</string>
+    <string name="global_import_done">Imported</string>
+    <plurals name="global_import_count">
+        <item quantity="one">%d phrase</item>
+        <item quantity="other">%d phrases</item>
+    </plurals>
 </resources>

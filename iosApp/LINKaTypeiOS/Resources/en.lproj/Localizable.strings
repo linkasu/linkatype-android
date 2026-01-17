@@ -42,6 +42,12 @@
 "auth_message_password_reset_sent" = "Password reset link sent. Check your inbox.";
 "auth_tracking_toggle" = "Allow analytics & tracking";
 "auth_tracking_agreement" = "I agree to the collection of anonymous usage data (button taps, feature usage) via Firebase Analytics to improve the app. No personal information is collected.";
+"dialog_title" = "Dialog";
+"dialog_message_hint" = "Type a message…";
+"dialog_send" = "Send";
+"dialog_record" = "Record";
+"dialog_audio_too_large" = "Recording is too long. Please keep it under 8 MB.";
+"dialog_untitled" = "New dialog";
 
 "logout" = "Log out";
 "welcome_back" = "Welcome back";
@@ -92,3 +98,12 @@
 "settings_delete_account_title" = "Delete Account?";
 "settings_delete_account_message" = "This action cannot be undone. All your data including categories and phrases will be permanently deleted.";
 "settings_delete_account_confirm" = "Delete";
+
+"global_import_title" = "Import phrases";
+"global_import_import" = "Import";
+"global_import_importing" = "Importing...";
+"global_import_empty" = "No global categories yet";
+"global_import_exists" = "Already imported";
+"global_import_done" = "Imported";
+"global_import_failed" = "Import failed";
+"global_import_count" = "%d phrases";

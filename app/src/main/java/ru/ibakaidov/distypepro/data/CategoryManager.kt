@@ -1,70 +1,84 @@
 package ru.ibakaidov.distypepro.data
 
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
-import ru.ibakaidov.distypepro.structures.Category
+import android.content.Context
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.shared.repository.CategoriesRepository
 import ru.ibakaidov.distypepro.utils.Callback
-import java.util.Date
 
-class CategoryManager : Manager<Category>() {
+class CategoryManager(
+    context: Context,
+    private val repository: CategoriesRepository = SharedSdkProvider.get(context).categoriesRepository,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
+) : Manager<ru.ibakaidov.distypepro.shared.model.Category>() {
+    private val scope = CoroutineScope(SupervisorJob() + ioDispatcher)
 
     override fun getList(callback: Callback<Map<String, String>>) {
-        getRoot()
-            .orderByChild("created")
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val result = snapshot.children
-                        .mapNotNull { child ->
-                            (child.value as? Map<*, *>)?.let(Category::fromMap)
-                        }
-                        .sortedByDescending { it.created }
-                        .associate { it.id to it.label }
+        scope.launch {
+            try {
+                val list = repository.list()
+                val result = list
+                    .sortedByDescending { it.created }
+                    .associate { it.id to it.label }
+                withContext(mainDispatcher) {
                     callback.onDone(result)
                 }
-
-                override fun onCancelled(error: DatabaseError) {
-                    callback.onError(error.toException())
+            } catch (ex: Exception) {
+                withContext(mainDispatcher) {
+                    callback.onError(ex)
                 }
-            })
-    }
-
-    override fun edit(key: String, value: String, callback: Callback<Unit>) {
-        getRoot().child(key).updateChildren(mapOf("label" to value))
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    callback.onDone(Unit)
-                } else {
-                    callback.onError(task.exception)
-                }
-            }
-    }
-
-    override fun create(value: String, callback: Callback<Unit>) {
-        val reference = getRoot().push()
-        val data = mapOf(
-            "label" to value,
-            "id" to reference.key.orEmpty(),
-            "created" to Date().time
-        )
-        reference.updateChildren(data) { error, _ ->
-            if (error != null) {
-                callback.onError(error.toException())
-            } else {
-                callback.onDone(Unit)
             }
         }
     }
 
-    override fun getRoot(): DatabaseReference =
-        Firebase.database.reference
-            .child("users/${userId()}")
-            .child("Category")
+    override fun edit(key: String, value: String, callback: Callback<Unit>) {
+        scope.launch {
+            try {
+                repository.update(id = key, label = value, aiUse = null)
+                withContext(mainDispatcher) {
+                    callback.onDone(Unit)
+                }
+            } catch (ex: Exception) {
+                withContext(mainDispatcher) {
+                    callback.onError(ex)
+                }
+            }
+        }
+    }
 
-    private fun userId(): String =
-        Firebase.auth.currentUser?.uid ?: error("User must be authenticated")
+    override fun create(value: String, callback: Callback<Unit>) {
+        scope.launch {
+            try {
+                repository.create(label = value)
+                withContext(mainDispatcher) {
+                    callback.onDone(Unit)
+                }
+            } catch (ex: Exception) {
+                withContext(mainDispatcher) {
+                    callback.onError(ex)
+                }
+            }
+        }
+    }
+
+    override fun remove(key: String, callback: Callback<Unit>) {
+        scope.launch {
+            try {
+                repository.delete(key)
+                withContext(mainDispatcher) {
+                    callback.onDone(Unit)
+                }
+            } catch (ex: Exception) {
+                withContext(mainDispatcher) {
+                    callback.onError(ex)
+                }
+            }
+        }
+    }
 }

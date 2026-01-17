@@ -1,6 +1,5 @@
 import SwiftUI
 import FirebaseCore
-import FirebaseDatabase
 
 @main
 struct LINKaTypeiOSApp: App {
@@ -8,8 +7,6 @@ struct LINKaTypeiOSApp: App {
     
     init() {
         FirebaseApp.configure()
-        
-        Database.database().isPersistenceEnabled = true
     }
     
     var body: some Scene {
@@ -19,4 +16,3 @@ struct LINKaTypeiOSApp: App {
         }
     }
 }
-

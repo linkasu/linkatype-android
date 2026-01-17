@@ -23,6 +23,7 @@ import ru.ibakaidov.distypepro.dialogs.ConfirmDialog
 import ru.ibakaidov.distypepro.dialogs.ContextDialog
 import ru.ibakaidov.distypepro.dialogs.ContextDialogAction
 import ru.ibakaidov.distypepro.dialogs.InputDialog
+import ru.ibakaidov.distypepro.screens.GlobalImportActivity
 import ru.ibakaidov.distypepro.utils.Callback
 import ru.ibakaidov.distypepro.utils.HashMapAdapter
 import ru.ibakaidov.distypepro.utils.Tts
@@ -34,7 +35,7 @@ class BankGroup @JvmOverloads constructor(
 
     override fun layoutId(): Int = R.layout.bank_group
 
-    private val categoryManager = CategoryManager()
+    private val categoryManager = CategoryManager(context)
     private var statementManager: StatementManager? = null
     private lateinit var toolbar: MaterialToolbar
     private lateinit var gridView: GridView
@@ -78,6 +79,12 @@ class BankGroup @JvmOverloads constructor(
                     downloadCurrentCategoryToCache()
                     true
                 }
+                R.id.action_import_global -> {
+                    context.startActivity(
+                        android.content.Intent(context, GlobalImportActivity::class.java)
+                    )
+                    true
+                }
 
                 else -> false
             }
@@ -106,6 +113,14 @@ class BankGroup @JvmOverloads constructor(
 
     fun back() = setState(false)
 
+    fun refresh() {
+        if (showingStatements) {
+            showStatements()
+        } else {
+            showCategories()
+        }
+    }
+
     private fun showAddDialog() {
         InputDialog.showDialog(context, R.string.create, listener = object : Callback<String> {
             override fun onDone(result: String) {
@@ -128,7 +143,7 @@ class BankGroup @JvmOverloads constructor(
         } else {
             currentCategoryId = key
             currentCategoryTitle = value
-            statementManager = StatementManager(key)
+            statementManager = StatementManager(context, key)
             setState(true)
         }
     }
@@ -211,6 +226,7 @@ class BankGroup @JvmOverloads constructor(
         menu.findItem(R.id.action_add_category)?.isVisible = !showingStatements
         menu.findItem(R.id.action_add_statement)?.isVisible = showingStatements
         menu.findItem(R.id.action_sort)?.isVisible = true
+        menu.findItem(R.id.action_import_global)?.isVisible = !showingStatements
 
         val downloadItem = menu.findItem(R.id.action_download_cache)
         downloadItem?.isVisible = showingStatements

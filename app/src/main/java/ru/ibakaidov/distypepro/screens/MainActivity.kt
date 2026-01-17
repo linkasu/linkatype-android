@@ -3,11 +3,16 @@ package ru.ibakaidov.distypepro.screens
 import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -15,15 +20,17 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.ktx.Firebase
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseException
-import com.google.firebase.database.ktx.database
-import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityMainBinding
+import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
 
@@ -31,7 +38,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var tts: Tts
+    private val sdk by lazy { SharedSdkProvider.get(this) }
     private var currentSlotIndex: Int = 0
+    private var networkCallback: ConnectivityManager.NetworkCallback? = null
+    private var realtimeJob: Job? = null
     private val slotLabels = intArrayOf(
         R.string.chat_slot_one,
         R.string.chat_slot_two,
@@ -44,7 +54,9 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        enableOfflinePersistence()
+        flushOfflineQueue()
+        startPeriodicSync()
+        startRealtimeSync()
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -68,6 +80,21 @@ class MainActivity : AppCompatActivity() {
             binding.inputGroup.back()
             binding.bankGroup.back()
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registerNetworkCallback()
+    }
+
+    override fun onStop() {
+        unregisterNetworkCallback()
+        super.onStop()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        binding.bankGroup.refresh()
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
@@ -94,13 +121,19 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, SettingsActivity::class.java))
             true
         }
+        R.id.dialog_menu_item -> {
+            startActivity(Intent(this, DialogActivity::class.java))
+            true
+        }
         R.id.logout_menu_item -> {
-            Firebase.auth.signOut()
-            val intent = Intent(this, AuthActivity::class.java).apply {
-                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            lifecycleScope.launch {
+                runCatching { sdk.authRepository.logout() }
+                val intent = Intent(this@MainActivity, AuthActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+                }
+                startActivity(intent)
+                finish()
             }
-            startActivity(intent)
-            finish()
             true
         }
 
@@ -146,12 +179,69 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun enableOfflinePersistence() {
-        try {
-            Firebase.database.setPersistenceEnabled(true)
-        } catch (e: DatabaseException) {
-            // Firebase throws if persistence was already enabled; ignore to keep idempotent.
+    private fun flushOfflineQueue() {
+        lifecycleScope.launch {
+            sdk.offlineQueueProcessor.flush()
         }
+    }
+
+    private fun startPeriodicSync() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    sdk.offlineQueueProcessor.flush()
+                    delay(SYNC_INTERVAL_MS)
+                }
+            }
+        }
+    }
+
+    private fun startRealtimeSync() {
+        if (realtimeJob != null) return
+        realtimeJob = lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                while (isActive) {
+                    val result = runCatching { sdk.changesSyncer.pollOnce() }
+                    result.onSuccess { response ->
+                        if (response.changes.isNotEmpty()) {
+                            Firebase.analytics.logEvent(
+                                "realtime_sync",
+                                bundleOf("changes" to response.changes.size),
+                            )
+                            binding.bankGroup.refresh()
+                        }
+                    }.onFailure { error ->
+                        Firebase.analytics.logEvent(
+                            "realtime_sync_error",
+                            bundleOf("message" to (error.message ?: "unknown")),
+                        )
+                        delay(REALTIME_RETRY_DELAY_MS)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun registerNetworkCallback() {
+        if (networkCallback != null) return
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+        val request = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .build()
+        val callback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                flushOfflineQueue()
+            }
+        }
+        connectivityManager.registerNetworkCallback(request, callback)
+        networkCallback = callback
+    }
+
+    private fun unregisterNetworkCallback() {
+        val callback = networkCallback ?: return
+        val connectivityManager = getSystemService(ConnectivityManager::class.java)
+        connectivityManager.unregisterNetworkCallback(callback)
+        networkCallback = null
     }
 
     private fun applyWindowInsets() {
@@ -214,5 +304,10 @@ class MainActivity : AppCompatActivity() {
     private fun isNightMode(): Boolean {
         val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         return nightModeFlags == Configuration.UI_MODE_NIGHT_YES
+    }
+
+    private companion object {
+        private const val SYNC_INTERVAL_MS = 60_000L
+        private const val REALTIME_RETRY_DELAY_MS = 3_000L
     }
 }

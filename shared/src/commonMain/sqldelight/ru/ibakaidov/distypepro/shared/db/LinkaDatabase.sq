@@ -1,0 +1,239 @@
+CREATE TABLE categories (
+  id TEXT NOT NULL PRIMARY KEY,
+  label TEXT NOT NULL,
+  created INTEGER NOT NULL,
+  is_default INTEGER NOT NULL DEFAULT 0,
+  ai_use INTEGER NOT NULL DEFAULT 0,
+  updated_at INTEGER
+);
+
+CREATE TABLE statements (
+  id TEXT NOT NULL PRIMARY KEY,
+  category_id TEXT NOT NULL,
+  text TEXT NOT NULL,
+  created INTEGER NOT NULL,
+  updated_at INTEGER
+);
+
+CREATE TABLE quickes (
+  slot INTEGER NOT NULL PRIMARY KEY,
+  text TEXT NOT NULL
+);
+
+CREATE TABLE user_state (
+  id TEXT NOT NULL PRIMARY KEY,
+  inited INTEGER NOT NULL DEFAULT 0,
+  preferences TEXT
+);
+
+CREATE TABLE dialog_chats (
+  id TEXT NOT NULL PRIMARY KEY,
+  title TEXT,
+  created INTEGER NOT NULL,
+  updated_at INTEGER,
+  last_message_at INTEGER,
+  message_count INTEGER
+);
+
+CREATE TABLE dialog_messages (
+  id TEXT NOT NULL PRIMARY KEY,
+  chat_id TEXT NOT NULL,
+  role TEXT NOT NULL,
+  content TEXT NOT NULL,
+  source TEXT,
+  created INTEGER NOT NULL,
+  updated_at INTEGER
+);
+
+CREATE TABLE dialog_suggestions (
+  id TEXT NOT NULL PRIMARY KEY,
+  chat_id TEXT,
+  message_id TEXT,
+  text TEXT NOT NULL,
+  status TEXT NOT NULL,
+  category_id TEXT,
+  created INTEGER NOT NULL,
+  updated_at INTEGER
+);
+
+CREATE TABLE offline_queue (
+  id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  entity_type TEXT NOT NULL,
+  op_type TEXT NOT NULL,
+  payload TEXT NOT NULL,
+  created_at INTEGER NOT NULL,
+  retry_count INTEGER NOT NULL DEFAULT 0,
+  last_error TEXT
+);
+
+CREATE TABLE sync_state (
+  key TEXT NOT NULL PRIMARY KEY,
+  value TEXT
+);
+
+selectAllCategories:
+SELECT id,
+       label,
+       created,
+       is_default AS isDefault,
+       ai_use AS aiUse,
+       updated_at AS updatedAt
+FROM categories
+ORDER BY created DESC;
+
+selectCategoryById:
+SELECT id,
+       label,
+       created,
+       is_default AS isDefault,
+       ai_use AS aiUse,
+       updated_at AS updatedAt
+FROM categories
+WHERE id = ?;
+
+upsertCategory:
+INSERT OR REPLACE INTO categories(
+  id, label, created, is_default, ai_use, updated_at
+) VALUES (?, ?, ?, ?, ?, ?);
+
+deleteCategory:
+DELETE FROM categories WHERE id = ?;
+
+selectStatementsByCategory:
+SELECT id,
+       category_id AS categoryId,
+       text,
+       created,
+       updated_at AS updatedAt
+FROM statements
+WHERE category_id = ?
+ORDER BY created DESC;
+
+selectStatementById:
+SELECT id,
+       category_id AS categoryId,
+       text,
+       created,
+       updated_at AS updatedAt
+FROM statements
+WHERE id = ?;
+
+upsertStatement:
+INSERT OR REPLACE INTO statements(
+  id, category_id, text, created, updated_at
+) VALUES (?, ?, ?, ?, ?);
+
+deleteStatement:
+DELETE FROM statements WHERE id = ?;
+
+deleteStatementsByCategory:
+DELETE FROM statements WHERE category_id = ?;
+
+selectQuickes:
+SELECT slot, text FROM quickes ORDER BY slot ASC;
+
+replaceQuickes:
+REPLACE INTO quickes(slot, text) VALUES (?, ?);
+
+clearQuickes:
+DELETE FROM quickes;
+
+getUserState:
+SELECT id, inited, preferences FROM user_state WHERE id = ?;
+
+upsertUserState:
+INSERT OR REPLACE INTO user_state(id, inited, preferences) VALUES (?, ?, ?);
+
+selectDialogChats:
+SELECT id,
+       title,
+       created,
+       updated_at AS updatedAt,
+       last_message_at AS lastMessageAt,
+       message_count AS messageCount
+FROM dialog_chats
+ORDER BY COALESCE(updated_at, created) DESC;
+
+upsertDialogChat:
+INSERT OR REPLACE INTO dialog_chats(
+  id, title, created, updated_at, last_message_at, message_count
+) VALUES (?, ?, ?, ?, ?, ?);
+
+deleteDialogChat:
+DELETE FROM dialog_chats WHERE id = ?;
+
+selectDialogMessages:
+SELECT id,
+       chat_id AS chatId,
+       role,
+       content,
+       source,
+       created,
+       updated_at AS updatedAt
+FROM dialog_messages
+WHERE chat_id = ?
+ORDER BY created ASC
+LIMIT ?;
+
+upsertDialogMessage:
+INSERT OR REPLACE INTO dialog_messages(
+  id, chat_id, role, content, source, created, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?);
+
+clearDialogMessagesByChat:
+DELETE FROM dialog_messages WHERE chat_id = ?;
+
+selectDialogSuggestions:
+SELECT id,
+       chat_id AS chatId,
+       message_id AS messageId,
+       text,
+       status,
+       category_id AS categoryId,
+       created,
+       updated_at AS updatedAt
+FROM dialog_suggestions
+WHERE status = ?
+ORDER BY created DESC
+LIMIT ?;
+
+upsertDialogSuggestion:
+INSERT OR REPLACE INTO dialog_suggestions(
+  id, chat_id, message_id, text, status, category_id, created, updated_at
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?);
+
+removeDialogSuggestion:
+DELETE FROM dialog_suggestions WHERE id = ?;
+
+clearDialogSuggestions:
+DELETE FROM dialog_suggestions;
+
+enqueueOffline:
+INSERT INTO offline_queue(entity_type, op_type, payload, created_at, retry_count, last_error)
+VALUES (?, ?, ?, ?, ?, ?);
+
+selectOfflineQueue:
+SELECT id,
+       entity_type AS entityType,
+       op_type AS opType,
+       payload,
+       created_at AS createdAt,
+       retry_count AS retryCount,
+       last_error AS lastError
+FROM offline_queue
+ORDER BY created_at ASC;
+
+updateOfflineRetry:
+UPDATE offline_queue SET retry_count = ?, last_error = ? WHERE id = ?;
+
+deleteOfflineEntry:
+DELETE FROM offline_queue WHERE id = ?;
+
+selectSyncValue:
+SELECT value FROM sync_state WHERE key = ?;
+
+upsertSyncValue:
+INSERT OR REPLACE INTO sync_state(key, value) VALUES (?, ?);
+
+deleteSyncValue:
+DELETE FROM sync_state WHERE key = ?;

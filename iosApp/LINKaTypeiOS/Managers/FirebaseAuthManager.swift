@@ -1,61 +1,80 @@
 import Foundation
-import FirebaseAuth
-import FirebaseDatabase
 import Combine
+import Shared
 
 class FirebaseAuthManager: ObservableObject {
     static let shared = FirebaseAuthManager()
-    
+
     @Published var isAuthenticated = false
-    @Published var currentUser: User?
-    
-    private var authStateHandle: AuthStateDidChangeListenerHandle?
-    
+    @Published var currentUserId: String?
+    @Published var currentUserEmail: String?
+
+    private let sdk = SharedSdkProvider.shared.sdk
+
     init() {
-        authStateHandle = Auth.auth().addStateDidChangeListener { [weak self] _, user in
-            // КРИТИЧНО: Обновление @Published должно быть на main thread
-            DispatchQueue.main.async {
-                self?.isAuthenticated = user != nil
-                self?.currentUser = user
-            }
+        Task {
+            await refreshIfPossible()
         }
     }
-    
-    deinit {
-        if let handle = authStateHandle {
-            Auth.auth().removeStateDidChangeListener(handle)
+
+    private func applyAuth(_ response: AuthResponse) {
+        DispatchQueue.main.async {
+            self.isAuthenticated = true
+            self.currentUserId = response.user.id
+            self.currentUserEmail = response.user.email
         }
     }
-    
+
+    private func clearAuth() {
+        DispatchQueue.main.async {
+            self.isAuthenticated = false
+            self.currentUserId = nil
+            self.currentUserEmail = nil
+        }
+    }
+
+    private func refreshIfPossible() async {
+        let refreshToken = sdk.tokenStorage.getRefreshToken()
+        if refreshToken == nil || refreshToken?.isEmpty == true {
+            clearAuth()
+            return
+        }
+        do {
+            let response = try await sdk.authRepository.refresh()
+            applyAuth(response)
+        } catch {
+            clearAuth()
+        }
+    }
+
     func signIn(email: String, password: String) async throws {
-        try await Auth.auth().signIn(withEmail: email, password: password)
+        let response = try await sdk.authRepository.login(email: email, password: password)
+        applyAuth(response)
     }
-    
+
     func signUp(email: String, password: String) async throws {
-        try await Auth.auth().createUser(withEmail: email, password: password)
+        let response = try await sdk.authRepository.register(email: email, password: password)
+        applyAuth(response)
     }
-    
+
     func signOut() throws {
-        try Auth.auth().signOut()
-    }
-    
-    func resetPassword(email: String) async throws {
-        try await Auth.auth().sendPasswordReset(withEmail: email)
-    }
-    
-    func getUserId() -> String? {
-        return Auth.auth().currentUser?.uid
-    }
-    
-    func deleteAccount() async throws {
-        guard let userId = getUserId() else {
-            throw NSError(domain: "FirebaseAuthManager", code: -1, userInfo: [NSLocalizedDescriptionKey: "No user logged in"])
+        Task {
+            try? await sdk.authRepository.logout()
+            clearAuth()
         }
-        
-        let ref = Database.database().reference().child("users/\(userId)")
-        try await ref.removeValue()
-        
-        try await Auth.auth().currentUser?.delete()
+    }
+
+    func resetPassword(email: String) async throws {
+        try await sdk.authRepository.resetPassword(email: email)
+    }
+
+    func getUserId() -> String? {
+        return currentUserId
+    }
+
+    func deleteAccount() async throws {
+        try await sdk.accountRepository.deleteAccount(deleteFirebase: true)
+        try? await sdk.authRepository.logout()
+        clearAuth()
     }
 }
-

@@ -21,6 +21,7 @@ struct BankGroupView: View {
     @State private var downloadProgress = 0
     @State private var downloadTotal = 0
     @State private var showDownloadAlert = false
+    @State private var showGlobalImport = false
     
     private let gridColumns = [
         GridItem(.adaptive(minimum: 150), spacing: 12)
@@ -86,6 +87,11 @@ struct BankGroupView: View {
                 }
             )
         }
+        .sheet(isPresented: $showGlobalImport) {
+            NavigationStack {
+                GlobalImportView()
+            }
+        }
         .alert(NSLocalizedString("remove", comment: ""), isPresented: $showConfirmDialog) {
             Button(NSLocalizedString("remove", comment: ""), role: .destructive) {
                 confirmDialogAction?()
@@ -113,6 +119,13 @@ struct BankGroupView: View {
                 ]
             )
         }
+        .onReceive(NotificationCenter.default.publisher(for: .realtimeDidUpdate)) { _ in
+            if showingStatements {
+                statementManager.refresh()
+            } else {
+                categoryManager.refresh()
+            }
+        }
     }
     
     private var toolbar: some View {
@@ -131,7 +144,13 @@ struct BankGroupView: View {
             Button(action: { showSortSheet = true }) {
                 Image(systemName: "arrow.up.arrow.down")
             }
-            
+
+            if !showingStatements {
+                Button(action: { showGlobalImport = true }) {
+                    Image(systemName: "tray.and.arrow.down")
+                }
+            }
+
             Button(action: showAddDialog) {
                 Image(systemName: "plus")
             }
@@ -314,4 +333,3 @@ enum SortMode {
     case alphabetAsc
     case alphabetDesc
 }
-

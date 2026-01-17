@@ -1,12 +1,14 @@
 import SwiftUI
-import FirebaseDatabase
 
 struct MainView: View {
     @EnvironmentObject var authManager: FirebaseAuthManager
+    private let sdk = SharedSdkProvider.shared.sdk
     @StateObject private var ttsManager = TtsManager.shared
     @State private var showSettings = false
+    @State private var showDialog = false
     @State private var snackbarMessage: String?
     @State private var showSnackbar = false
+    @State private var syncTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     
     var body: some View {
         NavigationStack {
@@ -32,6 +34,10 @@ struct MainView: View {
                         Button(action: { showSettings = true }) {
                             Label(NSLocalizedString("settings", comment: ""), systemImage: "gearshape")
                         }
+
+                        Button(action: { showDialog = true }) {
+                            Label(NSLocalizedString("dialog_title", comment: ""), systemImage: "message")
+                        }
                         
                         Button(role: .destructive, action: logout) {
                             Label(NSLocalizedString("logout", comment: ""), systemImage: "rectangle.portrait.and.arrow.right")
@@ -46,11 +52,27 @@ struct MainView: View {
                     SettingsView(ttsManager: ttsManager)
                 }
             }
+            .sheet(isPresented: $showDialog) {
+                NavigationStack {
+                    DialogView()
+                }
+            }
             .overlay(alignment: .bottom) {
                 if showSnackbar, let message = snackbarMessage {
                     SnackbarView(message: message)
                         .padding()
                         .transition(.move(edge: .bottom))
+                }
+            }
+            .task {
+                _ = try? await sdk.offlineQueueProcessor.flush()
+            }
+            .task {
+                await startRealtimeSync()
+            }
+            .onReceive(syncTimer) { _ in
+                Task {
+                    _ = try? await sdk.offlineQueueProcessor.flush()
                 }
             }
             .onReceive(ttsManager.eventPublisher) { event in
@@ -94,6 +116,21 @@ struct MainView: View {
             }
         }
     }
+
+    private func startRealtimeSync() async {
+        while !Task.isCancelled {
+            do {
+                let response = try await sdk.changesSyncer.pollOnce(limit: 100, timeoutSeconds: 25)
+                if !response.changes.isEmpty {
+                    FirebaseAnalyticsManager.shared.logRealtimeSyncEvent(changesCount: Int(response.changes.count))
+                    NotificationCenter.default.post(name: .realtimeDidUpdate, object: nil)
+                }
+            } catch {
+                FirebaseAnalyticsManager.shared.logRealtimeSyncError(message: error.localizedDescription)
+                try? await Task.sleep(nanoseconds: 3_000_000_000)
+            }
+        }
+    }
 }
 
 struct SnackbarView: View {
@@ -110,4 +147,5 @@ struct SnackbarView: View {
 
 extension Notification.Name {
     static let clearInput = Notification.Name("clearInput")
+    static let realtimeDidUpdate = Notification.Name("realtimeDidUpdate")
 }
