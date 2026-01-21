@@ -1,11 +1,11 @@
 package ru.ibakaidov.distypepro.dialogs
 
-import android.app.AlertDialog
 import android.content.Context
 import android.text.InputType
 import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.annotation.StringRes
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.utils.Callback
 
@@ -26,7 +26,7 @@ object InputDialog {
             }
         }
 
-        val dialog = AlertDialog.Builder(context)
+        val dialog = MaterialAlertDialogBuilder(context)
             .setTitle(title)
             .setView(view)
             .setPositiveButton(R.string.ok) { alert, _ ->

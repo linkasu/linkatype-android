@@ -3,14 +3,14 @@ package ru.ibakaidov.distypepro.components
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
-import android.widget.AdapterView
-import android.widget.GridView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.preference.PreferenceManager
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -25,7 +25,7 @@ import ru.ibakaidov.distypepro.dialogs.ContextDialogAction
 import ru.ibakaidov.distypepro.dialogs.InputDialog
 import ru.ibakaidov.distypepro.screens.GlobalImportActivity
 import ru.ibakaidov.distypepro.utils.Callback
-import ru.ibakaidov.distypepro.utils.HashMapAdapter
+import ru.ibakaidov.distypepro.utils.HashMapRecyclerAdapter
 import ru.ibakaidov.distypepro.utils.Tts
 
 class BankGroup @JvmOverloads constructor(
@@ -38,7 +38,8 @@ class BankGroup @JvmOverloads constructor(
     private val categoryManager = CategoryManager(context)
     private var statementManager: StatementManager? = null
     private lateinit var toolbar: MaterialToolbar
-    private lateinit var gridView: GridView
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: HashMapRecyclerAdapter
     private var tts: Tts? = null
 
     private var showingStatements = false
@@ -55,7 +56,16 @@ class BankGroup @JvmOverloads constructor(
 
     override fun initUi() {
         toolbar = findViewById(R.id.bank_toolbar)
-        gridView = findViewById(R.id.gridview)
+        recyclerView = findViewById(R.id.gridview)
+
+        adapter = HashMapRecyclerAdapter(
+            onItemClick = { key, value -> onItemSelected(key, value) },
+            onItemLongClick = { key, value -> onItemLongClick(key, value) }
+        )
+
+        val spanCount = resources.getInteger(R.integer.bank_grid_columns)
+        recyclerView.layoutManager = GridLayoutManager(context, spanCount)
+        recyclerView.adapter = adapter
 
         toolbar.inflateMenu(R.menu.bank_toolbar_menu)
         toolbar.setOnMenuItemClickListener { item ->
@@ -88,19 +98,6 @@ class BankGroup @JvmOverloads constructor(
 
                 else -> false
             }
-        }
-
-        gridView.onItemClickListener = AdapterView.OnItemClickListener { parent, _, position, _ ->
-            val adapter = parent?.adapter as? HashMapAdapter ?: return@OnItemClickListener
-            val key = adapter.getKey(position)
-            val value = adapter.getItem(position)
-            onItemSelected(key, value)
-        }
-
-        gridView.onItemLongClickListener = AdapterView.OnItemLongClickListener { parent, _, position, _ ->
-            val adapter = parent?.adapter as? HashMapAdapter ?: return@OnItemLongClickListener false
-            onItemLongClick(adapter.getKey(position), adapter.getItem(position))
-            false
         }
 
         refreshToolbar()
@@ -238,8 +235,8 @@ class BankGroup @JvmOverloads constructor(
             override fun onDone(result: Map<String, String>) {
                 if (showingStatements) return
                 val sorted = sortEntries(result, sortMode)
-                gridView.adapter = HashMapAdapter(context, sorted)
-                gridView.scheduleLayoutAnimation()
+                adapter.submitMap(sorted)
+                recyclerView.scheduleLayoutAnimation()
             }
         })
     }
@@ -249,8 +246,8 @@ class BankGroup @JvmOverloads constructor(
         statementManager?.getList(object : Callback<Map<String, String>> {
             override fun onDone(result: Map<String, String>) {
                 currentStatements = sortEntries(result, sortMode)
-                gridView.adapter = HashMapAdapter(context, currentStatements)
-                gridView.scheduleLayoutAnimation()
+                adapter.submitMap(currentStatements)
+                recyclerView.scheduleLayoutAnimation()
             }
         })
     }

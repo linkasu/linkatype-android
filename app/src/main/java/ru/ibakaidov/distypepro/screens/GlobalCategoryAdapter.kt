@@ -2,6 +2,8 @@ package ru.ibakaidov.distypepro.screens
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ItemGlobalCategoryBinding
@@ -10,24 +12,22 @@ internal data class GlobalCategoryItem(
     val id: String,
     val label: String,
     val count: Int,
+    val isImporting: Boolean = false,
 )
 
 internal class GlobalCategoryAdapter(
     private val onImport: (GlobalCategoryItem) -> Unit,
-) : RecyclerView.Adapter<GlobalCategoryAdapter.ViewHolder>() {
-
-    private val items = mutableListOf<GlobalCategoryItem>()
-    private var importingId: String? = null
+) : ListAdapter<GlobalCategoryItem, GlobalCategoryAdapter.ViewHolder>(CategoryDiffCallback()) {
 
     fun submit(newItems: List<GlobalCategoryItem>) {
-        items.clear()
-        items.addAll(newItems)
-        notifyDataSetChanged()
+        submitList(newItems.toList())
     }
 
     fun setImporting(id: String?) {
-        importingId = id
-        notifyDataSetChanged()
+        val updated = currentList.map { item ->
+            item.copy(isImporting = item.id == id)
+        }
+        submitList(updated)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,16 +36,14 @@ internal class GlobalCategoryAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(items[position], importingId)
+        holder.bind(getItem(position))
     }
-
-    override fun getItemCount(): Int = items.size
 
     internal class ViewHolder(
         private val binding: ItemGlobalCategoryBinding,
         private val onImport: (GlobalCategoryItem) -> Unit,
     ) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: GlobalCategoryItem, importingId: String?) {
+        fun bind(item: GlobalCategoryItem) {
             val context = binding.root.context
             binding.globalCategoryLabel.text = item.label
             binding.globalCategoryCount.text = context.resources.getQuantityString(
@@ -53,16 +51,25 @@ internal class GlobalCategoryAdapter(
                 item.count,
                 item.count,
             )
-            val isImporting = importingId == item.id
-            binding.globalCategoryImport.isEnabled = !isImporting
+            binding.globalCategoryImport.isEnabled = !item.isImporting
             binding.globalCategoryImport.text = context.getString(
-                if (isImporting) R.string.global_import_importing else R.string.global_import_import,
+                if (item.isImporting) R.string.global_import_importing else R.string.global_import_import,
             )
             binding.globalCategoryImport.setOnClickListener {
-                if (!isImporting) {
+                if (!item.isImporting) {
                     onImport(item)
                 }
             }
+        }
+    }
+
+    private class CategoryDiffCallback : DiffUtil.ItemCallback<GlobalCategoryItem>() {
+        override fun areItemsTheSame(oldItem: GlobalCategoryItem, newItem: GlobalCategoryItem): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: GlobalCategoryItem, newItem: GlobalCategoryItem): Boolean {
+            return oldItem == newItem
         }
     }
 }

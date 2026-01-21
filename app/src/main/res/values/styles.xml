@@ -36,6 +36,8 @@
 
     <style name="Widget.LinkaType.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
         <item name="backgroundTint">@color/colorButtonBlack</item>
         <item name="strokeColor">@color/colorButtonBlack</item>
         <item name="android:textColor">@color/colorOnButtonBlack</item>
@@ -45,6 +47,8 @@
 
     <style name="Widget.LinkaType.Button.Tonal" parent="Widget.Material3.Button.TonalButton">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
         <item name="backgroundTint">@color/colorButtonBlack</item>
         <item name="android:textColor">@color/colorOnButtonBlack</item>
         <item name="iconTint">@color/colorOnButtonBlack</item>
@@ -53,6 +57,8 @@
 
     <style name="Widget.LinkaType.Button.Say" parent="Widget.Material3.Button.TonalButton">
         <item name="shapeAppearanceOverlay">@style/ShapeAppearance.LinkaType.Button</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
         <item name="backgroundTint">@color/colorSecondary</item>
         <item name="android:textColor">@color/colorOnSecondary</item>
         <item name="iconTint">@color/colorOnSecondary</item>
@@ -86,10 +92,6 @@
 
     <style name="TextAppearance.LinkaType.ToolbarSubtitle" parent="TextAppearance.Material3.BodyMedium">
         <item name="android:textColor">@color/colorOnPrimary</item>
-    </style>
-
-    <style name="TextAppearance.LinkaType.MenuItem" parent="TextAppearance.Material3.BodyLarge">
-        <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
 </resources>

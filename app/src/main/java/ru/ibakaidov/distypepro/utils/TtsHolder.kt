@@ -27,6 +27,9 @@ object TtsHolder {
     }
 
     fun clear() {
-        instance = null
+        synchronized(this) {
+            instance?.shutdown()
+            instance = null
+        }
     }
 }

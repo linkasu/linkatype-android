@@ -33,18 +33,14 @@
                 app:titleTextColor="?attr/colorOnPrimary"
                 app:subtitleTextColor="?attr/colorOnPrimary" />
 
-            <GridView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/gridview"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:clipToPadding="false"
-                android:horizontalSpacing="@dimen/spacing_small"
-                android:numColumns="@integer/bank_grid_columns"
                 android:padding="@dimen/spacing_small"
-                android:stretchMode="columnWidth"
                 android:scrollbars="none"
-                android:verticalSpacing="@dimen/spacing_small"
                 android:layoutAnimation="@anim/layout_animation_fade_in" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

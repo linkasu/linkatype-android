@@ -3,6 +3,11 @@ package ru.ibakaidov.distypepro.shared.model
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+object DialogRole {
+    const val DISABLED_PERSON = "disabled_person"
+    const val SPEAKER = "speaker"
+}
+
 @Serializable
 data class DialogChat(
     val id: String,

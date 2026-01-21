@@ -426,6 +426,9 @@ class Tts(
         ioScope.cancel()
         textToSpeech?.shutdown()
         textToSpeech = null
+        mediaPlayer?.release()
+        mediaPlayer = null
+        lastAudioFile = null
     }
 
     private suspend fun speakOffline(text: String) {

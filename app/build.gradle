@@ -2,6 +2,9 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.gms.google-services'
+    id 'com.google.devtools.ksp'
+    id 'com.google.dagger.hilt.android'
+    id 'jacoco'
 }
 
 android {
@@ -20,6 +23,12 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -27,6 +36,7 @@ android {
         }
     }
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_21
         targetCompatibility JavaVersion.VERSION_21
     }
@@ -35,8 +45,41 @@ android {
     }
     buildFeatures {
         viewBinding true
+        buildConfig true
     }
     buildToolsVersion '35.0.1'
+}
+
+jacoco {
+    toolVersion = "0.8.12"
+}
+
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
+
+    def fileFilter = [
+        '**/R.class',
+        '**/R$*.class',
+        '**/BuildConfig.*',
+        '**/Manifest*.*',
+        '**/*Test*.*',
+        '**/databinding/**',
+        '**/di/**'
+    ]
+    def debugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.setFrom(fileTree(dir: buildDir, includes: [
+        'jacoco/testDebugUnitTest.exec',
+        'outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec'
+    ]))
 }
 
 kotlin {
@@ -44,6 +87,7 @@ kotlin {
 }
 
 dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     implementation project(':shared')
 
     implementation 'androidx.core:core-ktx:1.15.0'
@@ -55,6 +99,10 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.8.4'
     implementation 'androidx.preference:preference-ktx:1.2.1'
     implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.8.6'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6'
+
+    implementation 'com.google.dagger:hilt-android:2.56'
+    ksp 'com.google.dagger:hilt-compiler:2.56'
 
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
@@ -70,4 +118,8 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.11.1'
     androidTestImplementation 'androidx.test.ext:junit-ktx:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
+    androidTestImplementation 'com.google.dagger:hilt-android-testing:2.56'
+    kspAndroidTest 'com.google.dagger:hilt-compiler:2.56'
+
+    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 }
