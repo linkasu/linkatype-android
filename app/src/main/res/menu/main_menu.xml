@@ -3,12 +3,6 @@
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/chat_selector_menu_item"
-        android:title="@string/chat_slot_one"
-        app:showAsAction="always|withText"
-        app:iconTint="?attr/colorOnPrimary" />
-
-    <item
         android:id="@+id/spotlight_menu_item"
         android:title="@string/content_description_spotlight"
         app:showAsAction="always"
@@ -26,7 +20,10 @@
         android:title="@string/settings" />
     <item
         android:id="@+id/dialog_menu_item"
-        android:title="@string/dialog_title" />
+        android:title="@string/dialog_title"
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_chat_24"
+        app:iconTint="?attr/colorOnPrimary" />
     <item
         android:id="@+id/logout_menu_item"
         android:title="@string/logout" />

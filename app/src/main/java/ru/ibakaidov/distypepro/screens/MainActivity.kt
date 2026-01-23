@@ -30,7 +30,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityMainBinding
+import ru.ibakaidov.distypepro.dialogs.ConfirmDialog
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.utils.Callback
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
 
@@ -42,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     private var currentSlotIndex: Int = 0
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var realtimeJob: Job? = null
-    private val slotLabels = intArrayOf(
+    private val slotLabels = listOf(
         R.string.chat_slot_one,
         R.string.chat_slot_two,
         R.string.chat_slot_three
@@ -61,9 +63,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = getString(R.string.app_name)
-
-        binding.toolbar.subtitle = ""
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        binding.chatSlotButton.setOnClickListener { showChatSelectorPopup() }
+        updateChatSelectorTitle()
         applyWindowInsets()
 
         WindowCompat.getInsetsController(window, binding.root)?.let { controller ->
@@ -102,11 +104,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean = when (item.itemId) {
-        R.id.chat_selector_menu_item -> {
-            showChatSelectorPopup()
-            true
-        }
-
         R.id.spotlight_menu_item -> {
             binding.inputGroup.spotlight()
             true
@@ -126,50 +123,41 @@ class MainActivity : AppCompatActivity() {
             true
         }
         R.id.logout_menu_item -> {
-            lifecycleScope.launch {
-                runCatching { sdk.authRepository.logout() }
-                val intent = Intent(this@MainActivity, AuthActivity::class.java).apply {
-                    flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
-                }
-                startActivity(intent)
-                finish()
-            }
+            confirmLogout()
             true
         }
 
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val chatSelectorItem = menu.findItem(R.id.chat_selector_menu_item)
-        chatSelectorItem?.title = getString(slotLabels[currentSlotIndex])
-        return super.onPrepareOptionsMenu(menu)
-    }
-
     private fun showChatSelectorPopup() {
-        val popup = androidx.appcompat.widget.PopupMenu(this, binding.toolbar)
+        val popup = androidx.appcompat.widget.PopupMenu(this, binding.chatSlotButton)
         slotLabels.forEachIndexed { index, labelRes ->
-            popup.menu.add(0, index, index, labelRes)
+            popup.menu.add(Menu.NONE, index, index, labelRes)
         }
         popup.setOnMenuItemClickListener { item ->
-            val slotIndex = item.itemId
-            if (slotIndex in slotLabels.indices && slotIndex != currentSlotIndex) {
-                binding.inputGroup.switchSlot(currentSlotIndex, slotIndex)
-                currentSlotIndex = slotIndex
-                invalidateOptionsMenu()
-            }
+            switchChatSlot(item.itemId)
             true
         }
         popup.show()
     }
 
     private fun switchChatSlot(slotIndex: Int) {
-        if (slotIndex in slotLabels.indices && slotIndex != currentSlotIndex) {
-            binding.inputGroup.switchSlot(currentSlotIndex, slotIndex)
-            currentSlotIndex = slotIndex
-            invalidateOptionsMenu()
+        currentSlotIndex = safeSlotIndex(currentSlotIndex)
+        val targetIndex = safeSlotIndex(slotIndex)
+        if (targetIndex != currentSlotIndex) {
+            binding.inputGroup.switchSlot(currentSlotIndex, targetIndex)
+            currentSlotIndex = targetIndex
         }
+        updateChatSelectorTitle()
     }
+
+    private fun updateChatSelectorTitle() {
+        currentSlotIndex = safeSlotIndex(currentSlotIndex)
+        binding.chatSlotButton.text = getString(slotLabels[currentSlotIndex])
+    }
+
+    private fun safeSlotIndex(index: Int): Int = index.coerceIn(slotLabels.indices)
 
     override fun onDestroy() {
         super.onDestroy()
@@ -182,6 +170,25 @@ class MainActivity : AppCompatActivity() {
     private fun flushOfflineQueue() {
         lifecycleScope.launch {
             sdk.offlineQueueProcessor.flush()
+        }
+    }
+
+    private fun confirmLogout() {
+        ConfirmDialog.showConfirmDialog(this, R.string.logout_confirm, object : Callback<Unit> {
+            override fun onDone(result: Unit) {
+                performLogout()
+            }
+        })
+    }
+
+    private fun performLogout() {
+        lifecycleScope.launch {
+            runCatching { sdk.authRepository.logout() }
+            val intent = Intent(this@MainActivity, AuthActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+            startActivity(intent)
+            finish()
         }
     }
 

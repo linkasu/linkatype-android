@@ -48,6 +48,7 @@
     <string name="dialog_record">Record</string>
     <string name="dialog_stop_record">Stop</string>
     <string name="dialog_recording">Recording…</string>
+    <string name="dialog_recognizing">Recognizing…</string>
     <string name="dialog_audio_message">Audio message</string>
     <string name="dialog_audio_too_large">Recording is too long. Please keep it under 8 MB.</string>
     <string name="dialog_send_error">Failed to send recording</string>
@@ -59,6 +60,7 @@
     <string name="dialog_delete_chat">Delete chat</string>
     <string name="dialog_delete_chat_confirm">Delete this chat?</string>
     <string name="logout">Log out</string>
+    <string name="logout_confirm">Log out of this account?</string>
     <string name="chat_slot_button_description">Switch saved chat slot</string>
     <string name="chat_slot_one">Slot 1</string>
     <string name="chat_slot_two">Slot 2</string>

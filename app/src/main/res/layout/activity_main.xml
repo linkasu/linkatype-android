@@ -26,11 +26,26 @@
             android:contentInsetStartWithNavigation="0dp"
             android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
             app:popupTheme="@style/AppTheme.PopupOverlay"
-            app:title="@string/app_name"
-            app:titleCentered="true"
             app:titleTextColor="?attr/colorOnPrimary"
             app:subtitleTextColor="?attr/colorOnPrimary"
-            app:navigationIconTint="?attr/colorOnPrimary" />
+            app:navigationIconTint="?attr/colorOnPrimary">
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/chat_slot_button"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:minWidth="0dp"
+                android:paddingStart="@dimen/spacing_small"
+                android:paddingEnd="@dimen/spacing_small"
+                android:text="@string/chat_slot_one"
+                android:textAllCaps="false"
+                android:textColor="?attr/colorOnPrimary"
+                app:icon="@drawable/ic_baseline_expand_more_24"
+                app:iconGravity="textEnd"
+                app:iconPadding="@dimen/spacing_xs"
+                app:iconTint="?attr/colorOnPrimary" />
+        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <LinearLayout

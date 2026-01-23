@@ -51,6 +51,7 @@
     <string name="dialog_record">Запись</string>
     <string name="dialog_stop_record">Стоп</string>
     <string name="dialog_recording">Запись…</string>
+    <string name="dialog_recognizing">Распознаю…</string>
     <string name="dialog_audio_message">Голосовое сообщение</string>
     <string name="dialog_audio_too_large">Запись слишком длинная. Лимит — 8 МБ.</string>
     <string name="dialog_send_error">Не удалось отправить запись</string>
@@ -62,6 +63,7 @@
     <string name="dialog_delete_chat">Удалить чат</string>
     <string name="dialog_delete_chat_confirm">Удалить этот чат?</string>
     <string name="logout">Выйти</string>
+    <string name="logout_confirm">Выйти из аккаунта?</string>
     <string name="chat_slot_button_description">Выбрать сохранённый слот чата</string>
     <string name="chat_slot_one">Слот 1</string>
     <string name="chat_slot_two">Слот 2</string>
