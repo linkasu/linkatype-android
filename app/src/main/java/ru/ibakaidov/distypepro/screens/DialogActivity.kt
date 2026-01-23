@@ -263,6 +263,11 @@ class DialogActivity : AppCompatActivity() {
     }
 
     private fun startRecording() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) !=
+            PackageManager.PERMISSION_GRANTED
+        ) {
+            return
+        }
         val bufferSize = AudioRecord.getMinBufferSize(
             AUDIO_SAMPLE_RATE,
             AudioFormat.CHANNEL_IN_MONO,
