@@ -28,7 +28,7 @@
             android:layout_height="0dp"
             android:clipToPadding="false"
             android:padding="@dimen/spacing_medium"
-            app:layout_constraintBottom_toTopOf="@id/input_card"
+            app:layout_constraintBottom_toTopOf="@id/suggestions_chips"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/dialog_toolbar" />
@@ -44,6 +44,18 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@id/messages_recycler" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/suggestions_chips"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/spacing_medium"
+            android:paddingVertical="@dimen/spacing_small"
+            android:visibility="gone"
+            app:layout_constraintBottom_toTopOf="@id/input_card"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:singleLine="false" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/input_card"
@@ -92,34 +104,29 @@
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/send_button"
-                        style="@style/Widget.LinkaType.Button"
-                        android:layout_width="0dp"
+                        style="@style/Widget.Material3.Button.IconButton.Filled"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:text="@string/dialog_send"
-                        app:icon="@drawable/ic_baseline_send_24"
-                        app:iconGravity="textStart" />
+                        android:contentDescription="@string/dialog_send"
+                        app:icon="@drawable/ic_baseline_send_24" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/record_button"
-                        style="@style/Widget.LinkaType.Button.Tonal"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="@dimen/spacing_small"
-                        android:layout_weight="1"
-                        android:text="@string/dialog_record"
-                        app:icon="@drawable/ic_baseline_mic_24"
-                        app:iconGravity="textStart" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/clear_button"
-                        style="@style/Widget.LinkaType.Button.Outlined"
+                        style="@style/Widget.Material3.Button.IconButton.Filled.Tonal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="@dimen/spacing_small"
-                        android:text="@string/clear"
-                        app:icon="@drawable/ic_baseline_clear_24"
-                        app:iconGravity="textStart" />
+                        android:contentDescription="@string/dialog_record"
+                        app:icon="@drawable/ic_baseline_mic_24" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/clear_button"
+                        style="@style/Widget.Material3.Button.IconButton.Outlined"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="@dimen/spacing_small"
+                        android:contentDescription="@string/clear"
+                        app:icon="@drawable/ic_baseline_clear_24" />
                 </LinearLayout>
 
                 <TextView

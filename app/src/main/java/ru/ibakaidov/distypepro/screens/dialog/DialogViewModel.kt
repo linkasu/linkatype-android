@@ -92,7 +92,7 @@ class DialogViewModel @Inject constructor(
         viewModelScope.launch {
             val list = runCatching { sdk.dialogRepository.listMessages(chatId, MESSAGES_PAGE_SIZE, null) }
                 .getOrElse { emptyList() }
-            _uiState.update { it.copy(messages = list) }
+            _uiState.update { it.copy(messages = list, suggestions = emptyList()) }
             _events.send(DialogEvent.ScrollToBottom)
         }
     }
@@ -115,7 +115,10 @@ class DialogViewModel @Inject constructor(
                 )
             }.getOrNull()
 
-            result?.let { addMessage(it.message) }
+            result?.let {
+                addMessage(it.message)
+                updateSuggestions(it.suggestions.orEmpty())
+            }
         }
     }
 
@@ -167,7 +170,42 @@ class DialogViewModel @Inject constructor(
                 data.message
             }
             addMessage(message)
+            updateSuggestions(data.suggestions.orEmpty())
         }
+    }
+
+    fun sendSuggestion(text: String) {
+        val chatId = _uiState.value.activeChatId ?: return
+        val trimmedText = text.trim()
+        if (trimmedText.isEmpty()) return
+
+        clearSuggestions()
+
+        viewModelScope.launch {
+            val result = runCatching {
+                sdk.dialogRepository.sendMessage(
+                    chatId = chatId,
+                    role = DialogRole.DISABLED_PERSON,
+                    content = trimmedText,
+                    source = "suggestion",
+                    created = System.currentTimeMillis(),
+                    includeSuggestions = true,
+                )
+            }.getOrNull()
+
+            result?.let {
+                addMessage(it.message)
+                updateSuggestions(it.suggestions.orEmpty())
+            }
+        }
+    }
+
+    private fun updateSuggestions(suggestions: List<String>) {
+        _uiState.update { it.copy(suggestions = suggestions.take(MAX_SUGGESTIONS)) }
+    }
+
+    private fun clearSuggestions() {
+        _uiState.update { it.copy(suggestions = emptyList()) }
     }
 
     private fun addMessage(message: DialogMessage) {
@@ -201,6 +239,7 @@ class DialogViewModel @Inject constructor(
         private const val MESSAGES_PAGE_SIZE = 200
         private const val MAX_AUDIO_BYTES = 8 * 1024 * 1024
         private const val WAV_HEADER_SIZE = 44
+        private const val MAX_SUGGESTIONS = 5
     }
 }
 
@@ -208,6 +247,7 @@ data class DialogUiState(
     val chats: List<DialogChat> = emptyList(),
     val messages: List<DialogMessage> = emptyList(),
     val activeChatId: String? = null,
+    val suggestions: List<String> = emptyList(),
 ) {
     val activeChat: DialogChat?
         get() = chats.firstOrNull { it.id == activeChatId }

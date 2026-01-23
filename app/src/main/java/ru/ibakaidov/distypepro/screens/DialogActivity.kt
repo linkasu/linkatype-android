@@ -23,6 +23,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.chip.Chip
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -43,6 +44,7 @@ import ru.ibakaidov.distypepro.screens.dialog.DialogEvent
 import ru.ibakaidov.distypepro.screens.dialog.DialogViewModel
 import ru.ibakaidov.distypepro.shared.model.DialogChat
 import ru.ibakaidov.distypepro.utils.Callback
+import ru.ibakaidov.distypepro.utils.TtsHolder
 
 @AndroidEntryPoint
 class DialogActivity : AppCompatActivity() {
@@ -120,6 +122,7 @@ class DialogActivity : AppCompatActivity() {
                         chatAdapter.submit(state.chats, state.activeChatId)
                         binding.emptyMessages.isVisible = state.isMessagesEmpty
                         binding.dialogToolbar.subtitle = state.activeChat?.title ?: getString(R.string.dialog_untitled)
+                        updateSuggestions(state.suggestions)
                     }
                 }
 
@@ -335,6 +338,23 @@ class DialogActivity : AppCompatActivity() {
         val count = messageAdapter.itemCount
         if (count > 0) {
             binding.messagesRecycler.scrollToPosition(count - 1)
+        }
+    }
+
+    private fun updateSuggestions(suggestions: List<String>) {
+        binding.suggestionsChips.isVisible = suggestions.isNotEmpty()
+        binding.suggestionsChips.removeAllViews()
+        suggestions.forEach { text ->
+            val chip = Chip(this).apply {
+                this.text = text
+                isCheckable = false
+                isClickable = true
+                setOnClickListener {
+                    TtsHolder.get(this@DialogActivity).speak(text)
+                    viewModel.sendSuggestion(text)
+                }
+            }
+            binding.suggestionsChips.addView(chip)
         }
     }
 
