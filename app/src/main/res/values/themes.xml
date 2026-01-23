@@ -48,6 +48,16 @@
 
     <style name="AppTheme" parent="@style/BaseAppTheme" />
 
+    <style name="AppTheme.Splash" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="android:windowBackground">@drawable/splash_background</item>
+        <item name="android:statusBarColor">@color/colorPrimary</item>
+        <item name="android:navigationBarColor">@color/colorPrimary</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="AppTheme.NoActionBar" parent="@style/AppTheme">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
@@ -55,16 +65,16 @@
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.LinkaType.Toolbar" />
 
-    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.Material3">
-        <item name="colorOnSurface">@color/colorOnSurface</item>
+    <style name="AppTheme.PopupOverlay" parent="Theme.Material3.DayNight">
         <item name="colorSurface">@color/colorSurface</item>
-        <item name="android:textColor">@color/colorOnSurface</item>
+        <item name="colorOnSurface">@color/colorOnSurface</item>
+        <item name="colorSurfaceVariant">@color/colorSurfaceVariant</item>
+        <item name="colorOnSurfaceVariant">@color/colorOnSurfaceVariant</item>
+        <item name="colorOutline">@color/colorOutline</item>
+        <item name="colorOutlineVariant">@color/colorOutlineVariant</item>
         <item name="android:textColorPrimary">@color/colorOnSurface</item>
-        <item name="android:textColorSecondary">@color/colorOnSurface</item>
-        <item name="android:textColorLink">@color/colorPrimary</item>
-        <item name="android:itemTextAppearance">@style/TextAppearance.LinkaType.MenuItem</item>
-        <item name="textAppearanceLargePopupMenu">@style/TextAppearance.LinkaType.MenuItem</item>
-        <item name="textAppearanceSmallPopupMenu">@style/TextAppearance.LinkaType.MenuItem</item>
+        <item name="android:textColorSecondary">@color/colorOnSurfaceVariant</item>
+        <item name="android:windowBackground">@color/colorSurface</item>
     </style>
 
     <style name="ThemeOverlay.LINKaType.FullscreenContainer" parent="">

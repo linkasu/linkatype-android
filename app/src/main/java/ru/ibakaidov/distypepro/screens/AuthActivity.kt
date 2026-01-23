@@ -28,14 +28,6 @@ class AuthActivity : AppCompatActivity() {
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        lifecycleScope.launch {
-            val hasRefreshToken = sdk.tokenStorage.getRefreshToken() != null
-            if (hasRefreshToken) {
-                runCatching { sdk.authRepository.refresh() }
-                    .onSuccess { navigateToMain() }
-            }
-        }
-
         setupListeners()
         updateModeUi()
     }
