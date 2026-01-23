@@ -30,11 +30,12 @@ class DialogViewModel @Inject constructor(
     val events = _events.receiveAsFlow()
 
     init {
-        loadChats()
+        refreshChats()
     }
 
-    fun loadChats() {
+    private fun refreshChats() {
         viewModelScope.launch {
+            runCatching { sdk.offlineQueueProcessor.flush() }
             val list = runCatching { sdk.dialogRepository.listChats() }.getOrElse { emptyList() }
             val sorted = sortChats(list)
             val chats = if (sorted.isEmpty()) {
@@ -139,6 +140,7 @@ class DialogViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
+            _events.send(DialogEvent.ShowProcessing(true))
             val result = runCatching {
                 sdk.dialogRepository.sendAudioMessage(
                     chatId = chatId,
@@ -151,6 +153,8 @@ class DialogViewModel @Inject constructor(
                     includeSuggestions = true,
                 )
             }
+
+            _events.send(DialogEvent.ShowProcessing(false))
 
             val data = result.getOrNull()
             if (data == null) {
@@ -261,6 +265,7 @@ sealed class DialogEvent {
     data object CloseDrawer : DialogEvent()
     data object ClearInput : DialogEvent()
     data class ShowError(val error: DialogError) : DialogEvent()
+    data class ShowProcessing(val show: Boolean) : DialogEvent()
 }
 
 enum class DialogError {

@@ -34,6 +34,8 @@
     <color name="colorOutline">#737B76</color>
     <color name="colorOutlineVariant">#C0C7C2</color>
     <color name="colorPrimaryInverse">#9CD3D6</color>
+    <color name="dialogBubbleUser">#E0F3F4</color>
+    <color name="dialogBubbleSpeaker">#F3F4F5</color>
 
     <color name="spotlight_background">#000000</color>
     <color name="spotlight_text">#FFFFFF</color>
