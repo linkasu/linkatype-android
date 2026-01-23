@@ -61,6 +61,7 @@ class DialogActivity : AppCompatActivity() {
     private var recordingJob: Job? = null
     private var recordingFile: File? = null
     private var isRecording = false
+    private var pendingScrollToBottom = false
 
     override fun onDestroy() {
         super.onDestroy()
@@ -118,7 +119,12 @@ class DialogActivity : AppCompatActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 launch {
                     viewModel.uiState.collectLatest { state ->
-                        messageAdapter.submit(state.messages)
+                        messageAdapter.submit(state.messages) {
+                            if (pendingScrollToBottom) {
+                                pendingScrollToBottom = false
+                                scrollToBottom()
+                            }
+                        }
                         chatAdapter.submit(state.chats, state.activeChatId)
                         binding.emptyMessages.isVisible = state.isMessagesEmpty
                         binding.dialogToolbar.subtitle = state.activeChat?.title ?: getString(R.string.dialog_untitled)
@@ -129,10 +135,14 @@ class DialogActivity : AppCompatActivity() {
                 launch {
                     viewModel.events.collect { event ->
                         when (event) {
-                            is DialogEvent.ScrollToBottom -> scrollToBottom()
+                            is DialogEvent.ScrollToBottom -> {
+                                pendingScrollToBottom = true
+                                binding.messagesRecycler.post { scrollToBottom() }
+                            }
                             is DialogEvent.CloseDrawer -> binding.dialogDrawer.closeDrawer(GravityCompat.START)
                             is DialogEvent.ClearInput -> binding.messageInput.setText("")
                             is DialogEvent.ShowError -> showError(event.error)
+                            is DialogEvent.ShowProcessing -> updateProcessingUi(event.show)
                         }
                     }
                 }
@@ -207,6 +217,9 @@ class DialogActivity : AppCompatActivity() {
 
     private fun sendMessage() {
         val text = binding.messageInput.text?.toString()?.trim().orEmpty()
+        if (text.isNotBlank()) {
+            TtsHolder.get(this).speak(text)
+        }
         viewModel.sendTextMessage(text)
     }
 
@@ -327,6 +340,13 @@ class DialogActivity : AppCompatActivity() {
             binding.recordButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.colorSecondary))
             binding.recordButton.setTextColor(ContextCompat.getColor(this, R.color.colorOnSecondary))
             binding.recordButton.iconTint = ContextCompat.getColorStateList(this, R.color.colorOnSecondary)
+        }
+    }
+
+    private fun updateProcessingUi(processing: Boolean) {
+        binding.dialogStatus.isVisible = processing
+        if (processing) {
+            binding.dialogStatus.setText(R.string.dialog_recognizing)
         }
     }
 

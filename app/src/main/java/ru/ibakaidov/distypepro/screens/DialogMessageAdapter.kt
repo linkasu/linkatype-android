@@ -19,8 +19,13 @@ class DialogMessageAdapter : ListAdapter<DialogMessage, DialogMessageAdapter.Mes
 
     private val timeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-    fun submit(messages: List<DialogMessage>) {
-        submitList(messages.toList())
+    fun submit(messages: List<DialogMessage>, onCommit: (() -> Unit)? = null) {
+        val list = messages.toList()
+        if (onCommit == null) {
+            submitList(list)
+        } else {
+            submitList(list, onCommit)
+        }
     }
 
     fun add(message: DialogMessage) {
