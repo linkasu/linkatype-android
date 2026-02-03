@@ -41,6 +41,15 @@ data class DialogMessageResult(
 )
 
 @Serializable
+data class DialogMessageRequest(
+    val role: String,
+    val content: String,
+    val source: String? = null,
+    val created: Long,
+    val includeSuggestions: Boolean? = null,
+)
+
+@Serializable
 data class DialogSuggestion(
     val id: String,
     val chatId: String? = null,

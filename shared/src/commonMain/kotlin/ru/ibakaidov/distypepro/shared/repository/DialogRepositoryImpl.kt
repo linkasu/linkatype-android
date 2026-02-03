@@ -7,6 +7,7 @@ import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.DialogChat
 import ru.ibakaidov.distypepro.shared.model.DialogMessage
 import ru.ibakaidov.distypepro.shared.model.DialogMessageResult
+import ru.ibakaidov.distypepro.shared.model.DialogMessageRequest
 import ru.ibakaidov.distypepro.shared.model.DialogSuggestion
 import ru.ibakaidov.distypepro.shared.model.DialogSuggestionApplyItem
 import ru.ibakaidov.distypepro.shared.model.DialogSuggestionApplyResult
@@ -72,7 +73,12 @@ class DialogRepositoryImpl(
                 "/v1/dialog/chats/$chatId/messages" + query.toQueryString(),
             )
             remote.forEach { localStore.upsertMessage(it) }
-            remote
+            if (hasPendingDialogMessages(chatId)) {
+                val local = localStore.listMessages(chatId, (limit ?: 200).toLong())
+                mergeMessages(remote, local)
+            } else {
+                remote
+            }
         } catch (_: Exception) {
             localStore.listMessages(chatId, (limit ?: 200).toLong())
         }
@@ -96,18 +102,19 @@ class DialogRepositoryImpl(
             created = createdAt,
         )
         localStore.upsertMessage(optimistic)
+        val request = DialogMessageRequest(
+            role = role,
+            content = content,
+            source = source,
+            created = createdAt,
+            includeSuggestions = includeSuggestions,
+        )
 
         return try {
             val result = apiClient.authorizedRequest<DialogMessageResult>(
                 HttpMethod.Post,
                 "/v1/dialog/chats/$chatId/messages",
-                mapOf(
-                    "role" to role,
-                    "content" to content,
-                    "source" to source,
-                    "created" to createdAt,
-                    "includeSuggestions" to includeSuggestions,
-                ),
+                request,
             )
             localStore.upsertMessage(result.message)
             result
@@ -196,5 +203,22 @@ class DialogRepositoryImpl(
         return entries.joinToString(prefix = "?", separator = "&") { (key, value) ->
             "$key=$value"
         }
+    }
+
+    private fun hasPendingDialogMessages(chatId: String): Boolean {
+        return localStore.listOfflineQueue()
+            .asSequence()
+            .filter { it.entityType == OfflineQueueProcessor.ENTITY_DIALOG_MESSAGE }
+            .mapNotNull {
+                runCatching { json.decodeFromString(OfflineDialogMessagePayload.serializer(), it.payload) }.getOrNull()
+            }
+            .any { it.chatId == chatId }
+    }
+
+    private fun mergeMessages(remote: List<DialogMessage>, local: List<DialogMessage>): List<DialogMessage> {
+        if (local.isEmpty()) return remote
+        return (remote + local)
+            .distinctBy { Triple(it.role, it.created, it.content) }
+            .sortedBy { it.created }
     }
 }
