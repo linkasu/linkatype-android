@@ -4,11 +4,13 @@ struct MainView: View {
     @EnvironmentObject var authManager: FirebaseAuthManager
     private let sdk = SharedSdkProvider.shared.sdk
     @StateObject private var ttsManager = TtsManager.shared
+    @StateObject private var networkMonitor = NetworkMonitor.shared
     @State private var showSettings = false
     @State private var showDialog = false
     @State private var snackbarMessage: String?
     @State private var showSnackbar = false
     @State private var syncTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
+    private let isUiTest = ProcessInfo.processInfo.arguments.contains("ui_test")
     
     var body: some View {
         NavigationStack {
@@ -29,39 +31,63 @@ struct MainView: View {
                             NotificationCenter.default.post(name: .clearInput, object: nil)
                         }) {
                             Label(NSLocalizedString("clear", comment: ""), systemImage: "xmark.circle")
+                                .accessibilityIdentifier("menu_clear")
                         }
+                        .accessibilityIdentifier("menu_clear")
                         
                         Button(action: { showSettings = true }) {
                             Label(NSLocalizedString("settings", comment: ""), systemImage: "gearshape")
+                                .accessibilityIdentifier("menu_settings")
                         }
+                        .accessibilityIdentifier("menu_settings")
 
                         Button(action: { showDialog = true }) {
                             Label(NSLocalizedString("dialog_title", comment: ""), systemImage: "message")
+                                .accessibilityIdentifier("menu_dialog")
                         }
+                        .accessibilityIdentifier("menu_dialog")
                         
                         Button(role: .destructive, action: logout) {
                             Label(NSLocalizedString("logout", comment: ""), systemImage: "rectangle.portrait.and.arrow.right")
+                                .accessibilityIdentifier("menu_logout")
                         }
+                        .accessibilityIdentifier("menu_logout")
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
+                    .accessibilityIdentifier("main_menu")
                 }
             }
             .sheet(isPresented: $showSettings) {
                 NavigationStack {
                     SettingsView(ttsManager: ttsManager)
                 }
+                .accessibilityIdentifier("settings_view")
             }
             .sheet(isPresented: $showDialog) {
                 NavigationStack {
                     DialogView()
                 }
+                .accessibilityIdentifier("dialog_view")
             }
             .overlay(alignment: .bottom) {
                 if showSnackbar, let message = snackbarMessage {
                     SnackbarView(message: message)
                         .padding()
                         .transition(.move(edge: .bottom))
+                }
+            }
+            .overlay(alignment: .topLeading) {
+                if isUiTest {
+                    HStack(spacing: 8) {
+                        Button("UI Settings") { showSettings = true }
+                            .accessibilityIdentifier("ui_test_settings")
+                        Button("UI Dialog") { showDialog = true }
+                            .accessibilityIdentifier("ui_test_dialog")
+                    }
+                    .font(.caption2)
+                    .padding(4)
+                    .opacity(0.02)
                 }
             }
             .task {
@@ -73,6 +99,13 @@ struct MainView: View {
             .onReceive(syncTimer) { _ in
                 Task {
                     _ = try? await sdk.offlineQueueProcessor.flush()
+                }
+            }
+            .onReceive(networkMonitor.$isConnected) { isConnected in
+                if isConnected {
+                    Task {
+                        _ = try? await sdk.offlineQueueProcessor.flush()
+                    }
                 }
             }
             .onReceive(ttsManager.eventPublisher) { event in

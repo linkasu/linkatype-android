@@ -47,10 +47,20 @@
 		A0000017 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A0000703 /* InfoPlist.strings */; };
 		A0000018 /* FirebaseAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000307 /* FirebaseAnalyticsManager.swift */; };
 		A0000019 /* TrackingConsentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000308 /* TrackingConsentManager.swift */; };
+		A000001A /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000309 /* NetworkMonitor.swift */; };
+		E0000001 /* SmokeLoginUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000101 /* SmokeLoginUITests.swift */; };
+		E0000002 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0000201 /* XCTest.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
 		B00000A1 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A0000001Project /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A0000080;
+			remoteInfo = "LINKa type";
+		};
+		E00000A1 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A0000001Project /* Project object */;
 			proxyType = 1;
@@ -64,6 +74,9 @@
 		B0000100 /* LINKaTypeiOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LINKaTypeiOSTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B0000101 /* LINKaTypeiOSTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LINKaTypeiOSTests.swift; sourceTree = "<group>"; };
 		B0000102 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E0000100 /* LINKaTypeiOSUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LINKaTypeiOSUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		E0000101 /* SmokeLoginUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmokeLoginUITests.swift; sourceTree = "<group>"; };
+		E0000102 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B0000201 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = System/Library/Frameworks/XCTest.framework; sourceTree = SDKROOT; };
 		B0000202 /* Shared.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = Shared.xcframework; sourceTree = "<group>"; };
 		C0000101 /* SharedSdkProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedSdkProvider.swift; sourceTree = "<group>"; };
@@ -85,6 +98,7 @@
 		A0000305 /* TtsCacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TtsCacheManager.swift; sourceTree = "<group>"; };
 		A0000307 /* FirebaseAnalyticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseAnalyticsManager.swift; sourceTree = "<group>"; };
 		A0000308 /* TrackingConsentManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackingConsentManager.swift; sourceTree = "<group>"; };
+		A0000309 /* NetworkMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkMonitor.swift; sourceTree = "<group>"; };
 		A0000401 /* AuthView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthView.swift; sourceTree = "<group>"; };
 		A0000402 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		A0000403 /* InputGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InputGroupView.swift; sourceTree = "<group>"; };
@@ -105,6 +119,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				B0000002 /* XCTest.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0000090 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0000002 /* XCTest.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -131,6 +153,7 @@
 			children = (
 				A0000050 /* LINKaTypeiOS */,
 				B0000050 /* LINKaTypeiOSTests */,
+				E0000050 /* LINKaTypeiOSUITests */,
 				B0000060 /* Frameworks */,
 				A0000099 /* Products */,
 			);
@@ -157,6 +180,7 @@
 			children = (
 				A0000100 /* LINKa type.app */,
 				B0000100 /* LINKaTypeiOSTests.xctest */,
+				E0000100 /* LINKaTypeiOSUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -168,6 +192,15 @@
 				B0000102 /* Info.plist */,
 			);
 			path = LINKaTypeiOSTests;
+			sourceTree = "<group>";
+		};
+		E0000050 /* LINKaTypeiOSUITests */ = {
+			isa = PBXGroup;
+			children = (
+				E0000101 /* SmokeLoginUITests.swift */,
+				E0000102 /* Info.plist */,
+			);
+			path = LINKaTypeiOSUITests;
 			sourceTree = "<group>";
 		};
 		B0000060 /* Frameworks */ = {
@@ -200,6 +233,7 @@
 				A0000305 /* TtsCacheManager.swift */,
 				A0000307 /* FirebaseAnalyticsManager.swift */,
 				A0000308 /* TrackingConsentManager.swift */,
+				A0000309 /* NetworkMonitor.swift */,
 				C0000104 /* GlobalImportManager.swift */,
 				C0000101 /* SharedSdkProvider.swift */,
 			);
@@ -261,6 +295,24 @@
 			productReference = B0000100 /* LINKaTypeiOSTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
+		E0000080 /* LINKaTypeiOSUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E0000095 /* Build configuration list for PBXNativeTarget "LINKaTypeiOSUITests" */;
+			buildPhases = (
+				E0000085 /* Sources */,
+				E0000090 /* Frameworks */,
+				E0000091 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E00000A0 /* PBXTargetDependency */,
+			);
+			name = LINKaTypeiOSUITests;
+			productName = LINKaTypeiOSUITests;
+			productReference = E0000100 /* LINKaTypeiOSUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
 		A0000080 /* LINKa type */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = A0000095 /* Build configuration list for PBXNativeTarget "LINKa type" */;
@@ -305,6 +357,10 @@
 						CreatedOnToolsVersion = 15.0;
 						TestTargetID = A0000080;
 					};
+					E0000080 = {
+						CreatedOnToolsVersion = 15.0;
+						TestTargetID = A0000080;
+					};
 				};
 			};
 			buildConfigurationList = A0000002Project /* Build configuration list for PBXProject "LINKaTypeiOS" */;
@@ -325,12 +381,20 @@
 			targets = (
 				A0000080 /* LINKa type */,
 				B0000080 /* LINKaTypeiOSTests */,
+				E0000080 /* LINKaTypeiOSUITests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		B0000091 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E0000091 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -373,6 +437,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E0000085 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E0000001 /* SmokeLoginUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A0000085 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -397,6 +469,7 @@
 				A0000012 /* View+Extensions.swift in Sources */,
 				A0000018 /* FirebaseAnalyticsManager.swift in Sources */,
 				A0000019 /* TrackingConsentManager.swift in Sources */,
+				A000001A /* NetworkMonitor.swift in Sources */,
 				C0000001 /* SharedSdkProvider.swift in Sources */,
 				C0000002 /* DialogView.swift in Sources */,
 				C0000003 /* Data+Kotlin.swift in Sources */,
@@ -432,6 +505,11 @@
 			isa = PBXTargetDependency;
 			target = A0000080 /* LINKa type */;
 			targetProxy = B00000A1 /* PBXContainerItemProxy */;
+		};
+		E00000A0 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A0000080 /* LINKa type */;
+			targetProxy = E00000A1 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -670,6 +748,50 @@
 			};
 			name = Release;
 		};
+		E0000096 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 29HEQ626X2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LINKaTypeiOSUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ru.ibakaidov.distypepro.uitests;
+				PRODUCT_NAME = LINKaTypeiOSUITests;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "LINKa type";
+			};
+			name = Debug;
+		};
+		E0000097 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 29HEQ626X2;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = LINKaTypeiOSUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ru.ibakaidov.distypepro.uitests;
+				PRODUCT_NAME = LINKaTypeiOSUITests;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "LINKa type";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -696,6 +818,15 @@
 			buildConfigurations = (
 				B0000096 /* Debug */,
 				B0000097 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E0000095 /* Build configuration list for PBXNativeTarget "LINKaTypeiOSUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E0000096 /* Debug */,
+				E0000097 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

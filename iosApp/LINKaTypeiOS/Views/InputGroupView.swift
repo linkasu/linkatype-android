@@ -19,6 +19,7 @@ struct InputGroupView: View {
                 TextField(NSLocalizedString("input_hint", comment: ""), text: $textSlots[currentSlot], axis: .vertical)
                     .textFieldStyle(.roundedBorder)
                     .lineLimit(3...6)
+                    .accessibilityIdentifier("input_text")
                 
                 Menu {
                     ForEach(0..<3) { index in
@@ -59,6 +60,7 @@ struct InputGroupView: View {
                         .cornerRadius(12)
                 }
                 .disabled(textSlots[currentSlot].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
+                .accessibilityIdentifier("spotlight_button")
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: .clearInput)) { _ in
@@ -87,4 +89,3 @@ struct InputGroupView: View {
         currentSlot = index
     }
 }
-

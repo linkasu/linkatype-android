@@ -10,14 +10,28 @@ class FirebaseAuthManager: ObservableObject {
     @Published var currentUserEmail: String?
 
     private let sdk = SharedSdkProvider.shared.sdk
+    private let userDefaults = UserDefaults.standard
+    private var cancellables = Set<AnyCancellable>()
+
+    private let cachedUserIdKey = "auth_user_id"
+    private let cachedUserEmailKey = "auth_user_email"
 
     init() {
+        NetworkMonitor.shared.$isConnected
+            .removeDuplicates()
+            .sink { [weak self] isConnected in
+                guard isConnected else { return }
+                Task { await self?.refreshIfPossible() }
+            }
+            .store(in: &cancellables)
+
         Task {
             await refreshIfPossible()
         }
     }
 
     private func applyAuth(_ response: AuthResponse) {
+        cacheAuth(userId: response.user.id, email: response.user.email)
         DispatchQueue.main.async {
             self.isAuthenticated = true
             self.currentUserId = response.user.id
@@ -26,6 +40,7 @@ class FirebaseAuthManager: ObservableObject {
     }
 
     private func clearAuth() {
+        clearCachedAuth()
         DispatchQueue.main.async {
             self.isAuthenticated = false
             self.currentUserId = nil
@@ -39,11 +54,19 @@ class FirebaseAuthManager: ObservableObject {
             clearAuth()
             return
         }
+        if !NetworkMonitor.shared.isConnected {
+            applyCachedAuth()
+            return
+        }
         do {
             let response = try await sdk.authRepository.refresh()
             applyAuth(response)
         } catch {
-            clearAuth()
+            if NetworkMonitor.shared.isConnected {
+                clearAuth()
+            } else {
+                applyCachedAuth()
+            }
         }
     }
 
@@ -76,5 +99,28 @@ class FirebaseAuthManager: ObservableObject {
         try await sdk.accountRepository.deleteAccount(deleteFirebase: true)
         try? await sdk.authRepository.logout()
         clearAuth()
+    }
+
+    private func cacheAuth(userId: String, email: String?) {
+        userDefaults.set(userId, forKey: cachedUserIdKey)
+        userDefaults.set(email, forKey: cachedUserEmailKey)
+    }
+
+    private func applyCachedAuth() {
+        guard let userId = userDefaults.string(forKey: cachedUserIdKey) else {
+            clearAuth()
+            return
+        }
+        let email = userDefaults.string(forKey: cachedUserEmailKey)
+        DispatchQueue.main.async {
+            self.isAuthenticated = true
+            self.currentUserId = userId
+            self.currentUserEmail = email
+        }
+    }
+
+    private func clearCachedAuth() {
+        userDefaults.removeObject(forKey: cachedUserIdKey)
+        userDefaults.removeObject(forKey: cachedUserEmailKey)
     }
 }

@@ -34,6 +34,20 @@
                ReferencedContainer = "container:LINKaTypeiOS.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E0000080"
+               BuildableName = "LINKaTypeiOSUITests.xctest"
+               BlueprintName = "LINKaTypeiOSUITests"
+               ReferencedContainer = "container:LINKaTypeiOS.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -49,6 +63,16 @@
                BlueprintIdentifier = "B0000080"
                BuildableName = "LINKaTypeiOSTests.xctest"
                BlueprintName = "LINKaTypeiOSTests"
+               ReferencedContainer = "container:LINKaTypeiOS.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E0000080"
+               BuildableName = "LINKaTypeiOSUITests.xctest"
+               BlueprintName = "LINKaTypeiOSUITests"
                ReferencedContainer = "container:LINKaTypeiOS.xcodeproj">
             </BuildableReference>
          </TestableReference>

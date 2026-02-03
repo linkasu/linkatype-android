@@ -40,10 +40,12 @@ struct AuthView: View {
                         .textContentType(.emailAddress)
                         .keyboardType(.emailAddress)
                         .autocapitalization(.none)
+                        .accessibilityIdentifier("auth_email")
                     
                     SecureField(NSLocalizedString("auth_password_hint", comment: ""), text: $password)
                         .textFieldStyle(AuthTextFieldStyle())
                         .textContentType(.password)
+                        .accessibilityIdentifier("auth_password")
                     
                     if isSignUpMode {
                         SecureField(NSLocalizedString("auth_confirm_password_hint", comment: ""), text: $confirmPassword)
@@ -76,6 +78,7 @@ struct AuthView: View {
                     .cornerRadius(12)
                     .padding(.horizontal, 32)
                     .disabled(isLoading)
+                    .accessibilityIdentifier("auth_primary")
                     
                     if !isSignUpMode {
                         Button(action: { showResetPasswordAlert = true }) {

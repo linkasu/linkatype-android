@@ -1,4 +1,5 @@
 import SwiftUI
+import Shared
 
 struct SettingsView: View {
     @ObservedObject var ttsManager: TtsManager
@@ -19,6 +20,8 @@ struct SettingsView: View {
     @State private var showDeleteAccountAlert = false
     @State private var isDeleting = false
     @State private var deleteAccountError: String?
+    @State private var preferencesSyncTask: Task<Void, Never>?
+    @State private var didLoadInitialValues = false
     
     var body: some View {
         Form {
@@ -27,6 +30,7 @@ struct SettingsView: View {
                     .onChange(of: useYandex) { newValue in
                         ttsManager.setUseYandex(newValue)
                         loadVoices()
+                        schedulePreferencesSync()
                     }
                 
                 if !availableVoices.isEmpty {
@@ -37,6 +41,7 @@ struct SettingsView: View {
                     }
                     .onChange(of: selectedVoiceId) { newValue in
                         ttsManager.setVoiceId(newValue)
+                        schedulePreferencesSync()
                     }
                 }
                 
@@ -45,6 +50,7 @@ struct SettingsView: View {
                     Slider(value: $volume, in: 0...1)
                         .onChange(of: volume) { newValue in
                             ttsManager.setVolume(newValue)
+                            schedulePreferencesSync()
                         }
                 }
                 
@@ -53,6 +59,7 @@ struct SettingsView: View {
                     Slider(value: $rate, in: 0.1...2)
                         .onChange(of: rate) { newValue in
                             ttsManager.setRate(newValue)
+                            schedulePreferencesSync()
                         }
                 }
                 
@@ -61,6 +68,7 @@ struct SettingsView: View {
                     Slider(value: $pitch, in: 0.5...2)
                         .onChange(of: pitch) { newValue in
                             ttsManager.setPitch(newValue)
+                            schedulePreferencesSync()
                         }
                 }
                 
@@ -163,6 +171,7 @@ struct SettingsView: View {
                 }
             }
         }
+        .accessibilityIdentifier("settings_view")
         .navigationTitle(NSLocalizedString("settings", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -175,6 +184,7 @@ struct SettingsView: View {
         .onAppear {
             loadInitialValues()
             loadVoices()
+            didLoadInitialValues = true
         }
         .onReceive(ttsManager.eventPublisher) { event in
             handleTtsEvent(event)
@@ -222,6 +232,56 @@ struct SettingsView: View {
         await MainActor.run {
             cacheInfo = String(format: NSLocalizedString("settings_cache_info", comment: ""), info.fileCount, info.sizeMb, Int(info.sizeLimitMb))
         }
+    }
+
+    private func schedulePreferencesSync() {
+        guard didLoadInitialValues else { return }
+        preferencesSyncTask?.cancel()
+        preferencesSyncTask = Task {
+            try? await Task.sleep(nanoseconds: 300_000_000)
+            await syncPreferences()
+        }
+    }
+
+    private func syncPreferences() async {
+        let current = try? await SharedSdkProvider.shared.sdk.userStateRepository.getState()
+        let currentPrefs = current?.preferences ?? UserPreferences(
+            darkTheme: false,
+            yandex: true,
+            voiceUri: nil,
+            yandexVoice: nil,
+            volume: 1.0,
+            rate: 1.0,
+            pitch: 1.0,
+            showPredictor: true,
+            showSpotlightPredictor: true,
+            showQuickes: true,
+            showBank: true,
+            saveOnSay: false,
+            typeSound: false,
+            speakLastWord: false
+        )
+        let merged = UserPreferences(
+            darkTheme: currentPrefs.darkTheme,
+            yandex: useYandex,
+            voiceUri: useYandex ? currentPrefs.voiceUri : selectedVoiceId,
+            yandexVoice: useYandex ? selectedVoiceId : currentPrefs.yandexVoice,
+            volume: Double(volume),
+            rate: Double(rate),
+            pitch: Double(pitch),
+            showPredictor: currentPrefs.showPredictor,
+            showSpotlightPredictor: currentPrefs.showSpotlightPredictor,
+            showQuickes: currentPrefs.showQuickes,
+            showBank: currentPrefs.showBank,
+            saveOnSay: currentPrefs.saveOnSay,
+            typeSound: currentPrefs.typeSound,
+            speakLastWord: currentPrefs.speakLastWord
+        )
+        _ = try? await SharedSdkProvider.shared.sdk.userStateRepository.updateState(
+            inited: nil,
+            quickes: nil,
+            preferences: merged
+        )
     }
     
     private func handleTtsEvent(_ event: TtsEvent) {

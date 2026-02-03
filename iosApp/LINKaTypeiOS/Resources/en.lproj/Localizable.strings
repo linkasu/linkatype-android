@@ -43,11 +43,25 @@
 "auth_tracking_toggle" = "Allow analytics & tracking";
 "auth_tracking_agreement" = "I agree to the collection of anonymous usage data (button taps, feature usage) via Firebase Analytics to improve the app. No personal information is collected.";
 "dialog_title" = "Dialog";
+"dialog_chats_title" = "Chats";
+"dialog_new_chat" = "New chat";
 "dialog_message_hint" = "Type a message…";
 "dialog_send" = "Send";
 "dialog_record" = "Record";
+"dialog_stop_record" = "Stop recording";
+"dialog_recording" = "Recording…";
+"dialog_recognizing" = "Recognizing…";
+"dialog_audio_message" = "Audio message";
 "dialog_audio_too_large" = "Recording is too long. Please keep it under 8 MB.";
+"dialog_send_error" = "Failed to send recording";
+"dialog_record_permission_denied" = "Microphone access is denied. Allow it in Settings.";
 "dialog_untitled" = "New dialog";
+"dialog_empty" = "No messages yet";
+"dialog_you" = "You";
+"dialog_speaker" = "Speaker";
+"dialog_message_count" = "%d messages";
+"dialog_delete_chat" = "Delete chat";
+"dialog_delete_chat_confirm" = "Delete this chat?";
 
 "logout" = "Log out";
 "welcome_back" = "Welcome back";

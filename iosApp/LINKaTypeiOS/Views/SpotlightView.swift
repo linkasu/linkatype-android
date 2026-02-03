@@ -20,6 +20,7 @@ struct SpotlightView: View {
                 Spacer()
             }
         }
+        .accessibilityIdentifier("spotlight_view")
         .statusBar(hidden: true)
         .onTapGesture {
             isPresented = false
@@ -34,4 +35,3 @@ struct SpotlightView: View {
         )
     }
 }
-

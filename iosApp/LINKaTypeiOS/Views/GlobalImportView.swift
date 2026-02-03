@@ -48,6 +48,7 @@ struct GlobalImportView: View {
                 }
             }
         }
+        .accessibilityIdentifier("global_import_view")
         .navigationTitle(NSLocalizedString("global_import_title", comment: ""))
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

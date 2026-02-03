@@ -23,6 +23,8 @@ struct BankGroupView: View {
     @State private var showDownloadAlert = false
     @State private var showGlobalImport = false
     
+    private let sortModeKey = "bank_sort_mode"
+    
     private let gridColumns = [
         GridItem(.adaptive(minimum: 150), spacing: 12)
     ]
@@ -69,6 +71,7 @@ struct BankGroupView: View {
             }
         }
         .onAppear {
+            loadSortMode()
             if let userId = authManager.getUserId() {
                 categoryManager.startListening(userId: userId)
             }
@@ -91,6 +94,7 @@ struct BankGroupView: View {
             NavigationStack {
                 GlobalImportView()
             }
+            .accessibilityIdentifier("global_import_view")
         }
         .alert(NSLocalizedString("remove", comment: ""), isPresented: $showConfirmDialog) {
             Button(NSLocalizedString("remove", comment: ""), role: .destructive) {
@@ -111,9 +115,11 @@ struct BankGroupView: View {
                 buttons: [
                     .default(Text(NSLocalizedString("bank_sort_alpha_asc", comment: ""))) {
                         sortMode = .alphabetAsc
+                        persistSortMode()
                     },
                     .default(Text(NSLocalizedString("bank_sort_alpha_desc", comment: ""))) {
                         sortMode = .alphabetDesc
+                        persistSortMode()
                     },
                     .cancel(Text(NSLocalizedString("cancel", comment: "")))
                 ]
@@ -149,6 +155,7 @@ struct BankGroupView: View {
                 Button(action: { showGlobalImport = true }) {
                     Image(systemName: "tray.and.arrow.down")
                 }
+                .accessibilityIdentifier("bank_import_button")
             }
 
             Button(action: showAddDialog) {
@@ -279,6 +286,15 @@ struct BankGroupView: View {
             }
         }
     }
+
+    private func loadSortMode() {
+        let stored = UserDefaults.standard.integer(forKey: sortModeKey)
+        sortMode = SortMode(rawValue: stored) ?? .alphabetAsc
+    }
+
+    private func persistSortMode() {
+        UserDefaults.standard.set(sortMode.rawValue, forKey: sortModeKey)
+    }
 }
 
 struct BankItemView: View {
@@ -329,7 +345,7 @@ struct InputDialogView: View {
     }
 }
 
-enum SortMode {
+enum SortMode: Int {
     case alphabetAsc
     case alphabetDesc
 }
