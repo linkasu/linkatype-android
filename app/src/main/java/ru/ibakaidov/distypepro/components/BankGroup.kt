@@ -123,11 +123,15 @@ class BankGroup @JvmOverloads constructor(
             override fun onDone(result: String) {
                 if (showingStatements) {
                     statementManager?.create(result, object : Callback<Unit> {
-                        override fun onDone(result: Unit) = Unit
+                        override fun onDone(result: Unit) {
+                            refresh()
+                        }
                     })
                 } else {
                     categoryManager.create(result, object : Callback<Unit> {
-                        override fun onDone(result: Unit) = Unit
+                        override fun onDone(result: Unit) {
+                            refresh()
+                        }
                     })
                 }
             }
