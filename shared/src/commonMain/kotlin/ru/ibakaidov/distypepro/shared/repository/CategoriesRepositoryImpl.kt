@@ -5,6 +5,8 @@ import kotlinx.serialization.json.Json
 import ru.ibakaidov.distypepro.shared.api.ApiClient
 import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.Category
+import ru.ibakaidov.distypepro.shared.model.CategoryCreateRequest
+import ru.ibakaidov.distypepro.shared.model.CategoryUpdateRequest
 import ru.ibakaidov.distypepro.shared.sync.OfflineCategoryPayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineCategoryUpdatePayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
@@ -43,11 +45,11 @@ class CategoriesRepositoryImpl(
             val remote = apiClient.authorizedRequest<Category>(
                 HttpMethod.Post,
                 "/v1/categories",
-                mapOf(
-                    "id" to id,
-                    "label" to label,
-                    "created" to createdAt,
-                    "aiUse" to (aiUse ?: false),
+                CategoryCreateRequest(
+                    id = id,
+                    label = label,
+                    created = createdAt,
+                    aiUse = aiUse ?: false,
                 ),
             )
             localStore.upsertCategory(remote)
@@ -85,9 +87,9 @@ class CategoriesRepositoryImpl(
             val remote = apiClient.authorizedRequest<Category>(
                 HttpMethod.Patch,
                 "/v1/categories/$id",
-                mapOf(
-                    "label" to label,
-                    "aiUse" to aiUse,
+                CategoryUpdateRequest(
+                    label = label,
+                    aiUse = aiUse,
                 ),
             )
             localStore.upsertCategory(remote)

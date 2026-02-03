@@ -5,6 +5,8 @@ import kotlinx.serialization.json.Json
 import ru.ibakaidov.distypepro.shared.api.ApiClient
 import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.Statement
+import ru.ibakaidov.distypepro.shared.model.StatementCreateRequest
+import ru.ibakaidov.distypepro.shared.model.StatementUpdateRequest
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
 import ru.ibakaidov.distypepro.shared.sync.OfflineStatementPayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineStatementUpdatePayload
@@ -46,11 +48,11 @@ class StatementsRepositoryImpl(
             val remote = apiClient.authorizedRequest<Statement>(
                 HttpMethod.Post,
                 "/v1/statements",
-                mapOf(
-                    "id" to id,
-                    "categoryId" to categoryId,
-                    "text" to text,
-                    "created" to createdAt,
+                StatementCreateRequest(
+                    id = id,
+                    categoryId = categoryId,
+                    text = text,
+                    created = createdAt,
                 ),
             )
             localStore.upsertStatement(remote)
@@ -87,7 +89,7 @@ class StatementsRepositoryImpl(
             val remote = apiClient.authorizedRequest<Statement>(
                 HttpMethod.Patch,
                 "/v1/statements/$id",
-                mapOf("text" to text),
+                StatementUpdateRequest(text = text),
             )
             localStore.upsertStatement(remote)
             remote

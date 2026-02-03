@@ -7,8 +7,14 @@ import kotlinx.serialization.json.Json
 import ru.ibakaidov.distypepro.shared.api.ApiClient
 import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.Category
+import ru.ibakaidov.distypepro.shared.model.CategoryCreateRequest
+import ru.ibakaidov.distypepro.shared.model.CategoryUpdateRequest
+import ru.ibakaidov.distypepro.shared.model.DialogMessageRequest
 import ru.ibakaidov.distypepro.shared.model.Statement
+import ru.ibakaidov.distypepro.shared.model.StatementCreateRequest
+import ru.ibakaidov.distypepro.shared.model.StatementUpdateRequest
 import ru.ibakaidov.distypepro.shared.model.UserState
+import ru.ibakaidov.distypepro.shared.model.UserStateUpdateRequest
 
 class OfflineQueueProcessor(
     private val apiClient: ApiClient,
@@ -48,11 +54,11 @@ class OfflineQueueProcessor(
                 val created = apiClient.authorizedRequest<Category>(
                     HttpMethod.Post,
                     "/v1/categories",
-                    mapOf(
-                        "id" to data.id,
-                        "label" to data.label,
-                        "created" to data.created,
-                        "aiUse" to data.aiUse,
+                    CategoryCreateRequest(
+                        id = data.id,
+                        label = data.label,
+                        created = data.created,
+                        aiUse = data.aiUse,
                     ),
                 )
                 localStore.upsertCategory(created)
@@ -63,9 +69,9 @@ class OfflineQueueProcessor(
                 val updated = apiClient.authorizedRequest<Category>(
                     HttpMethod.Patch,
                     "/v1/categories/${data.id}",
-                    mapOf(
-                        "label" to data.label,
-                        "aiUse" to data.aiUse,
+                    CategoryUpdateRequest(
+                        label = data.label,
+                        aiUse = data.aiUse,
                     ),
                 )
                 localStore.upsertCategory(updated)
@@ -89,11 +95,11 @@ class OfflineQueueProcessor(
                 val created = apiClient.authorizedRequest<Statement>(
                     HttpMethod.Post,
                     "/v1/statements",
-                    mapOf(
-                        "id" to data.id,
-                        "categoryId" to data.categoryId,
-                        "text" to data.text,
-                        "created" to data.created,
+                    StatementCreateRequest(
+                        id = data.id,
+                        categoryId = data.categoryId,
+                        text = data.text,
+                        created = data.created,
                     ),
                 )
                 localStore.upsertStatement(created)
@@ -104,7 +110,7 @@ class OfflineQueueProcessor(
                 val updated = apiClient.authorizedRequest<Statement>(
                     HttpMethod.Patch,
                     "/v1/statements/${data.id}",
-                    mapOf("text" to data.text),
+                    StatementUpdateRequest(text = data.text),
                 )
                 localStore.upsertStatement(updated)
             }
@@ -137,10 +143,10 @@ class OfflineQueueProcessor(
         val updated = apiClient.authorizedRequest<UserState>(
             HttpMethod.Put,
             "/v1/user/state",
-            mapOf(
-                "inited" to data.inited,
-                "quickes" to data.quickes,
-                "preferences" to data.preferences,
+            UserStateUpdateRequest(
+                inited = data.inited,
+                quickes = data.quickes,
+                preferences = data.preferences,
             ),
         )
         localStore.upsertUserState(updated)
@@ -148,16 +154,17 @@ class OfflineQueueProcessor(
 
     private suspend fun handleDialogMessage(payload: String) {
         val data = json.decodeFromString(OfflineDialogMessagePayload.serializer(), payload)
+        val request = DialogMessageRequest(
+            role = data.role,
+            content = data.content,
+            source = data.source,
+            created = data.created,
+            includeSuggestions = data.includeSuggestions,
+        )
         apiClient.authorizedRequest<Unit>(
             HttpMethod.Post,
             "/v1/dialog/chats/${data.chatId}/messages",
-            mapOf(
-                "role" to data.role,
-                "content" to data.content,
-                "source" to data.source,
-                "created" to data.created,
-                "includeSuggestions" to data.includeSuggestions,
-            ),
+            request,
         )
     }
 

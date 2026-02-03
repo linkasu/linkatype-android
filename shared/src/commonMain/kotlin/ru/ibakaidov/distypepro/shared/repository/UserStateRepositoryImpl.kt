@@ -6,6 +6,7 @@ import ru.ibakaidov.distypepro.shared.api.ApiClient
 import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.UserPreferences
 import ru.ibakaidov.distypepro.shared.model.UserState
+import ru.ibakaidov.distypepro.shared.model.UserStateUpdateRequest
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
 import ru.ibakaidov.distypepro.shared.sync.OfflineUserStatePayload
 import ru.ibakaidov.distypepro.shared.utils.currentTimeMillis
@@ -47,10 +48,10 @@ class UserStateRepositoryImpl(
             val remote = apiClient.authorizedRequest<UserState>(
                 HttpMethod.Put,
                 "/v1/user/state",
-                mapOf(
-                    "inited" to inited,
-                    "quickes" to normalizedQuickes,
-                    "preferences" to preferences,
+                UserStateUpdateRequest(
+                    inited = inited,
+                    quickes = normalizedQuickes,
+                    preferences = preferences,
                 ),
             )
             val normalized = remote.copy(quickes = normalizeQuickes(remote.quickes))

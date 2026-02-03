@@ -3,6 +3,7 @@ package ru.ibakaidov.distypepro.shared.repository
 import io.ktor.http.HttpMethod
 import io.ktor.http.encodeURLParameter
 import ru.ibakaidov.distypepro.shared.api.ApiClient
+import ru.ibakaidov.distypepro.shared.model.GlobalImportCategoryRequest
 import ru.ibakaidov.distypepro.shared.model.GlobalCategory
 import ru.ibakaidov.distypepro.shared.model.ImportStatus
 import ru.ibakaidov.distypepro.shared.model.Statement
@@ -24,7 +25,7 @@ class GlobalRepositoryImpl(
         return apiClient.authorizedRequest(
             HttpMethod.Post,
             "/v1/global/import",
-            mapOf("category_id" to categoryId, "force" to force),
+            GlobalImportCategoryRequest(categoryId = categoryId, force = force),
         )
     }
 }
