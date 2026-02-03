@@ -2,5 +2,21 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/GoogleAppMeasurement" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/GoogleDataTransport" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/GoogleUtilities" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/abseil-cpp-binary" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/app-check" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/firebase-ios-sdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/google-ads-on-device-conversion-ios-sdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/grpc-binary" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/gtm-session-fetcher" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/interop-ios-for-google-sdks" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/leveldb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/nanopb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/promises" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/swift-protobuf" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/swift-protobuf/Sources/protobuf/abseil" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/tmp/DerivedData/SourcePackages/checkouts/swift-protobuf/Sources/protobuf/protobuf" vcs="Git" />
   </component>
 </project>
