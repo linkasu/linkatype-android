@@ -90,7 +90,7 @@ jobs:
           retention-days: 7
 
   build:
-    name: Build Release APK
+    name: Build Release AAB
     runs-on: ubuntu-latest
     needs: [test, lint]
 
@@ -115,17 +115,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Build release APK
-        run: ./gradlew assembleRelease --stacktrace
+      - name: Build release AAB
+        run: ./gradlew bundleRelease --stacktrace
 
-      - name: Upload unsigned APK
+      - name: Upload unsigned AAB
         uses: actions/upload-artifact@v4
         with:
-          name: apk-unsigned
-          path: app/build/outputs/apk/release/
+          name: aab-unsigned
+          path: app/build/outputs/bundle/release/
           retention-days: 7
   sign:
-    name: Sign Release APK
+    name: Sign Release AAB
     runs-on: ubuntu-latest
     needs: build
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
@@ -134,17 +134,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Download unsigned APK
+      - name: Download unsigned AAB
         uses: actions/download-artifact@v4
         with:
-          name: apk-unsigned
-          path: app/build/outputs/apk/release/
+          name: aab-unsigned
+          path: app/build/outputs/bundle/release/
 
-      - name: Sign app APK
+      - name: Sign app AAB
         uses: r0adkll/sign-android-release@v1
         id: sign_app
         with:
-          releaseDirectory: app/build/outputs/apk/release
+          releaseDirectory: app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: main key
           keyStorePassword: ${{ secrets.KEYSTOREPASSWORD }}
@@ -152,9 +152,9 @@ jobs:
         env:
           BUILD_TOOLS_VERSION: "35.0.1"
 
-      - name: Upload signed APK
+      - name: Upload signed AAB
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-signed
+          name: app-release-signed-aab
           path: ${{ steps.sign_app.outputs.signedReleaseFile }}
           retention-days: 30

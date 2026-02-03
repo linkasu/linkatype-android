@@ -15,7 +15,7 @@ android {
         applicationId "ru.ibakaidov.distypepro"
         minSdk 23
         targetSdk 35
-        versionCode 55
+        versionCode 56
         versionName "4.0"
 
         buildConfigField "String", "BACKEND_URL", "\"https://backend.linka.su\""
