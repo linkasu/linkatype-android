@@ -30,6 +30,10 @@
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
+            android:name=".screens.BankActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
             android:name=".screens.DialogActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />

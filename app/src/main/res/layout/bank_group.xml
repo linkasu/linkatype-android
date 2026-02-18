@@ -19,29 +19,31 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/bank_toolbar"
-                style="@style/Widget.LinkaType.Toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingStart="@dimen/spacing_small"
-                android:paddingEnd="@dimen/spacing_small"
-                android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
-                app:contentInsetStartWithNavigation="0dp"
-                app:navigationIconTint="?attr/colorOnPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                app:titleTextColor="?attr/colorOnPrimary"
-                app:subtitleTextColor="?attr/colorOnPrimary" />
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/gridview"
+            <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1"
-                android:clipToPadding="false"
-                android:padding="@dimen/spacing_small"
-                android:scrollbars="none"
-                android:layoutAnimation="@anim/layout_animation_fade_in" />
+                android:layout_weight="1">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/gridview"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:clipToPadding="false"
+                    android:padding="@dimen/spacing_small"
+                    android:scrollbars="none"
+                    android:layoutAnimation="@anim/layout_animation_fade_in" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/bank_empty_state"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_large"
+                    android:text="@string/bank_empty_categories"
+                    android:textAppearance="@style/TextAppearance.Material3.BodyLarge"
+                    android:textColor="?attr/colorOnSurfaceVariant"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 </LinearLayout>

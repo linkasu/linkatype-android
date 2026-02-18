@@ -48,6 +48,7 @@ class SmokeLoginTest {
 
         waitForAuthResult(30_000)
         waitForViewOnScreen(withId(R.id.input_group), 10_000)
+        waitForViewOnScreen(withId(R.id.open_bank_card), 10_000)
 
         openSpotlight()
         waitForViewOnScreen(withId(R.id.fullscreen_content), 10_000)
@@ -63,6 +64,8 @@ class SmokeLoginTest {
         waitForViewOnScreen(withId(R.id.messages_recycler), 10_000)
         pressBack()
 
+        onView(withId(R.id.open_bank_card)).perform(click())
+        waitForViewOnScreen(withId(R.id.bank_group), 10_000)
         openBankOverflow()
         onView(withText(R.string.global_import_title)).perform(click())
         waitForViewOnScreen(withId(R.id.global_import_list), 10_000)

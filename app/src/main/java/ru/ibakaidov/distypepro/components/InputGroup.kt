@@ -86,8 +86,12 @@ class InputGroup @JvmOverloads constructor(
         ttsEditText.setText("")
     }
 
-    fun back() {
+    fun back(): Boolean {
+        if (!ttsEditText.hasFocus()) {
+            return false
+        }
         ttsEditText.clearFocus()
+        return true
     }
 
     private fun say() {

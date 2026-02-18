@@ -65,6 +65,10 @@
     <string name="chat_slot_one">Slot 1</string>
     <string name="chat_slot_two">Slot 2</string>
     <string name="chat_slot_three">Slot 3</string>
+    <string name="main_open_bank_title">Phrase bank</string>
+    <string name="main_open_bank_subtitle">Open categories and saved phrases</string>
+    <string name="bank_empty_categories">No categories yet. Tap + to create one.</string>
+    <string name="bank_empty_statements">No phrases yet. Tap + to add one.</string>
     <string name="download">Download</string>
     <string name="play_last">Play last</string>
     <string name="tts_status_ready">Ready</string>

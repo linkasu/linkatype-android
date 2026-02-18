@@ -68,6 +68,10 @@
     <string name="chat_slot_one">Слот 1</string>
     <string name="chat_slot_two">Слот 2</string>
     <string name="chat_slot_three">Слот 3</string>
+    <string name="main_open_bank_title">Банк фраз</string>
+    <string name="main_open_bank_subtitle">Открыть категории и сохранённые фразы</string>
+    <string name="bank_empty_categories">Пока нет категорий. Нажмите +, чтобы создать.</string>
+    <string name="bank_empty_statements">Пока нет фраз. Нажмите +, чтобы добавить.</string>
     <string name="download">Скачать</string>
     <string name="play_last">Воспроизвести последнее</string>
     <string name="tts_status_ready">Готов</string>

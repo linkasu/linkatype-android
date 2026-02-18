@@ -3,6 +3,7 @@ package ru.ibakaidov.distypepro.components
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
@@ -37,10 +38,12 @@ class BankGroup @JvmOverloads constructor(
 
     private val categoryManager = CategoryManager(context)
     private var statementManager: StatementManager? = null
-    private lateinit var toolbar: MaterialToolbar
+    private var toolbar: MaterialToolbar? = null
     private lateinit var recyclerView: RecyclerView
+    private lateinit var emptyStateText: TextView
     private lateinit var adapter: HashMapRecyclerAdapter
     private var tts: Tts? = null
+    private var onExitRequested: (() -> Unit)? = null
 
     private var showingStatements = false
     private var currentStatements: Map<String, String> = emptyMap()
@@ -55,8 +58,8 @@ class BankGroup @JvmOverloads constructor(
         }
 
     override fun initUi() {
-        toolbar = findViewById(R.id.bank_toolbar)
         recyclerView = findViewById(R.id.gridview)
+        emptyStateText = findViewById(R.id.bank_empty_state)
 
         adapter = HashMapRecyclerAdapter(
             onItemClick = { key, value -> onItemSelected(key, value) },
@@ -67,39 +70,6 @@ class BankGroup @JvmOverloads constructor(
         recyclerView.layoutManager = GridLayoutManager(context, spanCount)
         recyclerView.adapter = adapter
 
-        toolbar.inflateMenu(R.menu.bank_toolbar_menu)
-        toolbar.setOnMenuItemClickListener { item ->
-            when (item.itemId) {
-                R.id.action_sort -> {
-                    showSortDialog()
-                    true
-                }
-
-                R.id.action_add_category -> {
-                    showAddDialog()
-                    true
-                }
-
-                R.id.action_add_statement -> {
-                    showAddDialog()
-                    true
-                }
-
-                R.id.action_download_cache -> {
-                    downloadCurrentCategoryToCache()
-                    true
-                }
-                R.id.action_import_global -> {
-                    context.startActivity(
-                        android.content.Intent(context, GlobalImportActivity::class.java)
-                    )
-                    true
-                }
-
-                else -> false
-            }
-        }
-
         refreshToolbar()
         showCategories()
     }
@@ -108,7 +78,22 @@ class BankGroup @JvmOverloads constructor(
         this.tts = tts
     }
 
-    fun back() = setState(false)
+    fun attachToolbar(toolbar: MaterialToolbar, onExitRequested: () -> Unit) {
+        this.toolbar = toolbar
+        this.onExitRequested = onExitRequested
+        toolbar.menu.clear()
+        toolbar.inflateMenu(R.menu.bank_toolbar_menu)
+        toolbar.setOnMenuItemClickListener { item -> onToolbarMenuClick(item.itemId) }
+        refreshToolbar()
+    }
+
+    fun back(): Boolean {
+        if (!showingStatements) {
+            return false
+        }
+        setState(false)
+        return true
+    }
 
     fun refresh() {
         if (showingStatements) {
@@ -208,12 +193,15 @@ class BankGroup @JvmOverloads constructor(
     }
 
     private fun refreshToolbar() {
-        if (showingStatements) {
-            toolbar.navigationIcon = AppCompatResources.getDrawable(context, R.drawable.ic_baseline_arrow_back_24)
-            toolbar.setNavigationOnClickListener { setState(false) }
-        } else {
-            toolbar.navigationIcon = null
-            toolbar.setNavigationOnClickListener(null)
+        val toolbar = toolbar ?: return
+
+        toolbar.navigationIcon = AppCompatResources.getDrawable(context, R.drawable.ic_baseline_arrow_back_24)
+        toolbar.setNavigationOnClickListener {
+            if (showingStatements) {
+                setState(false)
+            } else {
+                onExitRequested?.invoke()
+            }
         }
 
         val title = if (showingStatements) {
@@ -234,13 +222,45 @@ class BankGroup @JvmOverloads constructor(
         downloadItem?.isEnabled = showingStatements && !isDownloading
     }
 
+    private fun onToolbarMenuClick(itemId: Int): Boolean {
+        return when (itemId) {
+            R.id.action_sort -> {
+                showSortDialog()
+                true
+            }
+
+            R.id.action_add_category -> {
+                showAddDialog()
+                true
+            }
+
+            R.id.action_add_statement -> {
+                showAddDialog()
+                true
+            }
+
+            R.id.action_download_cache -> {
+                downloadCurrentCategoryToCache()
+                true
+            }
+
+            R.id.action_import_global -> {
+                context.startActivity(
+                    android.content.Intent(context, GlobalImportActivity::class.java)
+                )
+                true
+            }
+
+            else -> false
+        }
+    }
+
     private fun showCategories() {
         categoryManager.getList(object : Callback<Map<String, String>> {
             override fun onDone(result: Map<String, String>) {
                 if (showingStatements) return
                 val sorted = sortEntries(result, sortMode)
-                adapter.submitMap(sorted)
-                recyclerView.scheduleLayoutAnimation()
+                renderEntries(sorted)
             }
         })
     }
@@ -250,10 +270,22 @@ class BankGroup @JvmOverloads constructor(
         statementManager?.getList(object : Callback<Map<String, String>> {
             override fun onDone(result: Map<String, String>) {
                 currentStatements = sortEntries(result, sortMode)
-                adapter.submitMap(currentStatements)
-                recyclerView.scheduleLayoutAnimation()
+                renderEntries(currentStatements)
             }
         })
+    }
+
+    private fun renderEntries(entries: Map<String, String>) {
+        adapter.submitMap(entries)
+        recyclerView.scheduleLayoutAnimation()
+        val isEmpty = entries.isEmpty()
+        recyclerView.visibility = if (isEmpty) View.GONE else View.VISIBLE
+        emptyStateText.visibility = if (isEmpty) View.VISIBLE else View.GONE
+        emptyStateText.text = if (showingStatements) {
+            context.getString(R.string.bank_empty_statements)
+        } else {
+            context.getString(R.string.bank_empty_categories)
+        }
     }
 
     private fun showSortDialog() {

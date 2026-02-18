@@ -65,6 +65,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
         binding.chatSlotButton.setOnClickListener { showChatSelectorPopup() }
+        binding.openBankCard.setOnClickListener { openBankScreen() }
         updateChatSelectorTitle()
         applyWindowInsets()
 
@@ -75,12 +76,15 @@ class MainActivity : AppCompatActivity() {
 
         tts = TtsHolder.get(this)
         binding.inputGroup.setTts(tts)
-        binding.bankGroup.setTts(tts)
         observeTtsEvents()
 
         onBackPressedDispatcher.addCallback(this) {
-            binding.inputGroup.back()
-            binding.bankGroup.back()
+            if (binding.inputGroup.back()) {
+                return@addCallback
+            }
+            isEnabled = false
+            onBackPressedDispatcher.onBackPressed()
+            isEnabled = true
         }
     }
 
@@ -94,10 +98,6 @@ class MainActivity : AppCompatActivity() {
         super.onStop()
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.bankGroup.refresh()
-    }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
         return true
@@ -155,6 +155,11 @@ class MainActivity : AppCompatActivity() {
     private fun updateChatSelectorTitle() {
         currentSlotIndex = safeSlotIndex(currentSlotIndex)
         binding.chatSlotButton.text = getString(slotLabels[currentSlotIndex])
+    }
+
+    private fun openBankScreen() {
+        startActivity(Intent(this, BankActivity::class.java))
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
     }
 
     private fun safeSlotIndex(index: Int): Int = index.coerceIn(slotLabels.indices)
@@ -215,7 +220,6 @@ class MainActivity : AppCompatActivity() {
                                 "realtime_sync",
                                 bundleOf("changes" to response.changes.size),
                             )
-                            binding.bankGroup.refresh()
                         }
                     }.onFailure { error ->
                         Firebase.analytics.logEvent(
