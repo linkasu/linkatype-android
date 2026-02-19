@@ -2,7 +2,6 @@ package ru.ibakaidov.distypepro.shared.api
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.client.request.request
@@ -15,7 +14,6 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.isSuccess
-import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import ru.ibakaidov.distypepro.shared.auth.TokenStorage
 
@@ -29,11 +27,7 @@ class ApiClient(
         isLenient = true
     }
 
-    private val client = httpClient ?: HttpClient {
-        install(ContentNegotiation) {
-            json(this@ApiClient.json)
-        }
-    }
+    private val client = httpClient ?: createDefaultHttpClient(json)
 
     internal suspend inline fun <reified T> get(path: String, token: String? = null): T {
         return request(HttpMethod.Get, path, token = token)
