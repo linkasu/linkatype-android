@@ -9,6 +9,7 @@ import androidx.test.espresso.Espresso.pressBack
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.closeSoftKeyboard
 import androidx.test.espresso.action.ViewActions.replaceText
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.isDescendantOfA
 import androidx.test.espresso.matcher.ViewMatchers.withContentDescription
@@ -59,17 +60,39 @@ class SmokeLoginTest {
         waitForViewOnScreen(withId(R.id.ttsSectionTitle), 10_000)
         pressBack()
 
-        openMainOverflow()
-        onView(withText(R.string.dialog_title)).perform(click())
+        onView(withId(R.id.dialog_menu_item)).perform(click())
         waitForViewOnScreen(withId(R.id.messages_recycler), 10_000)
         pressBack()
 
         onView(withId(R.id.open_bank_card)).perform(click())
         waitForViewOnScreen(withId(R.id.bank_group), 10_000)
+        onView(withId(R.id.action_add_category)).check(matchesDisplayed())
+        onView(withId(R.id.action_add_statement)).check(doesNotExist())
+
         openBankOverflow()
         onView(withText(R.string.global_import_title)).perform(click())
         waitForViewOnScreen(withId(R.id.global_import_list), 10_000)
         pressBack()
+
+        val categoryName = "Smoke Category ${SystemClock.elapsedRealtime()}"
+        onView(withId(R.id.action_add_category)).perform(click())
+        waitForViewOnScreen(withId(R.id.input_prompt), 5_000)
+        onView(withId(R.id.input_prompt))
+            .perform(replaceText(categoryName), closeSoftKeyboard())
+        onView(withText(R.string.ok)).perform(click())
+        waitForViewOnScreen(withText(categoryName), 10_000)
+        onView(withText(categoryName)).perform(click())
+
+        onView(withId(R.id.action_add_statement)).check(matchesDisplayed())
+        onView(withId(R.id.action_add_category)).check(doesNotExist())
+
+        val phraseText = "Smoke Phrase ${SystemClock.elapsedRealtime()}"
+        onView(withId(R.id.action_add_statement)).perform(click())
+        waitForViewOnScreen(withId(R.id.input_prompt), 5_000)
+        onView(withId(R.id.input_prompt))
+            .perform(replaceText(phraseText), closeSoftKeyboard())
+        onView(withText(R.string.ok)).perform(click())
+        waitForViewOnScreen(withText(phraseText), 10_000)
     }
 
     private fun matchesDisplayed() = androidx.test.espresso.assertion.ViewAssertions.matches(isDisplayed())
@@ -146,7 +169,7 @@ class SmokeLoginTest {
         onView(
             allOf(
                 withContentDescription(overflowDescription),
-                isDescendantOfA(withId(R.id.bank_toolbar))
+                isDescendantOfA(withId(R.id.toolbar))
             )
         ).perform(click())
     }

@@ -1,5 +1,6 @@
 package ru.ibakaidov.distypepro.components
 
+import android.content.Intent
 import android.content.Context
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -8,11 +9,9 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
 import ru.ibakaidov.distypepro.R
@@ -38,12 +37,11 @@ class BankGroup @JvmOverloads constructor(
 
     private val categoryManager = CategoryManager(context)
     private var statementManager: StatementManager? = null
-    private var toolbar: MaterialToolbar? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var emptyStateText: TextView
     private lateinit var adapter: HashMapRecyclerAdapter
     private var tts: Tts? = null
-    private var onExitRequested: (() -> Unit)? = null
+    private var toolbarStateListener: ((ToolbarState) -> Unit)? = null
 
     private var showingStatements = false
     private var currentStatements: Map<String, String> = emptyMap()
@@ -70,7 +68,7 @@ class BankGroup @JvmOverloads constructor(
         recyclerView.layoutManager = GridLayoutManager(context, spanCount)
         recyclerView.adapter = adapter
 
-        refreshToolbar()
+        notifyToolbarStateChanged()
         showCategories()
     }
 
@@ -78,13 +76,21 @@ class BankGroup @JvmOverloads constructor(
         this.tts = tts
     }
 
-    fun attachToolbar(toolbar: MaterialToolbar, onExitRequested: () -> Unit) {
-        this.toolbar = toolbar
-        this.onExitRequested = onExitRequested
-        toolbar.menu.clear()
-        toolbar.inflateMenu(R.menu.bank_toolbar_menu)
-        toolbar.setOnMenuItemClickListener { item -> onToolbarMenuClick(item.itemId) }
-        refreshToolbar()
+    fun setToolbarStateListener(listener: (ToolbarState) -> Unit) {
+        toolbarStateListener = listener
+        notifyToolbarStateChanged()
+    }
+
+    fun toolbarState(): ToolbarState {
+        return ToolbarState(
+            title = if (showingStatements) {
+                context.getString(R.string.bank_toolbar_title_statements, currentCategoryTitle)
+            } else {
+                context.getString(R.string.bank_toolbar_title_categories)
+            },
+            showingStatements = showingStatements,
+            isDownloading = isDownloading,
+        )
     }
 
     fun back(): Boolean {
@@ -101,6 +107,22 @@ class BankGroup @JvmOverloads constructor(
         } else {
             showCategories()
         }
+    }
+
+    fun onSortClicked() {
+        showSortDialog()
+    }
+
+    fun onAddClicked() {
+        showAddDialog()
+    }
+
+    fun onDownloadCacheClicked() {
+        downloadCurrentCategoryToCache()
+    }
+
+    fun onImportGlobalClicked() {
+        context.startActivity(Intent(context, GlobalImportActivity::class.java))
     }
 
     private fun showAddDialog() {
@@ -184,7 +206,7 @@ class BankGroup @JvmOverloads constructor(
             currentCategoryId = null
             currentCategoryTitle = ""
         }
-        refreshToolbar()
+        notifyToolbarStateChanged()
         if (statements) {
             showStatements()
         } else {
@@ -192,67 +214,8 @@ class BankGroup @JvmOverloads constructor(
         }
     }
 
-    private fun refreshToolbar() {
-        val toolbar = toolbar ?: return
-
-        toolbar.navigationIcon = AppCompatResources.getDrawable(context, R.drawable.ic_baseline_arrow_back_24)
-        toolbar.setNavigationOnClickListener {
-            if (showingStatements) {
-                setState(false)
-            } else {
-                onExitRequested?.invoke()
-            }
-        }
-
-        val title = if (showingStatements) {
-            context.getString(R.string.bank_toolbar_title_statements, currentCategoryTitle)
-        } else {
-            context.getString(R.string.bank_toolbar_title_categories)
-        }
-        toolbar.title = title
-
-        val menu = toolbar.menu
-        menu.findItem(R.id.action_add_category)?.isVisible = !showingStatements
-        menu.findItem(R.id.action_add_statement)?.isVisible = showingStatements
-        menu.findItem(R.id.action_sort)?.isVisible = true
-        menu.findItem(R.id.action_import_global)?.isVisible = !showingStatements
-
-        val downloadItem = menu.findItem(R.id.action_download_cache)
-        downloadItem?.isVisible = showingStatements
-        downloadItem?.isEnabled = showingStatements && !isDownloading
-    }
-
-    private fun onToolbarMenuClick(itemId: Int): Boolean {
-        return when (itemId) {
-            R.id.action_sort -> {
-                showSortDialog()
-                true
-            }
-
-            R.id.action_add_category -> {
-                showAddDialog()
-                true
-            }
-
-            R.id.action_add_statement -> {
-                showAddDialog()
-                true
-            }
-
-            R.id.action_download_cache -> {
-                downloadCurrentCategoryToCache()
-                true
-            }
-
-            R.id.action_import_global -> {
-                context.startActivity(
-                    android.content.Intent(context, GlobalImportActivity::class.java)
-                )
-                true
-            }
-
-            else -> false
-        }
+    private fun notifyToolbarStateChanged() {
+        toolbarStateListener?.invoke(toolbarState())
     }
 
     private fun showCategories() {
@@ -334,7 +297,7 @@ class BankGroup @JvmOverloads constructor(
 
         dialog.show()
         isDownloading = true
-        refreshToolbar()
+        notifyToolbarStateChanged()
         Firebase.analytics.logEvent("download_category_cache", null)
 
         ttsInstance.downloadPhrasesToCache(phrases, "current") { current, total ->
@@ -343,11 +306,17 @@ class BankGroup @JvmOverloads constructor(
             if (current >= total) {
                 dialog.dismiss()
                 isDownloading = false
-                refreshToolbar()
+                notifyToolbarStateChanged()
                 Toast.makeText(context, R.string.bank_download_cache_done, Toast.LENGTH_LONG).show()
             }
         }
     }
+
+    data class ToolbarState(
+        val title: String,
+        val showingStatements: Boolean,
+        val isDownloading: Boolean,
+    )
 
     companion object {
         private const val PREF_SORT_MODE = "bank_sort_mode"
