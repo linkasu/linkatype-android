@@ -11,6 +11,7 @@ import com.google.android.material.color.DynamicColors
 import kotlinx.coroutines.launch
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.shared.session.AppMode
 
 class SplashActivity : AppCompatActivity() {
 
@@ -23,7 +24,17 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
 
         lifecycleScope.launch {
+            sdk.sessionRepository.getOrCreateDeviceId()
+            val mode = sdk.sessionRepository.getMode()
+            if (mode == AppMode.OFFLINE) {
+                navigateToMain()
+                return@launch
+            }
+
             val refreshToken = sdk.tokenStorage.getRefreshToken()
+            if (mode == null && !refreshToken.isNullOrBlank()) {
+                sdk.sessionRepository.setMode(AppMode.ONLINE)
+            }
             if (refreshToken.isNullOrBlank()) {
                 navigateToAuth()
                 return@launch

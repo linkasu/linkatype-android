@@ -1,5 +1,7 @@
 package ru.ibakaidov.distypepro.screens
 
+import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -10,6 +12,7 @@ import kotlinx.coroutines.launch
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityGlobalImportBinding
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.shared.session.AppMode
 
 class GlobalImportActivity : AppCompatActivity() {
 
@@ -29,6 +32,10 @@ class GlobalImportActivity : AppCompatActivity() {
         binding.globalImportList.layoutManager = LinearLayoutManager(this)
         binding.globalImportList.adapter = adapter
 
+        if (sdk.sessionRepository.getMode() == AppMode.OFFLINE) {
+            showOnlineRequiredDialog()
+            return
+        }
         loadCategories()
     }
 
@@ -54,6 +61,10 @@ class GlobalImportActivity : AppCompatActivity() {
     }
 
     private fun importCategory(item: GlobalCategoryItem) {
+        if (sdk.sessionRepository.getMode() == AppMode.OFFLINE) {
+            showOnlineRequiredDialog()
+            return
+        }
         adapter.setImporting(item.id)
         lifecycleScope.launch {
             val status = runCatching {
@@ -68,5 +79,21 @@ class GlobalImportActivity : AppCompatActivity() {
             Snackbar.make(binding.root, message, Snackbar.LENGTH_LONG).show()
             adapter.setImporting(null)
         }
+    }
+
+    private fun showOnlineRequiredDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.auth_online_required_title)
+            .setMessage(R.string.global_import_requires_online)
+            .setPositiveButton(R.string.auth_online_required_action) { _, _ ->
+                val intent = Intent(this, AuthActivity::class.java).apply {
+                    putExtra(AuthActivity.EXTRA_FORCE_ONLINE_MODE, true)
+                }
+                startActivity(intent)
+                finish()
+            }
+            .setNegativeButton(R.string.cancel) { _, _ -> finish() }
+            .setCancelable(false)
+            .show()
     }
 }

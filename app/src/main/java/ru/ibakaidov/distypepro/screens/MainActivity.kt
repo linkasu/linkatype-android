@@ -32,6 +32,7 @@ import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityMainBinding
 import ru.ibakaidov.distypepro.dialogs.ConfirmDialog
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.shared.session.AppMode
 import ru.ibakaidov.distypepro.utils.Callback
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
@@ -41,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var tts: Tts
     private val sdk by lazy { SharedSdkProvider.get(this) }
+    private val isOfflineMode by lazy { sdk.sessionRepository.getMode() == AppMode.OFFLINE }
     private var currentSlotIndex: Int = 0
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var realtimeJob: Job? = null
@@ -56,9 +58,11 @@ class MainActivity : AppCompatActivity() {
         window.statusBarColor = Color.TRANSPARENT
         window.navigationBarColor = Color.TRANSPARENT
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        flushOfflineQueue()
-        startPeriodicSync()
-        startRealtimeSync()
+        if (!isOfflineMode) {
+            flushOfflineQueue()
+            startPeriodicSync()
+            startRealtimeSync()
+        }
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -90,16 +94,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        registerNetworkCallback()
+        if (!isOfflineMode) {
+            registerNetworkCallback()
+        }
     }
 
     override fun onStop() {
-        unregisterNetworkCallback()
+        if (!isOfflineMode) {
+            unregisterNetworkCallback()
+        }
         super.onStop()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        val logoutTitle = if (isOfflineMode) {
+            R.string.auth_online_required_action
+        } else {
+            R.string.logout
+        }
+        menu.findItem(R.id.logout_menu_item)?.setTitle(logoutTitle)
         return true
     }
 
@@ -123,7 +137,11 @@ class MainActivity : AppCompatActivity() {
             true
         }
         R.id.logout_menu_item -> {
-            confirmLogout()
+            if (isOfflineMode) {
+                openOnlineAuth()
+            } else {
+                confirmLogout()
+            }
             true
         }
 
@@ -195,6 +213,14 @@ class MainActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun openOnlineAuth() {
+        val intent = Intent(this, AuthActivity::class.java).apply {
+            putExtra(AuthActivity.EXTRA_FORCE_ONLINE_MODE, true)
+        }
+        startActivity(intent)
+        finish()
     }
 
     private fun startPeriodicSync() {

@@ -23,6 +23,7 @@ import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivitySettingsBinding
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.shared.model.UserPreferences
+import ru.ibakaidov.distypepro.shared.session.AppMode
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
 
@@ -35,6 +36,8 @@ class SettingsActivity : AppCompatActivity() {
     private var voiceItems: List<VoiceItem> = emptyList()
     private var eventsJob: Job? = null
     private var preferencesSyncJob: Job? = null
+    private val isOfflineMode: Boolean
+        get() = sdk.sessionRepository.getMode() == AppMode.OFFLINE
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +52,7 @@ class SettingsActivity : AppCompatActivity() {
         setupControls()
         observeTtsEvents()
         loadInitialValues()
+        updateModeUi()
     }
 
     private fun setupToolbar() {
@@ -142,6 +146,14 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.buttonDeleteAccount.setOnClickListener {
             showDeleteAccountConfirmation()
+        }
+
+        binding.buttonSwitchMode.setOnClickListener {
+            if (isOfflineMode) {
+                openOnlineMode()
+            } else {
+                showSwitchToOfflineConfirmation()
+            }
         }
     }
 
@@ -288,6 +300,10 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private fun showDeleteAccountConfirmation() {
+        if (isOfflineMode) {
+            showSnackbar(getString(R.string.auth_online_required_title))
+            return
+        }
         AlertDialog.Builder(this)
             .setTitle(R.string.settings_delete_account_title)
             .setMessage(R.string.settings_delete_account_message)
@@ -316,6 +332,56 @@ class SettingsActivity : AppCompatActivity() {
                 binding.deleteAccountProgress.isVisible = false
                 showSnackbar(e.localizedMessage ?: getString(R.string.auth_error_generic))
             }
+        }
+    }
+
+    private fun updateModeUi() {
+        val offline = isOfflineMode
+        binding.accountModeValue.setText(if (offline) R.string.settings_mode_offline else R.string.settings_mode_online)
+        binding.accountModeDescription.setText(
+            if (offline) R.string.settings_mode_offline_description else R.string.settings_mode_online_description,
+        )
+        binding.buttonSwitchMode.setText(
+            if (offline) R.string.settings_mode_switch_to_online else R.string.settings_mode_switch_to_offline,
+        )
+        binding.deleteAccountWarningText.isVisible = !offline
+        binding.buttonDeleteAccount.isVisible = !offline
+        if (offline) {
+            binding.deleteAccountProgress.isVisible = false
+        }
+    }
+
+    private fun openOnlineMode() {
+        val intent = Intent(this, AuthActivity::class.java).apply {
+            putExtra(AuthActivity.EXTRA_FORCE_ONLINE_MODE, true)
+        }
+        startActivity(intent)
+        finish()
+    }
+
+    private fun showSwitchToOfflineConfirmation() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.settings_mode_switch_offline_title)
+            .setMessage(R.string.settings_mode_switch_offline_message)
+            .setPositiveButton(R.string.settings_mode_switch_offline_confirm) { _, _ ->
+                switchToOfflineMode()
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
+    }
+
+    private fun switchToOfflineMode() {
+        binding.buttonSwitchMode.isEnabled = false
+        lifecycleScope.launch {
+            sdk.tokenStorage.clear()
+            sdk.sessionRepository.setMode(AppMode.OFFLINE)
+            sdk.sessionRepository.getOrCreateDeviceId()
+
+            val intent = Intent(this@SettingsActivity, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
         }
     }
 

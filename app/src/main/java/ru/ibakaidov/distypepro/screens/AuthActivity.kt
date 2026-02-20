@@ -1,5 +1,6 @@
 package ru.ibakaidov.distypepro.screens
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -10,16 +11,20 @@ import androidx.lifecycle.lifecycleScope
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.databinding.ActivityAuthBinding
+import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.shared.session.AppMode
 
 class AuthActivity : AppCompatActivity() {
 
     private enum class AuthMode { SignIn, SignUp }
 
+    private enum class LaunchMode { Online, Offline }
+
     private lateinit var binding: ActivityAuthBinding
     private var authMode: AuthMode = AuthMode.SignIn
+    private var launchMode: LaunchMode = LaunchMode.Online
     private val sdk by lazy { SharedSdkProvider.get(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,14 +33,41 @@ class AuthActivity : AppCompatActivity() {
         binding = ActivityAuthBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        initLaunchMode()
         setupListeners()
         updateModeUi()
+    }
+
+    private fun initLaunchMode() = with(binding) {
+        val forceOnline = intent.getBooleanExtra(EXTRA_FORCE_ONLINE_MODE, false)
+        launchMode = when {
+            forceOnline -> LaunchMode.Online
+            sdk.sessionRepository.getMode() == AppMode.OFFLINE -> LaunchMode.Offline
+            else -> LaunchMode.Online
+        }
+        val selectedId = if (launchMode == LaunchMode.Online) {
+            R.id.modeOnlineButton
+        } else {
+            R.id.modeOfflineButton
+        }
+        authModeToggleGroup.check(selectedId)
     }
 
     private fun setupListeners() = with(binding) {
         authPrimaryButton.setOnClickListener { attemptAuth() }
         toggleAuthMode.setOnClickListener { toggleMode() }
         resetPasswordButton.setOnClickListener { attemptPasswordReset() }
+
+        authModeToggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            launchMode = if (checkedId == R.id.modeOfflineButton) {
+                LaunchMode.Offline
+            } else {
+                LaunchMode.Online
+            }
+            updateModeUi()
+        }
+
         passwordInput.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 attemptAuth()
@@ -60,19 +92,54 @@ class AuthActivity : AppCompatActivity() {
     }
 
     private fun updateModeUi() = with(binding) {
+        val isOnline = launchMode == LaunchMode.Online
         val isSignUp = authMode == AuthMode.SignUp
-        authSubtitle.setText(if (isSignUp) R.string.auth_subtitle_sign_up else R.string.auth_subtitle_sign_in)
-        authPrimaryButton.setText(if (isSignUp) R.string.auth_action_sign_up else R.string.auth_action_sign_in)
-        toggleAuthMode.setText(if (isSignUp) R.string.auth_toggle_to_sign_in else R.string.auth_toggle_to_sign_up)
-        confirmPasswordLayout.isVisible = isSignUp
-        resetPasswordButton.isVisible = !isSignUp
-        if (!isSignUp) {
+
+        authSubtitle.setText(
+            when {
+                !isOnline -> R.string.auth_subtitle_offline
+                isSignUp -> R.string.auth_subtitle_sign_up
+                else -> R.string.auth_subtitle_sign_in
+            },
+        )
+        authPrimaryButton.setText(
+            if (isOnline) {
+                if (isSignUp) R.string.auth_action_sign_up else R.string.auth_action_sign_in
+            } else {
+                R.string.auth_action_continue_offline
+            },
+        )
+
+        emailLayout.isVisible = isOnline
+        passwordLayout.isVisible = isOnline
+        confirmPasswordLayout.isVisible = isOnline && isSignUp
+        resetPasswordButton.isVisible = isOnline && !isSignUp
+        toggleAuthMode.isVisible = isOnline
+        offlineInfoText.isVisible = !isOnline
+
+        if (isOnline) {
+            toggleAuthMode.setText(if (isSignUp) R.string.auth_toggle_to_sign_in else R.string.auth_toggle_to_sign_up)
+        } else {
+            clearErrors()
             confirmPasswordInput.text = null
-            confirmPasswordLayout.error = null
         }
     }
 
     private fun attemptAuth() {
+        if (launchMode == LaunchMode.Offline) {
+            enterOfflineMode()
+            return
+        }
+        attemptOnlineAuth()
+    }
+
+    private fun enterOfflineMode() {
+        sdk.sessionRepository.setMode(AppMode.OFFLINE)
+        sdk.sessionRepository.getOrCreateDeviceId()
+        navigateToMain()
+    }
+
+    private fun attemptOnlineAuth() {
         clearErrors()
 
         val email = binding.emailInput.text?.toString()?.trim().orEmpty()
@@ -98,6 +165,10 @@ class AuthActivity : AppCompatActivity() {
 
         if (hasError) return
 
+        val previousMode = sdk.sessionRepository.getMode()
+        sdk.sessionRepository.setMode(AppMode.ONLINE)
+        sdk.sessionRepository.getOrCreateDeviceId()
+
         setLoading(true)
 
         lifecycleScope.launch {
@@ -109,18 +180,60 @@ class AuthActivity : AppCompatActivity() {
             }
 
             result.onSuccess {
+                val hasLocalData = previousMode == AppMode.OFFLINE &&
+                    runCatching { sdk.localDataMigrationService.hasLocalDataForMigration() }.getOrDefault(false)
+
+                if (hasLocalData) {
+                    setLoading(false)
+                    showMigrationChoiceDialog()
+                    return@onSuccess
+                }
+
                 if (authMode == AuthMode.SignUp) {
                     Snackbar.make(binding.root, R.string.auth_message_account_created, Snackbar.LENGTH_SHORT).show()
                 }
                 navigateToMain()
             }.onFailure { error ->
+                sdk.sessionRepository.setMode(previousMode)
                 setLoading(false)
                 Snackbar.make(
                     binding.root,
                     error.localizedMessage ?: getString(R.string.auth_error_generic),
-                    Snackbar.LENGTH_LONG
+                    Snackbar.LENGTH_LONG,
                 ).show()
             }
+        }
+    }
+
+    private fun showMigrationChoiceDialog() {
+        AlertDialog.Builder(this)
+            .setTitle(R.string.auth_migration_title)
+            .setMessage(R.string.auth_migration_message)
+            .setPositiveButton(R.string.auth_migration_sync) { _, _ ->
+                runMigration(syncLocalData = true)
+            }
+            .setNegativeButton(R.string.auth_migration_replace) { _, _ ->
+                runMigration(syncLocalData = false)
+            }
+            .setCancelable(false)
+            .show()
+    }
+
+    private fun runMigration(syncLocalData: Boolean) {
+        setLoading(true)
+        lifecycleScope.launch {
+            val migration = runCatching {
+                if (syncLocalData) {
+                    sdk.localDataMigrationService.syncLocalDataToRemote()
+                } else {
+                    sdk.localDataMigrationService.replaceLocalDataWithRemote()
+                }
+            }
+            migration.onFailure {
+                Snackbar.make(binding.root, R.string.auth_migration_failed, Snackbar.LENGTH_LONG).show()
+            }
+            setLoading(false)
+            navigateToMain()
         }
     }
 
@@ -144,7 +257,7 @@ class AuthActivity : AppCompatActivity() {
                 Snackbar.make(
                     binding.root,
                     error.localizedMessage ?: getString(R.string.auth_error_generic),
-                    Snackbar.LENGTH_LONG
+                    Snackbar.LENGTH_LONG,
                 ).show()
             }
         }
@@ -164,6 +277,8 @@ class AuthActivity : AppCompatActivity() {
         confirmPasswordLayout.isEnabled = !isLoading
         resetPasswordButton.isEnabled = !isLoading
         toggleAuthMode.isEnabled = !isLoading
+        modeOnlineButton.isEnabled = !isLoading
+        modeOfflineButton.isEnabled = !isLoading
     }
 
     private fun navigateToMain() {
@@ -172,6 +287,7 @@ class AuthActivity : AppCompatActivity() {
     }
 
     companion object {
+        const val EXTRA_FORCE_ONLINE_MODE = "extra_force_online_mode"
         private const val MIN_PASSWORD_LENGTH = 6
     }
 }
