@@ -3,6 +3,7 @@ import Shared
 
 struct GlobalImportView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var authManager: FirebaseAuthManager
     @StateObject private var manager = GlobalImportManager()
     @State private var snackbarMessage: String?
     @State private var showSnackbar = false
@@ -34,6 +35,10 @@ struct GlobalImportView: View {
                         } else {
                             Button(NSLocalizedString("global_import_import", comment: "")) {
                                 Task {
+                                    guard authManager.mode == "online" else {
+                                        showSnackbarMessage(NSLocalizedString("global_import_requires_online", comment: ""))
+                                        return
+                                    }
                                     let status = await manager.importCategory(id: category.id)
                                     let message = statusMessage(status)
                                     if let message = message {
@@ -66,6 +71,10 @@ struct GlobalImportView: View {
             }
         }
         .task {
+            guard authManager.mode == "online" else {
+                showSnackbarMessage(NSLocalizedString("global_import_requires_online", comment: ""))
+                return
+            }
             await manager.loadCategories()
         }
     }

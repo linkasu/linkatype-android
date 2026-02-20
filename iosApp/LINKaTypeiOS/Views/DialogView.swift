@@ -3,6 +3,7 @@ import Shared
 import AVFoundation
 
 struct DialogView: View {
+    @EnvironmentObject var authManager: FirebaseAuthManager
     private let sdk = SharedSdkProvider.shared.sdk
 
     @StateObject private var ttsManager = TtsManager.shared
@@ -428,6 +429,10 @@ struct DialogView: View {
 
     private func sendAudio(_ data: Data) async {
         guard let chatId = activeChatId else { return }
+        if authManager.mode == "offline" {
+            presentError(NSLocalizedString("auth_online_required_title", comment: ""))
+            return
+        }
         if data.count > maxAudioBytes {
             presentError(NSLocalizedString("dialog_audio_too_large", comment: ""))
             return

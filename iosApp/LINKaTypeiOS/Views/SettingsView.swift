@@ -18,6 +18,7 @@ struct SettingsView: View {
     @State private var statusText = NSLocalizedString("tts_status_ready", comment: "")
     @State private var availableVoices: [TtsVoice] = []
     @State private var showDeleteAccountAlert = false
+    @State private var showSwitchOfflineAlert = false
     @State private var isDeleting = false
     @State private var deleteAccountError: String?
     @State private var preferencesSyncTask: Task<Void, Never>?
@@ -149,6 +150,25 @@ struct SettingsView: View {
             }
             
             Section(header: Text(NSLocalizedString("settings_section_account", comment: ""))) {
+                Text(authManager.mode == "offline"
+                     ? NSLocalizedString("settings_mode_offline", comment: "")
+                     : NSLocalizedString("settings_mode_online", comment: ""))
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+
+                Button {
+                    if authManager.mode == "offline" {
+                        authManager.prepareOnlineMode()
+                        dismiss()
+                    } else {
+                        showSwitchOfflineAlert = true
+                    }
+                } label: {
+                    Text(authManager.mode == "offline"
+                         ? NSLocalizedString("settings_mode_switch_to_online", comment: "")
+                         : NSLocalizedString("settings_mode_switch_to_offline", comment: ""))
+                }
+
                 Button(role: .destructive) {
                     showDeleteAccountAlert = true
                 } label: {
@@ -163,6 +183,8 @@ struct SettingsView: View {
                     }
                 }
                 .disabled(isDeleting)
+                .opacity(authManager.mode == "online" ? 1.0 : 0.4)
+                .allowsHitTesting(authManager.mode == "online")
                 
                 if let error = deleteAccountError {
                     Text(error)
@@ -196,6 +218,15 @@ struct SettingsView: View {
             Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
         } message: {
             Text(NSLocalizedString("settings_delete_account_message", comment: ""))
+        }
+        .alert(NSLocalizedString("settings_mode_switch_offline_title", comment: ""), isPresented: $showSwitchOfflineAlert) {
+            Button(NSLocalizedString("settings_mode_switch_offline_confirm", comment: ""), role: .destructive) {
+                authManager.enterOfflineMode()
+                dismiss()
+            }
+            Button(NSLocalizedString("cancel", comment: ""), role: .cancel) {}
+        } message: {
+            Text(NSLocalizedString("settings_mode_switch_offline_message", comment: ""))
         }
     }
     

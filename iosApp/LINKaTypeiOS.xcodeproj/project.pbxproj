@@ -48,6 +48,7 @@
 		A0000018 /* FirebaseAnalyticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000307 /* FirebaseAnalyticsManager.swift */; };
 		A0000019 /* TrackingConsentManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000308 /* TrackingConsentManager.swift */; };
 		A000001A /* NetworkMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000309 /* NetworkMonitor.swift */; };
+		A000001B /* MigrationDecisionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A0000407 /* MigrationDecisionView.swift */; };
 		E0000001 /* SmokeLoginUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0000101 /* SmokeLoginUITests.swift */; };
 		E0000002 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B0000201 /* XCTest.framework */; };
 /* End PBXBuildFile section */
@@ -105,6 +106,7 @@
 		A0000404 /* BankGroupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BankGroupView.swift; sourceTree = "<group>"; };
 		A0000405 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A0000406 /* SpotlightView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpotlightView.swift; sourceTree = "<group>"; };
+		A0000407 /* MigrationDecisionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MigrationDecisionView.swift; sourceTree = "<group>"; };
 		A0000501 /* View+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "View+Extensions.swift"; sourceTree = "<group>"; };
 		A0000601 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A0000702 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -249,6 +251,7 @@
 				A0000404 /* BankGroupView.swift */,
 				A0000405 /* SettingsView.swift */,
 				A0000406 /* SpotlightView.swift */,
+				A0000407 /* MigrationDecisionView.swift */,
 				C0000102 /* DialogView.swift */,
 				C0000105 /* GlobalImportView.swift */,
 			);
@@ -466,6 +469,7 @@
 				A000000F /* BankGroupView.swift in Sources */,
 				A0000010 /* SettingsView.swift in Sources */,
 				A0000011 /* SpotlightView.swift in Sources */,
+				A000001B /* MigrationDecisionView.swift in Sources */,
 				A0000012 /* View+Extensions.swift in Sources */,
 				A0000018 /* FirebaseAnalyticsManager.swift in Sources */,
 				A0000019 /* TrackingConsentManager.swift in Sources */,

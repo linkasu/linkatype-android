@@ -11,6 +11,7 @@ struct MainView: View {
     @State private var showSnackbar = false
     @State private var syncTimer = Timer.publish(every: 60, on: .main, in: .common).autoconnect()
     private let isUiTest = ProcessInfo.processInfo.arguments.contains("ui_test")
+    private var isOfflineMode: Bool { authManager.mode == "offline" }
     
     var body: some View {
         NavigationStack {
@@ -47,11 +48,19 @@ struct MainView: View {
                         }
                         .accessibilityIdentifier("menu_dialog")
                         
-                        Button(role: .destructive, action: logout) {
-                            Label(NSLocalizedString("logout", comment: ""), systemImage: "rectangle.portrait.and.arrow.right")
-                                .accessibilityIdentifier("menu_logout")
+                        if isOfflineMode {
+                            Button(action: openOnlineAuth) {
+                                Label(NSLocalizedString("auth_online_required_action", comment: ""), systemImage: "person.crop.circle.badge.plus")
+                                    .accessibilityIdentifier("menu_login_online")
+                            }
+                            .accessibilityIdentifier("menu_login_online")
+                        } else {
+                            Button(role: .destructive, action: logout) {
+                                Label(NSLocalizedString("logout", comment: ""), systemImage: "rectangle.portrait.and.arrow.right")
+                                    .accessibilityIdentifier("menu_logout")
+                            }
+                            .accessibilityIdentifier("menu_logout")
                         }
-                        .accessibilityIdentifier("menu_logout")
                     } label: {
                         Image(systemName: "ellipsis.circle")
                     }
@@ -91,18 +100,21 @@ struct MainView: View {
                 }
             }
             .task {
+                guard !isOfflineMode else { return }
                 _ = try? await sdk.offlineQueueProcessor.flush()
             }
             .task {
+                guard !isOfflineMode else { return }
                 await startRealtimeSync()
             }
             .onReceive(syncTimer) { _ in
+                guard !isOfflineMode else { return }
                 Task {
                     _ = try? await sdk.offlineQueueProcessor.flush()
                 }
             }
             .onReceive(networkMonitor.$isConnected) { isConnected in
-                if isConnected {
+                if isConnected && !isOfflineMode {
                     Task {
                         _ = try? await sdk.offlineQueueProcessor.flush()
                     }
@@ -116,6 +128,10 @@ struct MainView: View {
     
     private func logout() {
         try? authManager.signOut()
+    }
+
+    private func openOnlineAuth() {
+        authManager.prepareOnlineMode()
     }
     
     private func handleTtsEvent(_ event: TtsEvent) {
@@ -152,6 +168,9 @@ struct MainView: View {
 
     private func startRealtimeSync() async {
         while !Task.isCancelled {
+            if isOfflineMode {
+                return
+            }
             do {
                 let response = try await sdk.changesSyncer.pollOnce(limit: 100, timeoutSeconds: 25)
                 if !response.changes.isEmpty {
