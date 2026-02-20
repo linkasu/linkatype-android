@@ -26,6 +26,29 @@ class LocalStore(private val database: LinkaDatabase) {
             )
         }
 
+    fun hasLocalUserData(): Boolean {
+        if (queries.selectAllCategories().executeAsList().isNotEmpty()) return true
+        if (queries.selectDialogChats().executeAsList().isNotEmpty()) return true
+        val quickes = queries.selectQuickes().executeAsList()
+        if (quickes.any { it.text.isNotBlank() }) return true
+        val userState = queries.getUserState("state").executeAsOneOrNull()
+        return userState?.inited == 1L || !userState?.preferences.isNullOrBlank()
+    }
+
+    fun clearAllUserData() {
+        queries.transaction {
+            queries.clearOfflineQueue()
+            queries.clearDialogSuggestions()
+            queries.clearDialogMessages()
+            queries.clearDialogChats()
+            queries.clearStatements()
+            queries.clearCategories()
+            queries.clearQuickes()
+            queries.clearUserState()
+            queries.clearSyncState()
+        }
+    }
+
     fun findCategory(id: String): Category? =
         queries.selectCategoryById(id).executeAsOneOrNull()?.let {
             Category(

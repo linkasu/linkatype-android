@@ -52,14 +52,17 @@ class AuthRepositoryImpl(
 
     override suspend fun logout() {
         val refreshToken = tokenStorage.getRefreshToken()
-        if (!refreshToken.isNullOrBlank()) {
-            apiClient.postRaw(
-                "/v1/auth/logout",
-                headers = mapOf(HttpHeaders.Cookie to "refresh_token=$refreshToken"),
-            )
+        try {
+            if (!refreshToken.isNullOrBlank()) {
+                apiClient.postRaw(
+                    "/v1/auth/logout",
+                    headers = mapOf(HttpHeaders.Cookie to "refresh_token=$refreshToken"),
+                )
+            }
+        } finally {
+            tokenStorage.clear()
+            sessionRepository.clearMode()
         }
-        tokenStorage.clear()
-        sessionRepository.clearMode()
     }
 
     private suspend fun handleAuthResponse(response: HttpResponse): AuthResponse {

@@ -7,6 +7,7 @@ import ru.ibakaidov.distypepro.shared.auth.SecureTokenStorage
 import ru.ibakaidov.distypepro.shared.db.DatabaseDriverFactory
 import ru.ibakaidov.distypepro.shared.db.LinkaDatabaseFactory
 import ru.ibakaidov.distypepro.shared.db.LocalStore
+import ru.ibakaidov.distypepro.shared.migration.LocalDataMigrationService
 import ru.ibakaidov.distypepro.shared.repository.AuthRepository
 import ru.ibakaidov.distypepro.shared.repository.AuthRepositoryImpl
 import ru.ibakaidov.distypepro.shared.repository.AccountRepository
@@ -21,6 +22,7 @@ import ru.ibakaidov.distypepro.shared.repository.StatementsRepository
 import ru.ibakaidov.distypepro.shared.repository.StatementsRepositoryImpl
 import ru.ibakaidov.distypepro.shared.repository.UserStateRepository
 import ru.ibakaidov.distypepro.shared.repository.UserStateRepositoryImpl
+import ru.ibakaidov.distypepro.shared.session.AppMode
 import ru.ibakaidov.distypepro.shared.session.DefaultSessionRepository
 import ru.ibakaidov.distypepro.shared.session.SessionStorage
 import ru.ibakaidov.distypepro.shared.sync.ChangesSyncer
@@ -46,4 +48,29 @@ class SharedSdk(
 
     val offlineQueueProcessor = OfflineQueueProcessor(apiClient, localStore, sessionRepository)
     val changesSyncer = ChangesSyncer(apiClient, localStore, sessionRepository = sessionRepository)
+    val localDataMigrationService = LocalDataMigrationService(apiClient, localStore)
+
+    fun modeName(): String? = when (sessionRepository.getMode()) {
+        AppMode.ONLINE -> "online"
+        AppMode.OFFLINE -> "offline"
+        null -> null
+    }
+
+    fun isOfflineMode(): Boolean = sessionRepository.getMode() == AppMode.OFFLINE
+
+    fun isOnlineMode(): Boolean = sessionRepository.getMode() == AppMode.ONLINE
+
+    fun setOfflineMode() {
+        sessionRepository.setMode(AppMode.OFFLINE)
+    }
+
+    fun setOnlineMode() {
+        sessionRepository.setMode(AppMode.ONLINE)
+    }
+
+    fun clearMode() {
+        sessionRepository.clearMode()
+    }
+
+    fun ensureDeviceId(): String = sessionRepository.getOrCreateDeviceId()
 }

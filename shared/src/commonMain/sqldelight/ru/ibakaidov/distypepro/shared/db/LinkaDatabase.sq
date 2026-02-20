@@ -99,6 +99,9 @@ INSERT OR REPLACE INTO categories(
 deleteCategory:
 DELETE FROM categories WHERE id = ?;
 
+clearCategories:
+DELETE FROM categories;
+
 selectStatementsByCategory:
 SELECT id,
        category_id AS categoryId,
@@ -129,6 +132,9 @@ DELETE FROM statements WHERE id = ?;
 deleteStatementsByCategory:
 DELETE FROM statements WHERE category_id = ?;
 
+clearStatements:
+DELETE FROM statements;
+
 selectQuickes:
 SELECT slot, text FROM quickes ORDER BY slot ASC;
 
@@ -143,6 +149,9 @@ SELECT id, inited, preferences FROM user_state WHERE id = ?;
 
 upsertUserState:
 INSERT OR REPLACE INTO user_state(id, inited, preferences) VALUES (?, ?, ?);
+
+clearUserState:
+DELETE FROM user_state;
 
 selectDialogChats:
 SELECT id,
@@ -161,6 +170,9 @@ INSERT OR REPLACE INTO dialog_chats(
 
 deleteDialogChat:
 DELETE FROM dialog_chats WHERE id = ?;
+
+clearDialogChats:
+DELETE FROM dialog_chats;
 
 selectDialogMessages:
 SELECT id,
@@ -182,6 +194,9 @@ INSERT OR REPLACE INTO dialog_messages(
 
 clearDialogMessagesByChat:
 DELETE FROM dialog_messages WHERE chat_id = ?;
+
+clearDialogMessages:
+DELETE FROM dialog_messages;
 
 selectDialogSuggestions:
 SELECT id,
@@ -229,6 +244,9 @@ UPDATE offline_queue SET retry_count = ?, last_error = ? WHERE id = ?;
 deleteOfflineEntry:
 DELETE FROM offline_queue WHERE id = ?;
 
+clearOfflineQueue:
+DELETE FROM offline_queue;
+
 selectSyncValue:
 SELECT value FROM sync_state WHERE key = ?;
 
@@ -237,3 +255,6 @@ INSERT OR REPLACE INTO sync_state(key, value) VALUES (?, ?);
 
 deleteSyncValue:
 DELETE FROM sync_state WHERE key = ?;
+
+clearSyncState:
+DELETE FROM sync_state;
