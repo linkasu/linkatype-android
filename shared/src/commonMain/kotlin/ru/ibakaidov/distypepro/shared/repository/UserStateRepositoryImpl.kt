@@ -7,6 +7,9 @@ import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.UserPreferences
 import ru.ibakaidov.distypepro.shared.model.UserState
 import ru.ibakaidov.distypepro.shared.model.UserStateUpdateRequest
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
 import ru.ibakaidov.distypepro.shared.sync.OfflineUserStatePayload
 import ru.ibakaidov.distypepro.shared.utils.currentTimeMillis
@@ -14,10 +17,16 @@ import ru.ibakaidov.distypepro.shared.utils.currentTimeMillis
 class UserStateRepositoryImpl(
     private val apiClient: ApiClient,
     private val localStore: LocalStore,
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) : UserStateRepository {
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun getState(): UserState {
+        if (isOfflineMode()) {
+            val cached = localStore.getUserState()
+            val quickes = cached?.quickes?.let { normalizeQuickes(it) } ?: normalizeQuickes(emptyList())
+            return cached?.copy(quickes = quickes) ?: UserState(inited = false, quickes = quickes, preferences = null)
+        }
         return try {
             val remote = apiClient.authorizedRequest<UserState>(HttpMethod.Get, "/v1/user/state")
             val normalized = remote.copy(quickes = normalizeQuickes(remote.quickes))
@@ -43,6 +52,9 @@ class UserStateRepositoryImpl(
             preferences = preferences ?: current.preferences,
         )
         localStore.upsertUserState(merged)
+        if (isOfflineMode()) {
+            return merged
+        }
 
         return try {
             val remote = apiClient.authorizedRequest<UserState>(
@@ -68,6 +80,8 @@ class UserStateRepositoryImpl(
             merged
         }
     }
+
+    private fun isOfflineMode(): Boolean = sessionRepository.getMode() == AppMode.OFFLINE
 
     private fun normalizeQuickes(values: List<String>): List<String> {
         if (values.size == QUICKES_SLOTS) return values

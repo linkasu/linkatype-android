@@ -7,6 +7,9 @@ import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.Category
 import ru.ibakaidov.distypepro.shared.model.CategoryCreateRequest
 import ru.ibakaidov.distypepro.shared.model.CategoryUpdateRequest
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 import ru.ibakaidov.distypepro.shared.sync.OfflineCategoryPayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineCategoryUpdatePayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
@@ -17,10 +20,14 @@ class CategoriesRepositoryImpl(
     private val apiClient: ApiClient,
     private val localStore: LocalStore,
     private val now: () -> Long = { currentTimeMillis() },
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) : CategoriesRepository {
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun list(): List<Category> {
+        if (isOfflineMode()) {
+            return localStore.listCategories()
+        }
         return try {
             val remote = apiClient.authorizedRequest<List<Category>>(HttpMethod.Get, "/v1/categories")
             remote.forEach { localStore.upsertCategory(it) }
@@ -40,6 +47,9 @@ class CategoriesRepositoryImpl(
             aiUse = aiUse ?: false,
         )
         localStore.upsertCategory(optimistic)
+        if (isOfflineMode()) {
+            return optimistic
+        }
 
         return try {
             val remote = apiClient.authorizedRequest<Category>(
@@ -82,6 +92,9 @@ class CategoriesRepositoryImpl(
             updatedAt = now(),
         )
         localStore.upsertCategory(optimistic)
+        if (isOfflineMode()) {
+            return optimistic
+        }
 
         return try {
             val remote = apiClient.authorizedRequest<Category>(
@@ -112,6 +125,7 @@ class CategoriesRepositoryImpl(
 
     override suspend fun delete(id: String) {
         localStore.deleteCategory(id)
+        if (isOfflineMode()) return
         try {
             apiClient.authorizedRequest<Unit>(HttpMethod.Delete, "/v1/categories/$id")
         } catch (_: Exception) {
@@ -124,4 +138,6 @@ class CategoriesRepositoryImpl(
             )
         }
     }
+
+    private fun isOfflineMode(): Boolean = sessionRepository.getMode() == AppMode.OFFLINE
 }

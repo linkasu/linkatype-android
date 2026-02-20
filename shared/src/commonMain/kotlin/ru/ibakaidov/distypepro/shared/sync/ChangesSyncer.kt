@@ -16,14 +16,24 @@ import ru.ibakaidov.distypepro.shared.model.ChangeEvent
 import ru.ibakaidov.distypepro.shared.model.ChangesResponse
 import ru.ibakaidov.distypepro.shared.model.Statement
 import ru.ibakaidov.distypepro.shared.model.UserState
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 
 class ChangesSyncer(
     private val apiClient: ApiClient,
     private val localStore: LocalStore,
     private val json: Json = Json { ignoreUnknownKeys = true },
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) {
     @Throws(Exception::class)
     suspend fun pollOnce(limit: Int = 100, timeoutSeconds: Int = 25): ChangesResponse {
+        if (sessionRepository.getMode() == AppMode.OFFLINE) {
+            return ChangesResponse(
+                cursor = localStore.getSyncValue(KEY_CURSOR).orEmpty(),
+                changes = emptyList(),
+            )
+        }
         val cursor = localStore.getSyncValue(KEY_CURSOR).orEmpty()
         val queryCursor = if (cursor.isBlank()) "" else cursor.encodeURLParameter()
         val path = buildString {

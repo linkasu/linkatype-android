@@ -7,6 +7,9 @@ import ru.ibakaidov.distypepro.shared.db.LocalStore
 import ru.ibakaidov.distypepro.shared.model.Statement
 import ru.ibakaidov.distypepro.shared.model.StatementCreateRequest
 import ru.ibakaidov.distypepro.shared.model.StatementUpdateRequest
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
 import ru.ibakaidov.distypepro.shared.sync.OfflineStatementPayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineStatementUpdatePayload
@@ -17,10 +20,14 @@ class StatementsRepositoryImpl(
     private val apiClient: ApiClient,
     private val localStore: LocalStore,
     private val now: () -> Long = { currentTimeMillis() },
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) : StatementsRepository {
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun listByCategory(categoryId: String): List<Statement> {
+        if (isOfflineMode()) {
+            return localStore.listStatements(categoryId)
+        }
         return try {
             val remote = apiClient.authorizedRequest<List<Statement>>(
                 HttpMethod.Get,
@@ -43,6 +50,9 @@ class StatementsRepositoryImpl(
             created = createdAt,
         )
         localStore.upsertStatement(optimistic)
+        if (isOfflineMode()) {
+            return optimistic
+        }
 
         return try {
             val remote = apiClient.authorizedRequest<Statement>(
@@ -84,6 +94,9 @@ class StatementsRepositoryImpl(
             updatedAt = now(),
         )
         localStore.upsertStatement(optimistic)
+        if (isOfflineMode()) {
+            return optimistic
+        }
 
         return try {
             val remote = apiClient.authorizedRequest<Statement>(
@@ -107,6 +120,7 @@ class StatementsRepositoryImpl(
 
     override suspend fun delete(id: String) {
         localStore.deleteStatement(id)
+        if (isOfflineMode()) return
         try {
             apiClient.authorizedRequest<Unit>(HttpMethod.Delete, "/v1/statements/$id")
         } catch (_: Exception) {
@@ -119,4 +133,6 @@ class StatementsRepositoryImpl(
             )
         }
     }
+
+    private fun isOfflineMode(): Boolean = sessionRepository.getMode() == AppMode.OFFLINE
 }

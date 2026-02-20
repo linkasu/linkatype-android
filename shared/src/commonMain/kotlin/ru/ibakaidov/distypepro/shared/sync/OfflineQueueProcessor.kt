@@ -15,15 +15,20 @@ import ru.ibakaidov.distypepro.shared.model.StatementCreateRequest
 import ru.ibakaidov.distypepro.shared.model.StatementUpdateRequest
 import ru.ibakaidov.distypepro.shared.model.UserState
 import ru.ibakaidov.distypepro.shared.model.UserStateUpdateRequest
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 
 class OfflineQueueProcessor(
     private val apiClient: ApiClient,
     private val localStore: LocalStore,
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) {
     private val json = Json { ignoreUnknownKeys = true }
     private val flushMutex = Mutex()
 
     suspend fun flush() {
+        if (sessionRepository.getMode() == AppMode.OFFLINE) return
         flushMutex.withLock {
             val queue = localStore.listOfflineQueue()
             for (entry in queue) {

@@ -6,10 +6,14 @@ import io.ktor.http.isSuccess
 import ru.ibakaidov.distypepro.shared.api.ApiClient
 import ru.ibakaidov.distypepro.shared.api.ApiException
 import ru.ibakaidov.distypepro.shared.model.AuthResponse
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 
 class AuthRepositoryImpl(
     private val apiClient: ApiClient,
     private val tokenStorage: ru.ibakaidov.distypepro.shared.auth.TokenStorage,
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) : AuthRepository {
     override suspend fun login(email: String, password: String): AuthResponse {
         val response = apiClient.postRaw("/v1/auth", mapOf("email" to email, "password" to password))
@@ -40,7 +44,10 @@ class AuthRepositoryImpl(
         } else {
             tokenStorageUser()
         }
-        return AuthResponse(token = token, user = user)
+        val response = AuthResponse(token = token, user = user)
+        sessionRepository.setMode(AppMode.ONLINE)
+        sessionRepository.getOrCreateDeviceId()
+        return response
     }
 
     override suspend fun logout() {
@@ -52,6 +59,7 @@ class AuthRepositoryImpl(
             )
         }
         tokenStorage.clear()
+        sessionRepository.clearMode()
     }
 
     private suspend fun handleAuthResponse(response: HttpResponse): AuthResponse {
@@ -61,6 +69,8 @@ class AuthRepositoryImpl(
         if (!refreshToken.isNullOrBlank()) {
             tokenStorage.setRefreshToken(refreshToken)
         }
+        sessionRepository.setMode(AppMode.ONLINE)
+        sessionRepository.getOrCreateDeviceId()
         return payload
     }
 

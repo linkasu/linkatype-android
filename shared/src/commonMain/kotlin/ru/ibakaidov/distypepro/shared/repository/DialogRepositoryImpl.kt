@@ -11,6 +11,9 @@ import ru.ibakaidov.distypepro.shared.model.DialogMessageRequest
 import ru.ibakaidov.distypepro.shared.model.DialogSuggestion
 import ru.ibakaidov.distypepro.shared.model.DialogSuggestionApplyItem
 import ru.ibakaidov.distypepro.shared.model.DialogSuggestionApplyResult
+import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.session.InMemorySessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionRepository
 import ru.ibakaidov.distypepro.shared.sync.OfflineDialogMessagePayload
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
 import ru.ibakaidov.distypepro.shared.utils.currentTimeMillis
@@ -20,10 +23,14 @@ class DialogRepositoryImpl(
     private val apiClient: ApiClient,
     private val localStore: LocalStore,
     private val now: () -> Long = { currentTimeMillis() },
+    private val sessionRepository: SessionRepository = InMemorySessionRepository(),
 ) : DialogRepository {
     private val json = Json { ignoreUnknownKeys = true }
 
     override suspend fun listChats(): List<DialogChat> {
+        if (isOfflineMode()) {
+            return localStore.listChats()
+        }
         return try {
             val remote = apiClient.authorizedRequest<List<DialogChat>>(HttpMethod.Get, "/v1/dialog/chats")
             remote.forEach { localStore.upsertChat(it) }
@@ -34,6 +41,15 @@ class DialogRepositoryImpl(
     }
 
     override suspend fun createChat(title: String?): DialogChat {
+        if (isOfflineMode()) {
+            val optimistic = DialogChat(
+                id = generateId(),
+                title = title,
+                created = now(),
+            )
+            localStore.upsertChat(optimistic)
+            return optimistic
+        }
         return try {
             val remote = apiClient.authorizedRequest<DialogChat>(
                 HttpMethod.Post,
@@ -55,6 +71,7 @@ class DialogRepositoryImpl(
 
     override suspend fun deleteChat(id: String) {
         localStore.deleteChat(id)
+        if (isOfflineMode()) return
         try {
             apiClient.authorizedRequest<Unit>(HttpMethod.Delete, "/v1/dialog/chats/$id")
         } catch (_: Exception) {
@@ -63,6 +80,9 @@ class DialogRepositoryImpl(
     }
 
     override suspend fun listMessages(chatId: String, limit: Int?, before: Long?): List<DialogMessage> {
+        if (isOfflineMode()) {
+            return localStore.listMessages(chatId, (limit ?: 200).toLong())
+        }
         return try {
             val query = buildMap<String, Any> {
                 if (limit != null) put("limit", limit)
@@ -109,6 +129,9 @@ class DialogRepositoryImpl(
             created = createdAt,
             includeSuggestions = includeSuggestions,
         )
+        if (isOfflineMode()) {
+            return DialogMessageResult(message = optimistic, transcript = null, suggestions = null)
+        }
 
         return try {
             val result = apiClient.authorizedRequest<DialogMessageResult>(
@@ -159,6 +182,9 @@ class DialogRepositoryImpl(
                 includeSuggestions = includeSuggestions,
             ),
         )
+        if (isOfflineMode()) {
+            throw ModeRestrictedException(feature = "dialog_audio")
+        }
         return apiClient.postMultipartAuthorized(
             path = "/v1/dialog/chats/$chatId/messages",
             payloadJson = payloadJson,
@@ -169,6 +195,9 @@ class DialogRepositoryImpl(
     }
 
     override suspend fun listSuggestions(status: String, limit: Int): List<DialogSuggestion> {
+        if (isOfflineMode()) {
+            return localStore.listSuggestions(status, limit.toLong())
+        }
         return try {
             val remote = apiClient.authorizedRequest<List<DialogSuggestion>>(
                 HttpMethod.Get,
@@ -182,6 +211,7 @@ class DialogRepositoryImpl(
     }
 
     override suspend fun applySuggestions(items: List<DialogSuggestionApplyItem>): DialogSuggestionApplyResult {
+        ensureOnline("dialog_suggestions_apply")
         return apiClient.authorizedRequest(
             HttpMethod.Post,
             "/v1/dialog/suggestions/apply",
@@ -190,6 +220,7 @@ class DialogRepositoryImpl(
     }
 
     override suspend fun dismissSuggestions(ids: List<String>) {
+        ensureOnline("dialog_suggestions_dismiss")
         apiClient.authorizedRequest<Unit>(
             HttpMethod.Post,
             "/v1/dialog/suggestions/dismiss",
@@ -197,6 +228,14 @@ class DialogRepositoryImpl(
         )
         ids.forEach { localStore.removeSuggestion(it) }
     }
+
+    private fun ensureOnline(feature: String) {
+        if (isOfflineMode()) {
+            throw ModeRestrictedException(feature = feature)
+        }
+    }
+
+    private fun isOfflineMode(): Boolean = sessionRepository.getMode() == AppMode.OFFLINE
 
     private fun Map<String, Any>.toQueryString(): String {
         if (isEmpty()) return ""

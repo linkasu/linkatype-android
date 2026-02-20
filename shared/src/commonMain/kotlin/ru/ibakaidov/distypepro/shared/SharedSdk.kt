@@ -21,6 +21,8 @@ import ru.ibakaidov.distypepro.shared.repository.StatementsRepository
 import ru.ibakaidov.distypepro.shared.repository.StatementsRepositoryImpl
 import ru.ibakaidov.distypepro.shared.repository.UserStateRepository
 import ru.ibakaidov.distypepro.shared.repository.UserStateRepositoryImpl
+import ru.ibakaidov.distypepro.shared.session.DefaultSessionRepository
+import ru.ibakaidov.distypepro.shared.session.SessionStorage
 import ru.ibakaidov.distypepro.shared.sync.ChangesSyncer
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
 
@@ -29,18 +31,19 @@ class SharedSdk(
     platformContext: PlatformContext,
 ) {
     val tokenStorage = DefaultTokenStorage(SecureTokenStorage(platformContext))
+    val sessionRepository = DefaultSessionRepository(SessionStorage(platformContext))
     private val apiClient = ApiClient(baseUrl, tokenStorage)
     private val database = LinkaDatabaseFactory(DatabaseDriverFactory(platformContext)).create()
     private val localStore = LocalStore(database)
 
-    val authRepository: AuthRepository = AuthRepositoryImpl(apiClient, tokenStorage)
-    val accountRepository: AccountRepository = AccountRepositoryImpl(apiClient)
-    val categoriesRepository: CategoriesRepository = CategoriesRepositoryImpl(apiClient, localStore)
-    val statementsRepository: StatementsRepository = StatementsRepositoryImpl(apiClient, localStore)
-    val userStateRepository: UserStateRepository = UserStateRepositoryImpl(apiClient, localStore)
-    val dialogRepository: DialogRepository = DialogRepositoryImpl(apiClient, localStore)
-    val globalRepository: GlobalRepository = GlobalRepositoryImpl(apiClient)
+    val authRepository: AuthRepository = AuthRepositoryImpl(apiClient, tokenStorage, sessionRepository)
+    val accountRepository: AccountRepository = AccountRepositoryImpl(apiClient, sessionRepository)
+    val categoriesRepository: CategoriesRepository = CategoriesRepositoryImpl(apiClient, localStore, sessionRepository = sessionRepository)
+    val statementsRepository: StatementsRepository = StatementsRepositoryImpl(apiClient, localStore, sessionRepository = sessionRepository)
+    val userStateRepository: UserStateRepository = UserStateRepositoryImpl(apiClient, localStore, sessionRepository = sessionRepository)
+    val dialogRepository: DialogRepository = DialogRepositoryImpl(apiClient, localStore, sessionRepository = sessionRepository)
+    val globalRepository: GlobalRepository = GlobalRepositoryImpl(apiClient, sessionRepository)
 
-    val offlineQueueProcessor = OfflineQueueProcessor(apiClient, localStore)
-    val changesSyncer = ChangesSyncer(apiClient, localStore)
+    val offlineQueueProcessor = OfflineQueueProcessor(apiClient, localStore, sessionRepository)
+    val changesSyncer = ChangesSyncer(apiClient, localStore, sessionRepository = sessionRepository)
 }
