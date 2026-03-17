@@ -116,6 +116,11 @@
     <string name="settings_cache_cleared">Кеш очищен</string>
     <string name="settings_cache_enabled_on">Кеширование включено</string>
     <string name="settings_cache_enabled_off">Кеширование выключено</string>
+    <string name="settings_section_home_screen">Главный экран</string>
+    <string name="settings_bank_placement">Размещение банка фраз</string>
+    <string name="settings_bank_placement_description">Выберите, будет ли банк фраз встроен в главный экран или открываться отдельно.</string>
+    <string name="settings_bank_placement_main">На главном экране</string>
+    <string name="settings_bank_placement_separate">Отдельный экран</string>
     <string name="bank_download_cache">Скачать в кеш</string>
     <string name="bank_download_cache_title">Скачать фразы</string>
     <string name="bank_download_cache_progress">%1$d из %2$d</string>

@@ -260,6 +260,59 @@
                     android:padding="@dimen/spacing_large">
 
                     <TextView
+                        android:id="@+id/homeScreenSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/settings_section_home_screen"
+                        android:textAppearance="@style/TextAppearance.Material3.TitleLarge" />
+
+                    <TextView
+                        android:id="@+id/bankPlacementLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_medium"
+                        android:text="@string/settings_bank_placement"
+                        android:textAppearance="@style/TextAppearance.Material3.LabelLarge" />
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/bankPlacementInputLayout"
+                        style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:hint="@string/settings_bank_placement">
+
+                        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                            android:id="@+id/bankPlacementDropdown"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="none" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:id="@+id/bankPlacementDescription"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/spacing_small"
+                        android:text="@string/settings_bank_placement_description"
+                        android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                        android:textColor="?android:attr/textColorSecondary" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/spacing_large"
+                app:cardElevation="@dimen/elevation_small">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/spacing_large">
+
+                    <TextView
                         android:id="@+id/accountSectionTitle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"

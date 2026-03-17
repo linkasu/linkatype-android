@@ -10,8 +10,10 @@ import android.net.NetworkRequest
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.LinearLayout
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
@@ -19,6 +21,8 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -29,6 +33,11 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import ru.ibakaidov.distypepro.R
+import ru.ibakaidov.distypepro.bank.BankPlacement
+import ru.ibakaidov.distypepro.bank.BankPlacementStore
+import ru.ibakaidov.distypepro.components.BankActionHandler
+import ru.ibakaidov.distypepro.components.BankChromeMenuBinder
+import ru.ibakaidov.distypepro.components.BankChromeState
 import ru.ibakaidov.distypepro.databinding.ActivityMainBinding
 import ru.ibakaidov.distypepro.dialogs.ConfirmDialog
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
@@ -42,10 +51,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var tts: Tts
     private val sdk by lazy { SharedSdkProvider.get(this) }
+    private val bankPlacementStore by lazy { BankPlacementStore(this) }
     private val isOfflineMode by lazy { sdk.sessionRepository.getMode() == AppMode.OFFLINE }
     private var currentSlotIndex: Int = 0
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
     private var realtimeJob: Job? = null
+    private var currentBankPlacement: BankPlacement = BankPlacement.MAIN
+    private var inlineBankChromeState: BankChromeState? = null
     private val slotLabels = listOf(
         R.string.chat_slot_one,
         R.string.chat_slot_two,
@@ -70,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.setDisplayShowTitleEnabled(false)
         binding.chatSlotButton.setOnClickListener { showChatSelectorPopup() }
         binding.openBankCard.setOnClickListener { openBankScreen() }
+        setupInlineBankToolbar()
         updateChatSelectorTitle()
         applyWindowInsets()
 
@@ -80,16 +93,31 @@ class MainActivity : AppCompatActivity() {
 
         tts = TtsHolder.get(this)
         binding.inputGroup.setTts(tts)
+        binding.inlineBankGroup.setTts(tts)
+        binding.inlineBankGroup.setChromeStateListener { state ->
+            inlineBankChromeState = state
+            renderInlineBankChrome(state)
+        }
+        currentBankPlacement = bankPlacementStore.get()
+        applyBankPlacement(refreshInlineBank = true)
         observeTtsEvents()
 
         onBackPressedDispatcher.addCallback(this) {
             if (binding.inputGroup.back()) {
                 return@addCallback
             }
+            if (isInlineBankActive() && binding.inlineBankGroup.back()) {
+                return@addCallback
+            }
             isEnabled = false
             onBackPressedDispatcher.onBackPressed()
             isEnabled = true
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        applyBankPlacement(refreshInlineBank = true)
     }
 
     override fun onStart() {
@@ -173,6 +201,74 @@ class MainActivity : AppCompatActivity() {
     private fun updateChatSelectorTitle() {
         currentSlotIndex = safeSlotIndex(currentSlotIndex)
         binding.chatSlotButton.text = getString(slotLabels[currentSlotIndex])
+    }
+
+    private fun setupInlineBankToolbar() {
+        binding.bankInlineToolbar.inflateMenu(R.menu.bank_toolbar_menu)
+        binding.bankInlineToolbar.setNavigationOnClickListener {
+            binding.inlineBankGroup.back()
+        }
+        binding.bankInlineToolbar.setOnMenuItemClickListener { item ->
+            BankActionHandler.handle(item.itemId, binding.inlineBankGroup)
+        }
+    }
+
+    private fun renderInlineBankChrome(state: BankChromeState) {
+        val navigationIcon = if (state.canNavigateBack) {
+            AppCompatResources.getDrawable(this, R.drawable.ic_baseline_arrow_back_24)
+        } else {
+            null
+        }
+        binding.bankInlineToolbar.title = state.title
+        binding.bankInlineToolbar.navigationIcon = navigationIcon
+        binding.bankInlineToolbar.navigationContentDescription = if (state.canNavigateBack) {
+            getString(R.string.bank_back)
+        } else {
+            null
+        }
+        BankChromeMenuBinder.bind(binding.bankInlineToolbar.menu, state)
+    }
+
+    private fun applyBankPlacement(refreshInlineBank: Boolean) {
+        val placement = bankPlacementStore.get()
+        val placementChanged = placement != currentBankPlacement
+        currentBankPlacement = placement
+        updateSectionLayout(placement)
+        binding.bankInlineSection.isVisible = placement == BankPlacement.MAIN
+        binding.openBankCard.isVisible = placement == BankPlacement.SEPARATE_ACTIVITY
+
+        if (placement == BankPlacement.MAIN) {
+            renderInlineBankChrome(inlineBankChromeState ?: binding.inlineBankGroup.chromeState())
+            if (refreshInlineBank || placementChanged) {
+                binding.inlineBankGroup.refresh()
+            }
+        }
+    }
+
+    private fun updateSectionLayout(placement: BankPlacement) {
+        val inlineSpacing = resources.getDimensionPixelSize(R.dimen.spacing_medium)
+        val regularSpacing = resources.getDimensionPixelSize(R.dimen.spacing_large)
+
+        binding.inputGroup.updateLayoutParams<LinearLayout.LayoutParams> {
+            if (placement == BankPlacement.MAIN) {
+                height = 0
+                weight = INPUT_SECTION_WEIGHT
+                bottomMargin = inlineSpacing
+            } else {
+                height = LinearLayout.LayoutParams.WRAP_CONTENT
+                weight = 0f
+                bottomMargin = regularSpacing
+            }
+        }
+
+        binding.bankInlineSection.updateLayoutParams<LinearLayout.LayoutParams> {
+            height = 0
+            weight = if (placement == BankPlacement.MAIN) BANK_SECTION_WEIGHT else 0f
+        }
+    }
+
+    private fun isInlineBankActive(): Boolean {
+        return currentBankPlacement == BankPlacement.MAIN && binding.bankInlineSection.isVisible
     }
 
     private fun openBankScreen() {
@@ -298,11 +394,12 @@ class MainActivity : AppCompatActivity() {
 
         ViewCompat.setOnApplyWindowInsetsListener(content) { view, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
             view.updatePadding(
                 left = contentInitialLeft + systemBars.left,
                 top = contentInitialTop,
                 right = contentInitialRight + systemBars.right,
-                bottom = contentInitialBottom + systemBars.bottom
+                bottom = contentInitialBottom + maxOf(systemBars.bottom, ime.bottom)
             )
             insets
         }
@@ -346,5 +443,7 @@ class MainActivity : AppCompatActivity() {
     private companion object {
         private const val SYNC_INTERVAL_MS = 60_000L
         private const val REALTIME_RETRY_DELAY_MS = 3_000L
+        private const val INPUT_SECTION_WEIGHT = 2f
+        private const val BANK_SECTION_WEIGHT = 8f
     }
 }

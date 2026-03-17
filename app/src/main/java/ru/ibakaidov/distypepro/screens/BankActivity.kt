@@ -13,14 +13,16 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updatePadding
 import com.google.android.material.color.DynamicColors
 import ru.ibakaidov.distypepro.R
-import ru.ibakaidov.distypepro.components.BankGroup
+import ru.ibakaidov.distypepro.components.BankActionHandler
+import ru.ibakaidov.distypepro.components.BankChromeMenuBinder
+import ru.ibakaidov.distypepro.components.BankChromeState
 import ru.ibakaidov.distypepro.databinding.ActivityBankBinding
 import ru.ibakaidov.distypepro.utils.TtsHolder
 
 class BankActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityBankBinding
-    private var toolbarState: BankGroup.ToolbarState? = null
+    private var chromeState: BankChromeState? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,8 +43,8 @@ class BankActivity : AppCompatActivity() {
 
         val tts = TtsHolder.get(this)
         binding.bankGroup.setTts(tts)
-        binding.bankGroup.setToolbarStateListener { state ->
-            toolbarState = state
+        binding.bankGroup.setChromeStateListener { state ->
+            chromeState = state
             supportActionBar?.title = state.title
             invalidateOptionsMenu()
         }
@@ -68,15 +70,8 @@ class BankActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        val state = toolbarState ?: binding.bankGroup.toolbarState()
-        menu.findItem(R.id.action_add_category)?.isVisible = !state.showingStatements
-        menu.findItem(R.id.action_add_statement)?.isVisible = state.showingStatements
-        menu.findItem(R.id.action_sort)?.isVisible = true
-        menu.findItem(R.id.action_import_global)?.isVisible = !state.showingStatements
-        menu.findItem(R.id.action_download_cache)?.apply {
-            isVisible = state.showingStatements
-            isEnabled = state.showingStatements && !state.isDownloading
-        }
+        val state = chromeState ?: binding.bankGroup.chromeState()
+        BankChromeMenuBinder.bind(menu, state)
         supportActionBar?.title = state.title
         return super.onPrepareOptionsMenu(menu)
     }
@@ -88,28 +83,8 @@ class BankActivity : AppCompatActivity() {
                 true
             }
 
-            R.id.action_sort -> {
-                binding.bankGroup.onSortClicked()
-                true
-            }
-
-            R.id.action_add_category,
-            R.id.action_add_statement -> {
-                binding.bankGroup.onAddClicked()
-                true
-            }
-
-            R.id.action_download_cache -> {
-                binding.bankGroup.onDownloadCacheClicked()
-                true
-            }
-
-            R.id.action_import_global -> {
-                binding.bankGroup.onImportGlobalClicked()
-                true
-            }
-
-            else -> super.onOptionsItemSelected(item)
+            else -> BankActionHandler.handle(item.itemId, binding.bankGroup)
+                || super.onOptionsItemSelected(item)
         }
     }
 

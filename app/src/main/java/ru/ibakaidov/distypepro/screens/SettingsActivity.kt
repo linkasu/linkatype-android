@@ -20,6 +20,8 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
 import ru.ibakaidov.distypepro.R
+import ru.ibakaidov.distypepro.bank.BankPlacement
+import ru.ibakaidov.distypepro.bank.BankPlacementStore
 import ru.ibakaidov.distypepro.databinding.ActivitySettingsBinding
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.shared.model.UserPreferences
@@ -32,8 +34,10 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var binding: ActivitySettingsBinding
     private lateinit var tts: Tts
     private val sdk by lazy { SharedSdkProvider.get(this) }
+    private val bankPlacementStore by lazy { BankPlacementStore(this) }
 
     private var voiceItems: List<VoiceItem> = emptyList()
+    private var bankPlacementItems: List<BankPlacementItem> = emptyList()
     private var eventsJob: Job? = null
     private var preferencesSyncJob: Job? = null
     private val isOfflineMode: Boolean
@@ -71,6 +75,12 @@ class SettingsActivity : AppCompatActivity() {
             MaterialColors.getColor(binding.voiceDropdown, com.google.android.material.R.attr.colorOnSurface)
         )
         binding.voiceDropdown.setHintTextColor(hintColor)
+        binding.bankPlacementInputLayout.setHintTextColor(hintColor)
+        binding.bankPlacementInputLayout.setEndIconTintList(hintColor)
+        binding.bankPlacementDropdown.setTextColor(
+            MaterialColors.getColor(binding.bankPlacementDropdown, com.google.android.material.R.attr.colorOnSurface)
+        )
+        binding.bankPlacementDropdown.setHintTextColor(hintColor)
 
         binding.switchUseYandex.setOnCheckedChangeListener { _, isChecked ->
             tts.setUseYandex(isChecked)
@@ -82,6 +92,13 @@ class SettingsActivity : AppCompatActivity() {
             voiceItems.getOrNull(position)?.let { item ->
                 tts.setVoice(item.id)
                 schedulePreferencesSync()
+            }
+        }
+
+        binding.bankPlacementDropdown.setOnItemClickListener { _, _, position, _ ->
+            bankPlacementItems.getOrNull(position)?.let { item ->
+                bankPlacementStore.set(item.placement)
+                binding.bankPlacementDropdown.setText(item.label, false)
             }
         }
 
@@ -168,6 +185,7 @@ class SettingsActivity : AppCompatActivity() {
         updateCacheControlsEnabled(binding.switchCacheEnabled.isChecked)
         binding.cacheLimitSlider.value = tts.getCacheSizeLimitMb().toFloat().coerceIn(100f, 10000f)
         updateCacheLimitLabel(tts.getCacheSizeLimitMb())
+        updateBankPlacementList()
         lifecycleScope.launch { updateCacheInfo() }
     }
 
@@ -210,6 +228,24 @@ class SettingsActivity : AppCompatActivity() {
 
             binding.voiceInputLayout.isEnabled = voices.isNotEmpty()
         }
+    }
+
+    private fun updateBankPlacementList() {
+        bankPlacementItems = listOf(
+            BankPlacementItem(BankPlacement.MAIN, getString(R.string.settings_bank_placement_main)),
+            BankPlacementItem(BankPlacement.SEPARATE_ACTIVITY, getString(R.string.settings_bank_placement_separate)),
+        )
+        val adapter = ArrayAdapter(
+            this,
+            R.layout.item_dropdown_menu,
+            bankPlacementItems.map { it.label }
+        ).apply {
+            setDropDownViewResource(R.layout.item_dropdown_menu_dropdown)
+        }
+        binding.bankPlacementDropdown.setAdapter(adapter)
+        val current = bankPlacementStore.get()
+        val currentLabel = bankPlacementItems.firstOrNull { it.placement == current }?.label.orEmpty()
+        binding.bankPlacementDropdown.setText(currentLabel, false)
     }
 
     private fun observeTtsEvents() {
@@ -392,6 +428,8 @@ class SettingsActivity : AppCompatActivity() {
     }
 
     private data class VoiceItem(val id: String, val label: String)
+
+    private data class BankPlacementItem(val placement: BankPlacement, val label: String)
 
     private fun applyWindowInsets() {
         val root = binding.root

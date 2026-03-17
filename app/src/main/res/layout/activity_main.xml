@@ -54,6 +54,7 @@
         android:layout_height="match_parent"
         android:animateLayoutChanges="true"
         android:orientation="vertical"
+        android:weightSum="10"
         android:paddingStart="@dimen/spacing_large"
         android:paddingTop="@dimen/spacing_large"
         android:paddingEnd="@dimen/spacing_large"
@@ -63,8 +64,37 @@
         <ru.ibakaidov.distypepro.components.InputGroup
             android:id="@+id/input_group"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/spacing_large" />
+            android:layout_height="0dp"
+            android:layout_marginBottom="@dimen/spacing_medium"
+            android:layout_weight="2" />
+
+        <LinearLayout
+            android:id="@+id/bank_inline_section"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/bank_inline_toolbar"
+                style="@style/Widget.LinkaType.Toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:layout_marginBottom="@dimen/spacing_medium"
+                android:theme="@style/ThemeOverlay.LinkaType.Toolbar"
+                app:contentInsetStartWithNavigation="0dp"
+                app:navigationIconTint="?attr/colorOnPrimary"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:titleTextColor="?attr/colorOnPrimary"
+                app:subtitleTextColor="?attr/colorOnPrimary" />
+
+            <ru.ibakaidov.distypepro.components.BankGroup
+                android:id="@+id/inline_bank_group"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+        </LinearLayout>
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/open_bank_card"
@@ -75,6 +105,7 @@
             android:foreground="?attr/selectableItemBackground"
             android:minHeight="96dp"
             android:padding="@dimen/spacing_medium"
+            android:visibility="gone"
             app:cardBackgroundColor="?attr/colorSecondaryContainer"
             app:cardElevation="@dimen/elevation_small"
             app:shapeAppearanceOverlay="@style/ShapeAppearance.LinkaType.Medium"

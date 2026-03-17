@@ -41,11 +41,10 @@ class BankGroup @JvmOverloads constructor(
     private lateinit var emptyStateText: TextView
     private lateinit var adapter: HashMapRecyclerAdapter
     private var tts: Tts? = null
-    private var toolbarStateListener: ((ToolbarState) -> Unit)? = null
+    private var chromeStateListener: ((BankChromeState) -> Unit)? = null
 
     private var showingStatements = false
     private var currentStatements: Map<String, String> = emptyMap()
-    private var currentCategoryId: String? = null
     private var currentCategoryTitle: String = ""
     private var isDownloading = false
 
@@ -68,7 +67,7 @@ class BankGroup @JvmOverloads constructor(
         recyclerView.layoutManager = GridLayoutManager(context, spanCount)
         recyclerView.adapter = adapter
 
-        notifyToolbarStateChanged()
+        notifyChromeStateChanged()
         showCategories()
     }
 
@@ -76,18 +75,19 @@ class BankGroup @JvmOverloads constructor(
         this.tts = tts
     }
 
-    fun setToolbarStateListener(listener: (ToolbarState) -> Unit) {
-        toolbarStateListener = listener
-        notifyToolbarStateChanged()
+    fun setChromeStateListener(listener: (BankChromeState) -> Unit) {
+        chromeStateListener = listener
+        notifyChromeStateChanged()
     }
 
-    fun toolbarState(): ToolbarState {
-        return ToolbarState(
+    fun chromeState(): BankChromeState {
+        return BankChromeState(
             title = if (showingStatements) {
                 context.getString(R.string.bank_toolbar_title_statements, currentCategoryTitle)
             } else {
                 context.getString(R.string.bank_toolbar_title_categories)
             },
+            canNavigateBack = showingStatements,
             showingStatements = showingStatements,
             isDownloading = isDownloading,
         )
@@ -149,7 +149,6 @@ class BankGroup @JvmOverloads constructor(
         if (showingStatements) {
             tts?.speak(value)
         } else {
-            currentCategoryId = key
             currentCategoryTitle = value
             statementManager = StatementManager(context, key)
             setState(true)
@@ -172,11 +171,15 @@ class BankGroup @JvmOverloads constructor(
             override fun onDone(result: String) {
                 if (showingStatements) {
                     statementManager?.edit(key, result, object : Callback<Unit> {
-                        override fun onDone(result: Unit) = Unit
+                        override fun onDone(result: Unit) {
+                            refresh()
+                        }
                     })
                 } else {
                     categoryManager.edit(key, result, object : Callback<Unit> {
-                        override fun onDone(result: Unit) = Unit
+                        override fun onDone(result: Unit) {
+                            refresh()
+                        }
                     })
                 }
             }
@@ -188,11 +191,15 @@ class BankGroup @JvmOverloads constructor(
             override fun onDone(result: Unit) {
                 if (showingStatements) {
                     statementManager?.remove(key, object : Callback<Unit> {
-                        override fun onDone(result: Unit) = Unit
+                        override fun onDone(result: Unit) {
+                            refresh()
+                        }
                     })
                 } else {
                     categoryManager.remove(key, object : Callback<Unit> {
-                        override fun onDone(result: Unit) = Unit
+                        override fun onDone(result: Unit) {
+                            refresh()
+                        }
                     })
                 }
             }
@@ -203,10 +210,9 @@ class BankGroup @JvmOverloads constructor(
         showingStatements = statements
         if (!statements) {
             currentStatements = emptyMap()
-            currentCategoryId = null
             currentCategoryTitle = ""
         }
-        notifyToolbarStateChanged()
+        notifyChromeStateChanged()
         if (statements) {
             showStatements()
         } else {
@@ -214,8 +220,8 @@ class BankGroup @JvmOverloads constructor(
         }
     }
 
-    private fun notifyToolbarStateChanged() {
-        toolbarStateListener?.invoke(toolbarState())
+    private fun notifyChromeStateChanged() {
+        chromeStateListener?.invoke(chromeState())
     }
 
     private fun showCategories() {
@@ -297,7 +303,7 @@ class BankGroup @JvmOverloads constructor(
 
         dialog.show()
         isDownloading = true
-        notifyToolbarStateChanged()
+        notifyChromeStateChanged()
         Firebase.analytics.logEvent("download_category_cache", null)
 
         ttsInstance.downloadPhrasesToCache(phrases, "current") { current, total ->
@@ -306,17 +312,11 @@ class BankGroup @JvmOverloads constructor(
             if (current >= total) {
                 dialog.dismiss()
                 isDownloading = false
-                notifyToolbarStateChanged()
+                notifyChromeStateChanged()
                 Toast.makeText(context, R.string.bank_download_cache_done, Toast.LENGTH_LONG).show()
             }
         }
     }
-
-    data class ToolbarState(
-        val title: String,
-        val showingStatements: Boolean,
-        val isDownloading: Boolean,
-    )
 
     companion object {
         private const val PREF_SORT_MODE = "bank_sort_mode"

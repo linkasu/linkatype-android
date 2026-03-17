@@ -15,15 +15,17 @@ android {
         applicationId "ru.ibakaidov.distypepro"
         minSdk 23
         targetSdk 35
-        versionCode 59
-        versionName "4.3"
+        versionCode 60
+        versionName "4.4"
 
         buildConfigField "String", "BACKEND_URL", "\"https://backend.linka.su\""
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments clearPackageData: 'true'
     }
 
     testOptions {
+        execution 'ANDROIDX_TEST_ORCHESTRATOR'
         unitTests {
             includeAndroidResources = true
         }
@@ -120,6 +122,7 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit-ktx:1.2.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.6.1'
     androidTestImplementation 'com.google.dagger:hilt-android-testing:2.56'
+    androidTestUtil 'androidx.test:orchestrator:1.5.1'
     kspAndroidTest 'com.google.dagger:hilt-compiler:2.56'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
