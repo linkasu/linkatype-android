@@ -34,10 +34,15 @@ class InputGroup @JvmOverloads constructor(
     private val textCache = arrayOf("", "", "")
     private var eventsJob: Job? = null
     private var isSpeaking: Boolean = false
+    private var onInputFocusChanged: ((Boolean) -> Unit)? = null
 
     override fun initUi() {
         ttsEditText = findViewById(R.id.text_to_speech_edittext)
         sayButton = findViewById(R.id.say_button)
+
+        ttsEditText.setOnFocusChangeListener { _, hasFocus ->
+            onInputFocusChanged?.invoke(hasFocus)
+        }
 
         setOnClickListener {
             if (ttsEditText.hasFocus()) {
@@ -84,6 +89,11 @@ class InputGroup @JvmOverloads constructor(
 
     fun clear() {
         ttsEditText.setText("")
+    }
+
+    fun setOnInputFocusChangedListener(listener: (Boolean) -> Unit) {
+        onInputFocusChanged = listener
+        listener(ttsEditText.hasFocus())
     }
 
     fun back(): Boolean {

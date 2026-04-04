@@ -58,6 +58,7 @@ class MainActivity : AppCompatActivity() {
     private var realtimeJob: Job? = null
     private var currentBankPlacement: BankPlacement = BankPlacement.MAIN
     private var inlineBankChromeState: BankChromeState? = null
+    private var isInputFocused: Boolean = false
     private val slotLabels = listOf(
         R.string.chat_slot_one,
         R.string.chat_slot_two,
@@ -93,6 +94,11 @@ class MainActivity : AppCompatActivity() {
 
         tts = TtsHolder.get(this)
         binding.inputGroup.setTts(tts)
+        binding.inputGroup.setOnInputFocusChangedListener { hasFocus ->
+            if (isInputFocused == hasFocus) return@setOnInputFocusChangedListener
+            isInputFocused = hasFocus
+            applyBankPlacement(refreshInlineBank = false)
+        }
         binding.inlineBankGroup.setTts(tts)
         binding.inlineBankGroup.setChromeStateListener { state ->
             inlineBankChromeState = state
@@ -233,11 +239,13 @@ class MainActivity : AppCompatActivity() {
         val placement = bankPlacementStore.get()
         val placementChanged = placement != currentBankPlacement
         currentBankPlacement = placement
-        updateSectionLayout(placement)
-        binding.bankInlineSection.isVisible = placement == BankPlacement.MAIN
+        val showInlineBank = placement == BankPlacement.MAIN && !isInputFocused
+
+        updateSectionLayout(placement, showInlineBank)
+        binding.bankInlineSection.isVisible = showInlineBank
         binding.openBankCard.isVisible = placement == BankPlacement.SEPARATE_ACTIVITY
 
-        if (placement == BankPlacement.MAIN) {
+        if (showInlineBank) {
             renderInlineBankChrome(inlineBankChromeState ?: binding.inlineBankGroup.chromeState())
             if (refreshInlineBank || placementChanged) {
                 binding.inlineBankGroup.refresh()
@@ -245,15 +253,22 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateSectionLayout(placement: BankPlacement) {
+    private fun updateSectionLayout(
+        placement: BankPlacement,
+        showInlineBank: Boolean,
+    ) {
         val inlineSpacing = resources.getDimensionPixelSize(R.dimen.spacing_medium)
         val regularSpacing = resources.getDimensionPixelSize(R.dimen.spacing_large)
 
         binding.inputGroup.updateLayoutParams<LinearLayout.LayoutParams> {
-            if (placement == BankPlacement.MAIN) {
+            if (placement == BankPlacement.MAIN && showInlineBank) {
                 height = 0
                 weight = INPUT_SECTION_WEIGHT
                 bottomMargin = inlineSpacing
+            } else if (placement == BankPlacement.MAIN) {
+                height = LinearLayout.LayoutParams.WRAP_CONTENT
+                weight = 0f
+                bottomMargin = 0
             } else {
                 height = LinearLayout.LayoutParams.WRAP_CONTENT
                 weight = 0f
@@ -262,8 +277,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.bankInlineSection.updateLayoutParams<LinearLayout.LayoutParams> {
-            height = 0
-            weight = if (placement == BankPlacement.MAIN) BANK_SECTION_WEIGHT else 0f
+            height = if (showInlineBank) 0 else LinearLayout.LayoutParams.WRAP_CONTENT
+            weight = if (showInlineBank) BANK_SECTION_WEIGHT else 0f
         }
     }
 
