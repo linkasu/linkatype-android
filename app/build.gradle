@@ -15,8 +15,8 @@ android {
         applicationId "ru.ibakaidov.distypepro"
         minSdk 23
         targetSdk 35
-        versionCode 61
-        versionName "4.5"
+        versionCode 62
+        versionName "4.5.1"
 
         buildConfigField "String", "BACKEND_URL", "\"https://backend.linka.su\""
 
@@ -126,4 +126,41 @@ dependencies {
     kspAndroidTest 'com.google.dagger:hilt-compiler:2.56'
 
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
+}
+
+tasks.register('verifyReleasePrivacy') {
+    dependsOn 'processReleaseMainManifest'
+
+    doLast {
+        def manifests = fileTree("$buildDir/intermediates").matching {
+            include '**/merged_manifest/**/AndroidManifest.xml'
+            include '**/merged_manifests/**/AndroidManifest.xml'
+        }.files.findAll { manifest ->
+            manifest.path.contains("${File.separator}release${File.separator}")
+        }
+        if (manifests.isEmpty()) {
+            throw new GradleException('Release merged manifest was not generated')
+        }
+
+        manifests.each { manifest ->
+            def manifestText = manifest.getText('UTF-8').toLowerCase()
+            if (!(manifestText =~ /(?s)firebase_analytics_collection_enabled.*?android:value="false"/)) {
+                throw new GradleException('Firebase Analytics must default to disabled in release')
+            }
+            if (manifestText.contains('crashlytics')) {
+                throw new GradleException('Release manifest must not contain Crashlytics')
+            }
+        }
+
+        def crashlyticsComponents = configurations.releaseRuntimeClasspath.incoming.resolutionResult.allComponents.findAll {
+            it.id.displayName.toLowerCase().contains('crashlytics')
+        }
+        if (!crashlyticsComponents.isEmpty()) {
+            throw new GradleException("Crashlytics must not be present in releaseRuntimeClasspath: ${crashlyticsComponents}")
+        }
+    }
+}
+
+tasks.named('check').configure {
+    dependsOn 'verifyReleasePrivacy'
 }

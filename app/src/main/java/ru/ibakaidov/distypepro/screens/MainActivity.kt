@@ -361,7 +361,7 @@ class MainActivity : AppCompatActivity() {
                     }.onFailure { error ->
                         Firebase.analytics.logEvent(
                             "realtime_sync_error",
-                            bundleOf("message" to (error.message ?: "unknown")),
+                            bundleOf("error_type" to error.javaClass.simpleName.take(100)),
                         )
                         delay(REALTIME_RETRY_DELAY_MS)
                     }
