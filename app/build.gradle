@@ -8,14 +8,14 @@ plugins {
 
 android {
     namespace 'ru.ibakaidov.distypepro'
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "ru.ibakaidov.distypepro"
         minSdk 23
-        targetSdk 35
-        versionCode 63
-        versionName "4.5.2"
+        targetSdk 36
+        versionCode 64
+        versionName "4.5.3"
 
         buildConfigField "String", "BACKEND_URL", "\"https://backend.linka.su\""
 
