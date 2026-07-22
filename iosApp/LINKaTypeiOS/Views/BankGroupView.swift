@@ -268,7 +268,7 @@ struct BankGroupView: View {
         let phrases = Array(statementManager.statements.values)
         guard !phrases.isEmpty else { return }
         
-        FirebaseAnalyticsManager.shared.logDownloadCategoryCacheEvent()
+        TelemetryManager.shared.logDownloadCategoryCacheEvent()
         
         isDownloading = true
         downloadProgress = 0

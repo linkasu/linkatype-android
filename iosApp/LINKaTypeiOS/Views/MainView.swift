@@ -174,11 +174,11 @@ struct MainView: View {
             do {
                 let response = try await sdk.changesSyncer.pollOnce(limit: 100, timeoutSeconds: 25)
                 if !response.changes.isEmpty {
-                    FirebaseAnalyticsManager.shared.logRealtimeSyncEvent(changesCount: Int(response.changes.count))
+                    TelemetryManager.shared.logRealtimeSyncEvent(changesCount: Int(response.changes.count))
                     NotificationCenter.default.post(name: .realtimeDidUpdate, object: nil)
                 }
             } catch {
-                FirebaseAnalyticsManager.shared.logRealtimeSyncError(message: error.localizedDescription)
+                TelemetryManager.shared.logRealtimeSyncError(message: error.localizedDescription)
                 try? await Task.sleep(nanoseconds: 3_000_000_000)
             }
         }

@@ -7,7 +7,6 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
-import androidx.core.os.bundleOf
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import androidx.activity.viewModels
@@ -27,8 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.chip.Chip
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.FileOutputStream
@@ -57,10 +54,6 @@ class DialogActivity : AppCompatActivity() {
     private val messageAdapter = DialogMessageAdapter()
     private val chatAdapter = DialogChatAdapter(
         onSelect = { chat ->
-            logEvent(
-                "dialog_chat_select",
-                bundleOf("message_count" to (chat.messageCount ?: 0)),
-            )
             viewModel.selectChat(chat)
         },
         onDelete = { chat -> confirmDeleteChat(chat) },
@@ -106,14 +99,12 @@ class DialogActivity : AppCompatActivity() {
         binding.recordButton.setOnClickListener { toggleRecording() }
         binding.clearButton.setOnClickListener { clearInput() }
         binding.newChatButton.setOnClickListener {
-            logEvent("dialog_chat_create")
             viewModel.createChat()
         }
 
         updateRecordingUi(false)
         applyWindowInsets()
         observeViewModel()
-        logEvent("dialog_mode_opened")
     }
 
     private fun observeViewModel() {
@@ -212,10 +203,6 @@ class DialogActivity : AppCompatActivity() {
     private fun confirmDeleteChat(chat: DialogChat) {
         ConfirmDialog.showConfirmDialog(this, R.string.dialog_delete_chat_confirm, object : Callback<Unit> {
             override fun onDone(result: Unit) {
-                logEvent(
-                    "dialog_chat_delete",
-                    bundleOf("message_count" to (chat.messageCount ?: 0)),
-                )
                 viewModel.deleteChat(chat)
             }
         })
@@ -224,14 +211,7 @@ class DialogActivity : AppCompatActivity() {
     private fun sendMessage() {
         val text = binding.messageInput.text?.toString()?.trim().orEmpty()
         if (text.isNotBlank()) {
-            logEvent(
-                "dialog_message_send",
-                bundleOf(
-                    "source" to "typed",
-                    "text_length" to text.length,
-                ),
-            )
-            TtsHolder.get(this).speak(text)
+            TtsHolder.get(this).speak(text, source = ru.ibakaidov.distypepro.utils.Tts.SpeechSource.DIALOG)
         }
         viewModel.sendTextMessage(text)
     }
@@ -295,7 +275,6 @@ class DialogActivity : AppCompatActivity() {
         recordingFile = file
         isRecording = true
         updateRecordingUi(true)
-        logEvent("dialog_record_start")
 
         recordingJob = lifecycleScope.launch(Dispatchers.IO) {
             var totalBytes = 0
@@ -333,7 +312,6 @@ class DialogActivity : AppCompatActivity() {
         audioRecord = null
         isRecording = false
         updateRecordingUi(false)
-        logEvent("dialog_record_stop")
         runCatching { record?.stop() }
 
         lifecycleScope.launch {
@@ -341,13 +319,6 @@ class DialogActivity : AppCompatActivity() {
             record?.release()
             recordingJob = null
             val bytes = runCatching { file.readBytes() }.getOrNull() ?: return@launch
-            logEvent(
-                "dialog_message_send",
-                bundleOf(
-                    "source" to "audio",
-                    "audio_bytes" to bytes.size,
-                ),
-            )
             viewModel.sendAudioMessage(bytes, file.name)
         }
     }
@@ -397,14 +368,10 @@ class DialogActivity : AppCompatActivity() {
                 isCheckable = false
                 isClickable = true
                 setOnClickListener {
-                    logEvent(
-                        "dialog_message_send",
-                        bundleOf(
-                            "source" to "suggestion",
-                            "text_length" to text.length,
-                        ),
+                    TtsHolder.get(this@DialogActivity).speak(
+                        text,
+                        source = ru.ibakaidov.distypepro.utils.Tts.SpeechSource.DIALOG,
                     )
-                    TtsHolder.get(this@DialogActivity).speak(text)
                     viewModel.sendSuggestion(text)
                 }
             }
@@ -477,14 +444,7 @@ class DialogActivity : AppCompatActivity() {
         target[offset + 3] = ((value shr 24) and 0xff).toByte()
     }
 
-    private fun logEvent(name: String, params: Bundle? = null) {
-        Firebase.analytics.logEvent(name, params)
-    }
-
     override fun onDestroy() {
-        if (isFinishing) {
-            logEvent("dialog_mode_closed")
-        }
         super.onDestroy()
         recordingJob?.cancel()
         audioRecord?.let { record ->

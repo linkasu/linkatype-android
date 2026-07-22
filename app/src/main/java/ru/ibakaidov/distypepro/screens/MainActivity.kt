@@ -14,7 +14,6 @@ import android.widget.LinearLayout
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.os.bundleOf
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -24,8 +23,6 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import com.google.android.material.color.DynamicColors
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.delay
@@ -42,6 +39,12 @@ import ru.ibakaidov.distypepro.databinding.ActivityMainBinding
 import ru.ibakaidov.distypepro.dialogs.ConfirmDialog
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryCountBucket
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryFailureCode
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryOutcome
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryOutcomeKind
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryResult
+import ru.ibakaidov.distypepro.telemetry.TelemetryService
 import ru.ibakaidov.distypepro.utils.Callback
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
@@ -52,6 +55,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var tts: Tts
     private val sdk by lazy { SharedSdkProvider.get(this) }
     private val bankPlacementStore by lazy { BankPlacementStore(this) }
+    private val telemetry by lazy { TelemetryService.get(this) }
     private val isOfflineMode by lazy { sdk.sessionRepository.getMode() == AppMode.OFFLINE }
     private var currentSlotIndex: Int = 0
     private var networkCallback: ConnectivityManager.NetworkCallback? = null
@@ -353,15 +357,22 @@ class MainActivity : AppCompatActivity() {
                     val result = runCatching { sdk.changesSyncer.pollOnce() }
                     result.onSuccess { response ->
                         if (response.changes.isNotEmpty()) {
-                            Firebase.analytics.logEvent(
-                                "realtime_sync",
-                                bundleOf("changes" to response.changes.size),
+                            telemetry.report(
+                                TelemetryOutcome(
+                                    kind = TelemetryOutcomeKind.SYNC_COMPLETED,
+                                    result = TelemetryResult.COMPLETED,
+                                    countBucket = TelemetryCountBucket.fromCount(response.changes.size),
+                                ),
                             )
                         }
-                    }.onFailure { error ->
-                        Firebase.analytics.logEvent(
-                            "realtime_sync_error",
-                            bundleOf("error_type" to error.javaClass.simpleName.take(100)),
+                    }.onFailure {
+                        telemetry.report(
+                            TelemetryOutcome(
+                                kind = TelemetryOutcomeKind.SYNC_COMPLETED,
+                                result = TelemetryResult.FAILED,
+                                countBucket = TelemetryCountBucket.ONE,
+                                failureCode = TelemetryFailureCode.NETWORK_UNAVAILABLE,
+                            ),
                         )
                         delay(REALTIME_RETRY_DELAY_MS)
                     }

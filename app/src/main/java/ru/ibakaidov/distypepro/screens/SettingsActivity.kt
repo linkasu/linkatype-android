@@ -26,6 +26,9 @@ import ru.ibakaidov.distypepro.databinding.ActivitySettingsBinding
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.shared.model.UserPreferences
 import ru.ibakaidov.distypepro.shared.session.AppMode
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryConsent
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryConsentAction
+import ru.ibakaidov.distypepro.telemetry.TelemetryService
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
 
@@ -35,6 +38,7 @@ class SettingsActivity : AppCompatActivity() {
     private lateinit var tts: Tts
     private val sdk by lazy { SharedSdkProvider.get(this) }
     private val bankPlacementStore by lazy { BankPlacementStore(this) }
+    private val telemetry by lazy { TelemetryService.get(this) }
 
     private var voiceItems: List<VoiceItem> = emptyList()
     private var bankPlacementItems: List<BankPlacementItem> = emptyList()
@@ -172,6 +176,11 @@ class SettingsActivity : AppCompatActivity() {
                 showSwitchToOfflineConfirmation()
             }
         }
+
+        binding.switchTelemetry.setOnCheckedChangeListener { _, enabled ->
+            telemetry.setConsent(if (enabled) TelemetryConsentAction.GRANT else TelemetryConsentAction.DENY)
+            updateTelemetryUi()
+        }
     }
 
     private fun loadInitialValues() {
@@ -186,6 +195,7 @@ class SettingsActivity : AppCompatActivity() {
         binding.cacheLimitSlider.value = tts.getCacheSizeLimitMb().toFloat().coerceIn(100f, 10000f)
         updateCacheLimitLabel(tts.getCacheSizeLimitMb())
         updateBankPlacementList()
+        updateTelemetryUi()
         lifecycleScope.launch { updateCacheInfo() }
     }
 
@@ -246,6 +256,25 @@ class SettingsActivity : AppCompatActivity() {
         val current = bankPlacementStore.get()
         val currentLabel = bankPlacementItems.firstOrNull { it.placement == current }?.label.orEmpty()
         binding.bankPlacementDropdown.setText(currentLabel, false)
+    }
+
+    private fun updateTelemetryUi() {
+        when (telemetry.consent()) {
+            TelemetryConsent.UNKNOWN -> {
+                binding.switchTelemetry.isChecked = false
+                binding.telemetryDescription.setText(R.string.settings_telemetry_unknown)
+            }
+
+            TelemetryConsent.GRANTED -> {
+                binding.switchTelemetry.isChecked = true
+                binding.telemetryDescription.setText(R.string.settings_telemetry_granted)
+            }
+
+            TelemetryConsent.DENIED -> {
+                binding.switchTelemetry.isChecked = false
+                binding.telemetryDescription.setText(R.string.settings_telemetry_denied)
+            }
+        }
     }
 
     private fun observeTtsEvents() {

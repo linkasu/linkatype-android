@@ -121,6 +121,11 @@
     <string name="settings_bank_placement_description">Выберите, будет ли банк фраз встроен в главный экран или открываться отдельно.</string>
     <string name="settings_bank_placement_main">На главном экране</string>
     <string name="settings_bank_placement_separate">Отдельный экран</string>
+    <string name="settings_section_telemetry">Приватность</string>
+    <string name="settings_allow_telemetry">Отправлять анонимные результаты использования</string>
+    <string name="settings_telemetry_unknown">Решение не принято. Телеметрия выключена, сетевые запросы телеметрии не выполняются.</string>
+    <string name="settings_telemetry_granted">Анонимные укрупнённые результаты помогают улучшать LINKa напиши. Фразы, ID аккаунта, URL и сообщения ошибок не передаются.</string>
+    <string name="settings_telemetry_denied">Телеметрия выключена. Сохранённые данные и capability загрузки удалены; отказ безопасно повторяется до записи.</string>
     <string name="bank_download_cache">Скачать в кеш</string>
     <string name="bank_download_cache_title">Скачать фразы</string>
     <string name="bank_download_cache_progress">%1$d из %2$d</string>

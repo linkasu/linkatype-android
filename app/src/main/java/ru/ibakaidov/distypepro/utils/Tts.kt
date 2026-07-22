@@ -35,6 +35,14 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import org.json.JSONArray
 import ru.ibakaidov.distypepro.R
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryCountBucket
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryFailureCode
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryMode
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryOutcome
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryOutcomeKind
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryResult
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetrySource
+import ru.ibakaidov.distypepro.telemetry.TelemetryService
 
 class Tts(
     context: Context,
@@ -62,6 +70,7 @@ class Tts(
     private var ttsReady = CompletableDeferred<Boolean>()
     private var cachedYandexVoices: List<YandexVoice>? = null
     private var voicesLoadingInProgress = false
+    private var activeSpeech: ActiveSpeech? = null
 
     init {
         initializeTextToSpeech()
@@ -168,9 +177,12 @@ class Tts(
         textToSpeech?.setPitch(normalized)
     }
 
-    fun speak(text: String, download: Boolean = false) {
+    fun speak(text: String, download: Boolean = false, source: SpeechSource = SpeechSource.INPUT) {
         val trimmed = text.trim()
         if (trimmed.isEmpty()) return
+        if (!download) {
+            startSpeechTelemetry(trimmed.length, source)
+        }
         if (download || useYandexCache) {
             mainScope.launch {
                 speakOnline(trimmed, download)
@@ -184,6 +196,7 @@ class Tts(
 
     fun stop() {
         mainScope.launch {
+            finishSpeechTelemetry(TelemetryResult.CANCELLED, TelemetryFailureCode.CANCELLED)
             stopOnlinePlayback()
             textToSpeech?.stop()
             emitPlaybackCompleted()
@@ -437,7 +450,7 @@ class Tts(
             putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, getVolume())
         }
         val speakResult = textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, bundle, UUID.randomUUID().toString())
-        if (speakResult == TextToSpeech.ERROR) {
+        if (speakResult != TextToSpeech.SUCCESS) {
             emitError("Ошибка синтеза речи")
         }
     }
@@ -501,11 +514,13 @@ class Tts(
     }
 
     private fun emitPlaybackCompleted() {
+        finishSpeechTelemetry(TelemetryResult.COMPLETED)
         onPlayCallback?.onDone(ProgressState.STOP)
         eventsFlow.tryEmit(TtsEvent.SpeakingCompleted)
     }
 
     private fun emitError(message: String) {
+        finishSpeechTelemetry(TelemetryResult.FAILED, TelemetryFailureCode.REQUEST_FAILED)
         lastErrorMessage = message
         onPlayCallback?.onDone(ProgressState.ERROR)
         eventsFlow.tryEmit(TtsEvent.Error(message))
@@ -591,6 +606,67 @@ class Tts(
         } finally {
             mediaPlayer?.release()
             mediaPlayer = null
+        }
+    }
+
+    private fun startSpeechTelemetry(characterCount: Int, source: SpeechSource) {
+        synchronized(this) {
+            activeSpeech?.let {
+                reportSpeech(it, TelemetryResult.CANCELLED, TelemetryFailureCode.CANCELLED)
+            }
+            val telemetrySource = source.telemetrySource
+            TelemetryService.get(appContext).report(
+                TelemetryOutcome(
+                    kind = TelemetryOutcomeKind.PHRASE_COMPOSED,
+                    source = telemetrySource,
+                    countBucket = TelemetryCountBucket.fromCount(characterCount),
+                ),
+            )
+            activeSpeech = ActiveSpeech(
+                source = telemetrySource,
+                mode = if (useYandexCache) TelemetryMode.CLOUD else TelemetryMode.LOCAL,
+                countBucket = TelemetryCountBucket.fromCount(characterCount),
+                startedAtMillis = System.currentTimeMillis(),
+            )
+        }
+    }
+
+    private fun finishSpeechTelemetry(result: TelemetryResult, failureCode: TelemetryFailureCode? = null) {
+        synchronized(this) {
+            activeSpeech?.let { reportSpeech(it, result, failureCode) }
+            activeSpeech = null
+        }
+    }
+
+    private fun reportSpeech(
+        speech: ActiveSpeech,
+        result: TelemetryResult,
+        failureCode: TelemetryFailureCode?,
+    ) {
+        TelemetryService.get(appContext).report(
+            TelemetryOutcome(
+                kind = TelemetryOutcomeKind.SPEECH_COMPLETED,
+                result = result,
+                source = speech.source,
+                mode = speech.mode,
+                countBucket = speech.countBucket,
+                durationBucket = ru.ibakaidov.distypepro.shared.telemetry.TelemetryDurationBucket.fromDurationMillis(
+                    (System.currentTimeMillis() - speech.startedAtMillis).coerceAtLeast(0L),
+                ),
+                failureCode = failureCode,
+            ),
+        )
+        if (speech.source == TelemetrySource.BANK) {
+            TelemetryService.get(appContext).report(
+                TelemetryOutcome(
+                    kind = TelemetryOutcomeKind.BANK_ACTION_COMPLETED,
+                    result = when (result) {
+                        TelemetryResult.COMPLETED -> TelemetryResult.COMPLETED
+                        TelemetryResult.FAILED, TelemetryResult.CANCELLED -> TelemetryResult.FAILED
+                    },
+                    source = TelemetrySource.PHRASE_SPOKEN,
+                ),
+            )
         }
     }
 
@@ -718,6 +794,19 @@ class Tts(
         YANDEX,
         OFFLINE
     }
+
+    enum class SpeechSource(val telemetrySource: TelemetrySource) {
+        INPUT(TelemetrySource.INPUT),
+        BANK(TelemetrySource.BANK),
+        DIALOG(TelemetrySource.DIALOG),
+    }
+
+    private data class ActiveSpeech(
+        val source: TelemetrySource,
+        val mode: TelemetryMode,
+        val countBucket: TelemetryCountBucket,
+        val startedAtMillis: Long,
+    )
 
     sealed class TtsEvent {
         object SpeakingStarted : TtsEvent()

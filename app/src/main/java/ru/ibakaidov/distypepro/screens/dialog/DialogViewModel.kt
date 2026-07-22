@@ -16,11 +16,17 @@ import ru.ibakaidov.distypepro.shared.api.ApiException
 import ru.ibakaidov.distypepro.shared.model.DialogChat
 import ru.ibakaidov.distypepro.shared.model.DialogMessage
 import ru.ibakaidov.distypepro.shared.model.DialogRole
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryOutcome
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryOutcomeKind
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetryResult
+import ru.ibakaidov.distypepro.shared.telemetry.TelemetrySource
+import ru.ibakaidov.distypepro.telemetry.TelemetryService
 import javax.inject.Inject
 
 @HiltViewModel
 class DialogViewModel @Inject constructor(
     private val sdk: SharedSdk,
+    private val telemetry: TelemetryService,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(DialogUiState())
@@ -117,9 +123,10 @@ class DialogViewModel @Inject constructor(
             }.getOrNull()
 
             result?.let {
+                reportDialogOutcome(TelemetryResult.COMPLETED, TelemetrySource.MESSAGE_SENT)
                 addMessage(it.message)
                 updateSuggestions(it.suggestions.orEmpty())
-            }
+            } ?: reportDialogOutcome(TelemetryResult.FAILED, TelemetrySource.MESSAGE_SENT)
         }
     }
 
@@ -158,6 +165,7 @@ class DialogViewModel @Inject constructor(
 
             val data = result.getOrNull()
             if (data == null) {
+                reportDialogOutcome(TelemetryResult.FAILED, TelemetrySource.MESSAGE_SENT)
                 val error = result.exceptionOrNull()
                 Log.e(TAG, "sendAudioMessage failed", error)
                 if (error is ApiException) {
@@ -166,6 +174,7 @@ class DialogViewModel @Inject constructor(
                 _events.send(DialogEvent.ShowError(DialogError.SendFailed))
                 return@launch
             }
+            reportDialogOutcome(TelemetryResult.COMPLETED, TelemetrySource.MESSAGE_SENT)
 
             val transcript = data.transcript
             val message = if (!transcript.isNullOrBlank() && data.message.content.isBlank()) {
@@ -198,9 +207,10 @@ class DialogViewModel @Inject constructor(
             }.getOrNull()
 
             result?.let {
+                reportDialogOutcome(TelemetryResult.COMPLETED, TelemetrySource.SUGGESTION_ACCEPTED)
                 addMessage(it.message)
                 updateSuggestions(it.suggestions.orEmpty())
-            }
+            } ?: reportDialogOutcome(TelemetryResult.FAILED, TelemetrySource.SUGGESTION_ACCEPTED)
         }
     }
 
@@ -233,6 +243,16 @@ class DialogViewModel @Inject constructor(
         viewModelScope.launch {
             _events.send(DialogEvent.ScrollToBottom)
         }
+    }
+
+    private fun reportDialogOutcome(result: TelemetryResult, source: TelemetrySource) {
+        telemetry.report(
+            TelemetryOutcome(
+                kind = TelemetryOutcomeKind.DIALOG_ACTION_COMPLETED,
+                result = result,
+                source = source,
+            ),
+        )
     }
 
     private fun sortChats(list: List<DialogChat>): List<DialogChat> =

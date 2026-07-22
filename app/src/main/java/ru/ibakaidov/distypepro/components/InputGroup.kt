@@ -9,8 +9,6 @@ import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.material.button.MaterialButton
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
@@ -107,13 +105,11 @@ class InputGroup @JvmOverloads constructor(
     private fun say() {
         val text = currentText
         tts.speak(text)
-        Firebase.analytics.logEvent("say", null)
     }
 
 
     fun spotlight() {
         SpotlightActivity.show(context, currentText)
-        Firebase.analytics.logEvent("spotlight", null)
     }
 
     private val currentText: String

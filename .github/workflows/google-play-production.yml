@@ -8,7 +8,7 @@ on:
       ref:
         description: Git tag or commit to publish
         required: true
-        default: v4.5.1
+        default: v4.5.2
 
 permissions:
   contents: read
@@ -57,7 +57,7 @@ jobs:
       - name: Upload signed AAB
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: linka-type-android-4.5.1
+          name: linka-type-android-4.5.2
           path: ${{ steps.sign_app.outputs.signedReleaseFile }}
           retention-days: 30
 

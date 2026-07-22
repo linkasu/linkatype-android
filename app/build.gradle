@@ -1,7 +1,6 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
-    id 'com.google.gms.google-services'
     id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
     id 'jacoco'
@@ -15,8 +14,8 @@ android {
         applicationId "ru.ibakaidov.distypepro"
         minSdk 23
         targetSdk 35
-        versionCode 62
-        versionName "4.5.1"
+        versionCode 63
+        versionName "4.5.2"
 
         buildConfigField "String", "BACKEND_URL", "\"https://backend.linka.su\""
 
@@ -110,8 +109,7 @@ dependencies {
     implementation 'com.afollestad.material-dialogs:input:3.3.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1'
     implementation 'com.squareup.okhttp3:okhttp:5.2.1'
-    implementation platform('com.google.firebase:firebase-bom:33.7.0')
-    implementation 'com.google.firebase:firebase-analytics-ktx'
+    implementation 'androidx.security:security-crypto:1.1.0-alpha06'
 
     implementation 'com.github.bumptech.glide:glide:4.16.0'
     testImplementation 'junit:junit:4.13.2'
@@ -129,7 +127,8 @@ dependencies {
 }
 
 tasks.register('verifyReleasePrivacy') {
-    dependsOn 'processReleaseMainManifest'
+    // Verify the final application manifest, including dependency contributions.
+    dependsOn 'processReleaseManifest'
 
     doLast {
         def manifests = fileTree("$buildDir/intermediates").matching {
@@ -144,8 +143,8 @@ tasks.register('verifyReleasePrivacy') {
 
         manifests.each { manifest ->
             def manifestText = manifest.getText('UTF-8').toLowerCase()
-            if (!(manifestText =~ /(?s)firebase_analytics_collection_enabled.*?android:value="false"/)) {
-                throw new GradleException('Firebase Analytics must default to disabled in release')
+            if (manifestText.contains('firebase_analytics') || manifestText.contains('firebase.analytics')) {
+                throw new GradleException('Release manifest must not contain Firebase Analytics')
             }
             if (manifestText.contains('crashlytics')) {
                 throw new GradleException('Release manifest must not contain Crashlytics')
@@ -157,6 +156,12 @@ tasks.register('verifyReleasePrivacy') {
         }
         if (!crashlyticsComponents.isEmpty()) {
             throw new GradleException("Crashlytics must not be present in releaseRuntimeClasspath: ${crashlyticsComponents}")
+        }
+        def analyticsComponents = configurations.releaseRuntimeClasspath.incoming.resolutionResult.allComponents.findAll {
+            it.id.displayName.toLowerCase().contains('firebase-analytics')
+        }
+        if (!analyticsComponents.isEmpty()) {
+            throw new GradleException("Firebase Analytics must not be present in releaseRuntimeClasspath: ${analyticsComponents}")
         }
     }
 }

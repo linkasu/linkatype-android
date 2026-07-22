@@ -8,6 +8,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.ibakaidov.distypepro.shared.SharedSdk
 import ru.ibakaidov.distypepro.shared.SharedSdkProvider
+import ru.ibakaidov.distypepro.telemetry.TelemetryService
 import ru.ibakaidov.distypepro.utils.Tts
 import ru.ibakaidov.distypepro.utils.TtsHolder
 import javax.inject.Singleton
@@ -26,5 +27,11 @@ object AppModule {
     @Singleton
     fun provideTts(@ApplicationContext context: Context): Tts {
         return TtsHolder.get(context)
+    }
+
+    @Provides
+    @Singleton
+    fun provideTelemetry(@ApplicationContext context: Context): TelemetryService {
+        return TelemetryService.get(context)
     }
 }

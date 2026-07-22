@@ -50,7 +50,7 @@ struct InputGroupView: View {
                 .disabled(textSlots[currentSlot].trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !ttsManager.isSpeaking)
                 
                 Button(action: {
-                    FirebaseAnalyticsManager.shared.logSpotlightEvent()
+                    TelemetryManager.shared.logSpotlightEvent()
                     spotlightItem = SpotlightTextItem(text: textSlots[currentSlot])
                 }) {
                     Image(systemName: "arrow.up.left.and.arrow.down.right")
@@ -80,7 +80,7 @@ struct InputGroupView: View {
         } else {
             let text = textSlots[currentSlot]
             ttsManager.speak(text)
-            FirebaseAnalyticsManager.shared.logSayEvent()
+            TelemetryManager.shared.logSayEvent()
         }
     }
     

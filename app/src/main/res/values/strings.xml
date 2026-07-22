@@ -118,6 +118,11 @@
     <string name="settings_bank_placement_description">Choose whether the phrase bank stays on the main screen or opens as a separate screen.</string>
     <string name="settings_bank_placement_main">On main screen</string>
     <string name="settings_bank_placement_separate">Separate screen</string>
+    <string name="settings_section_telemetry">Privacy</string>
+    <string name="settings_allow_telemetry">Share anonymous usage outcomes</string>
+    <string name="settings_telemetry_unknown">No decision has been made. Telemetry is off and no telemetry network requests are made.</string>
+    <string name="settings_telemetry_granted">Anonymous, coarse outcomes help improve LINKa type. Phrases, account IDs, URLs, and error messages are never sent.</string>
+    <string name="settings_telemetry_denied">Telemetry is disabled. Stored telemetry and its upload capability are removed; your denial is retried securely until recorded.</string>
     <string name="bank_download_cache">Download cache</string>
     <string name="bank_download_cache_title">Download phrases</string>
     <string name="bank_download_cache_progress">%1$d of %2$d</string>

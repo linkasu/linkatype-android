@@ -70,10 +70,10 @@ struct DialogView: View {
         }
         .accessibilityIdentifier("dialog_view")
         .onAppear {
-            FirebaseAnalyticsManager.shared.logDialogOpened()
+            TelemetryManager.shared.logDialogOpened()
         }
         .onDisappear {
-            FirebaseAnalyticsManager.shared.logDialogClosed()
+            TelemetryManager.shared.logDialogClosed()
         }
     }
 
@@ -277,7 +277,7 @@ struct DialogView: View {
                 activeChatId = chat.id
                 toggleDrawer(false)
             }
-            FirebaseAnalyticsManager.shared.logDialogChatCreate()
+            TelemetryManager.shared.logDialogChatCreate()
         } catch {
             presentError(NSLocalizedString("auth_error_generic", comment: ""))
         }
@@ -287,12 +287,12 @@ struct DialogView: View {
         activeChatId = chat.id
         toggleDrawer(false)
         let count = Int(chat.messageCount?.int32Value ?? 0)
-        FirebaseAnalyticsManager.shared.logDialogChatSelect(messageCount: count)
+        TelemetryManager.shared.logDialogChatSelect(messageCount: count)
     }
 
     private func deleteChat(_ chat: DialogChat) async {
         let count = Int(chat.messageCount?.int32Value ?? 0)
-        FirebaseAnalyticsManager.shared.logDialogChatDelete(messageCount: count)
+        TelemetryManager.shared.logDialogChatDelete(messageCount: count)
         do {
             try await sdk.dialogRepository.deleteChat(id: chat.id)
         } catch {
@@ -332,7 +332,7 @@ struct DialogView: View {
         if text.isEmpty { return }
         await MainActor.run { inputText = "" }
         ttsManager.speak(text)
-        FirebaseAnalyticsManager.shared.logDialogMessageSend(source: "typed", textLength: text.count)
+        TelemetryManager.shared.logDialogMessageSend(source: "typed", textLength: text.count)
         do {
             let result = try await sdk.dialogRepository.sendMessage(
                 chatId: chatId,
@@ -404,7 +404,7 @@ struct DialogView: View {
             recorder = try AVAudioRecorder(url: url, settings: settings)
             recorder?.record()
             isRecording = true
-            FirebaseAnalyticsManager.shared.logDialogRecordStart()
+            TelemetryManager.shared.logDialogRecordStart()
         } catch {
             recorder = nil
             isRecording = false
@@ -423,7 +423,7 @@ struct DialogView: View {
         isRecording = false
 
         guard let data = try? Data(contentsOf: url) else { return }
-        FirebaseAnalyticsManager.shared.logDialogRecordStop()
+        TelemetryManager.shared.logDialogRecordStop()
         Task { await sendAudio(data) }
     }
 
@@ -438,7 +438,7 @@ struct DialogView: View {
             return
         }
         await MainActor.run { isProcessing = true }
-        FirebaseAnalyticsManager.shared.logDialogMessageSend(source: "audio", audioBytes: data.count)
+        TelemetryManager.shared.logDialogMessageSend(source: "audio", audioBytes: data.count)
         do {
             let result = try await sdk.dialogRepository.sendAudioMessage(
                 chatId: chatId,
@@ -479,7 +479,7 @@ struct DialogView: View {
         if trimmed.isEmpty { return }
         await MainActor.run { clearSuggestions() }
         ttsManager.speak(trimmed)
-        FirebaseAnalyticsManager.shared.logDialogMessageSend(source: "suggestion", textLength: trimmed.count)
+        TelemetryManager.shared.logDialogMessageSend(source: "suggestion", textLength: trimmed.count)
         do {
             let result = try await sdk.dialogRepository.sendMessage(
                 chatId: chatId,

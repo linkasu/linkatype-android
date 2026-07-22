@@ -1,5 +1,4 @@
 import Foundation
-import FirebaseAnalytics
 import Combine
 
 class TrackingConsentManager: ObservableObject {
@@ -7,27 +6,19 @@ class TrackingConsentManager: ObservableObject {
   
   @Published private(set) var isAnalyticsEnabled: Bool
   
-  private let userDefaultsKey = "analytics_enabled"
+  private let userDefaultsKey = "telemetry_consent_v2"
   private let userDefaults: UserDefaults
   
   private init(userDefaults: UserDefaults = .standard) {
     self.userDefaults = userDefaults
     
-    if let storedValue = userDefaults.object(forKey: userDefaultsKey) as? Bool {
-      self.isAnalyticsEnabled = storedValue
-      Analytics.setAnalyticsCollectionEnabled(storedValue)
-    } else {
-      self.isAnalyticsEnabled = true
-      userDefaults.set(true, forKey: userDefaultsKey)
-      Analytics.setAnalyticsCollectionEnabled(true)
-    }
+    self.isAnalyticsEnabled = userDefaults.string(forKey: userDefaultsKey) == "granted"
   }
   
   func setAnalyticsEnabled(_ enabled: Bool) {
     guard enabled != isAnalyticsEnabled else { return }
     
-    userDefaults.set(enabled, forKey: userDefaultsKey)
+    userDefaults.set(enabled ? "granted" : "denied", forKey: userDefaultsKey)
     isAnalyticsEnabled = enabled
-    Analytics.setAnalyticsCollectionEnabled(enabled)
   }
 }

@@ -12,8 +12,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
 import ru.ibakaidov.distypepro.R
 import ru.ibakaidov.distypepro.bank.SortMode
 import ru.ibakaidov.distypepro.bank.sortEntries
@@ -147,7 +145,7 @@ class BankGroup @JvmOverloads constructor(
 
     private fun onItemSelected(key: String, value: String) {
         if (showingStatements) {
-            tts?.speak(value)
+            tts?.speak(value, source = Tts.SpeechSource.BANK)
         } else {
             currentCategoryTitle = value
             statementManager = StatementManager(context, key)
@@ -304,8 +302,6 @@ class BankGroup @JvmOverloads constructor(
         dialog.show()
         isDownloading = true
         notifyChromeStateChanged()
-        Firebase.analytics.logEvent("download_category_cache", null)
-
         ttsInstance.downloadPhrasesToCache(phrases, "current") { current, total ->
             progressBar.progress = current
             progressText.text = context.getString(R.string.bank_download_cache_progress, current, total)
