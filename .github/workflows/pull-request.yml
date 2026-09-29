@@ -21,6 +21,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ''
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -61,6 +63,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: ''
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -80,4 +84,3 @@ jobs:
         with:
           name: lint-report
           path: app/build/reports/lint-results-debug.html
-
