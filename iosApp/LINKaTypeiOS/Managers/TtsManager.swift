@@ -25,6 +25,12 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
     private let pitchKey = "tts_pitch"
     private let useYandexKey = "tts_use_yandex"
     private let voiceIdKey = "tts_voice_id"
+
+    #if TTS_INSTALLATION_TOKENS_ENABLED
+    private let installationTokensEnabled = true
+    #else
+    private let installationTokensEnabled = false
+    #endif
     
     private let defaultYandexVoice = "zahar"
     private let ttsEndpoint = "https://tts.linka.su/tts"
@@ -306,6 +312,29 @@ class TtsManager: NSObject, ObservableObject, AVSpeechSynthesizerDelegate, AVAud
     }
     
     private func requestYandexAudio(text: String, voice: String) async -> Data? {
+        if installationTokensEnabled {
+            do {
+                let response = try await SharedSdkProvider.shared.sdk.installationTtsClient.synthesize(text: text, voice: voice)
+                if let bytes = response.bytes {
+                    return Data((0..<Int(bytes.size)).map { UInt8(bitPattern: bytes.get(index: Int32($0))) })
+                }
+                if !response.useDirect {
+                    lastErrorMessage = response.rateLimited ? "HTTP 429" : "Installation TTS unavailable"
+                    if !response.rateLimited {
+                        await notifyTemporarilyUnavailable()
+                    }
+                    return nil
+                }
+            } catch {
+                lastErrorMessage = error.localizedDescription
+                await notifyTemporarilyUnavailable()
+                return nil
+            }
+        }
+        return await requestDirectYandexAudio(text: text, voice: voice)
+    }
+
+    private func requestDirectYandexAudio(text: String, voice: String) async -> Data? {
         guard let url = URL(string: ttsEndpoint) else { return nil }
         
         var request = URLRequest(url: url)

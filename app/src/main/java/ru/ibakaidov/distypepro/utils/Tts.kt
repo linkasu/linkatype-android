@@ -35,6 +35,8 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import org.json.JSONArray
 import ru.ibakaidov.distypepro.R
+import ru.ibakaidov.distypepro.BuildConfig
+import ru.ibakaidov.distypepro.shared.SharedSdkProvider
 import ru.ibakaidov.distypepro.shared.telemetry.TelemetryCountBucket
 import ru.ibakaidov.distypepro.shared.telemetry.TelemetryFailureCode
 import ru.ibakaidov.distypepro.shared.telemetry.TelemetryMode
@@ -532,6 +534,23 @@ class Tts(
     }
 
     private suspend fun requestYandexAudio(text: String, voice: String): ByteArray? {
+        if (BuildConfig.TTS_INSTALLATION_TOKENS_ENABLED) {
+            val response = SharedSdkProvider.get(appContext).installationTtsClient.synthesize(text, voice)
+            response.bytes?.let { return it }
+            if (response.useDirect) {
+                return requestDirectYandexAudio(text, voice)
+            }
+            lastErrorMessage = if (response.rateLimited) "HTTP 429" else "Installation TTS unavailable"
+            eventsFlow.tryEmit(TtsEvent.Status(lastErrorMessage!!))
+            if (!response.rateLimited) {
+                emitTemporarilyUnavailable()
+            }
+            return null
+        }
+        return requestDirectYandexAudio(text, voice)
+    }
+
+    private suspend fun requestDirectYandexAudio(text: String, voice: String): ByteArray? {
         return withContext(Dispatchers.IO) {
             try {
                 val payload = JSONObject()

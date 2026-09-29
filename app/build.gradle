@@ -18,6 +18,8 @@ android {
         versionName "4.5.3"
 
         buildConfigField "String", "BACKEND_URL", "\"https://backend.linka.su\""
+        buildConfigField "String", "TTS_BACKEND_URL", "\"https://backend.linka.su/v1\""
+        buildConfigField "boolean", "TTS_INSTALLATION_TOKENS_ENABLED", providers.gradleProperty("TTS_INSTALLATION_TOKENS_ENABLED").getOrElse("false").toBoolean().toString()
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments clearPackageData: 'true'
