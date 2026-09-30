@@ -35,7 +35,7 @@ class InstallationTtsClientTest {
 
     @Test
     fun synthesize_withValidToken_usesStoredTokenWithoutBootstrap() = runTest {
-        val storage = FakeStorage(token = "stored", expiresAtMillis = NOW + TWO_DAYS)
+        val storage = FakeStorage(storedToken = "stored", storedExpiresAtMillis = NOW + TWO_DAYS)
         val client = client { request ->
             assertEquals("/v1/tts/anonymous", request.url.encodedPath)
             assertEquals("stored", request.headers["X-TTS-Installation-Token"])
@@ -50,7 +50,7 @@ class InstallationTtsClientTest {
 
     @Test
     fun synthesize_onUnauthorized_refreshesOnceWithSameIdempotencyKey() = runTest {
-        val storage = FakeStorage(token = "old", expiresAtMillis = NOW + TWO_DAYS)
+        val storage = FakeStorage(storedToken = "old", storedExpiresAtMillis = NOW + TWO_DAYS)
         val keys = mutableListOf<String?>()
         var requestNumber = 0
         val client = client { request ->
@@ -81,7 +81,7 @@ class InstallationTtsClientTest {
 
         assertContentEquals(byteArrayOf(4), result.bytes)
         assertEquals(listOf<String?>("call-id", "call-id"), keys)
-        assertEquals("new", storage.token)
+        assertEquals("new", storage.storedToken)
     }
 
     @Test
@@ -99,7 +99,7 @@ class InstallationTtsClientTest {
 
     @Test
     fun synthesize_whenSecondUnauthorized_doesNotUseDirectPath() = runTest {
-        val storage = FakeStorage(token = "old", expiresAtMillis = NOW + TWO_DAYS)
+        val storage = FakeStorage(storedToken = "old", storedExpiresAtMillis = NOW + TWO_DAYS)
         var requestNumber = 0
         val client = client { request ->
             when (requestNumber++) {
@@ -127,7 +127,7 @@ class InstallationTtsClientTest {
 
         val result = InstallationTtsClient(
             enabled = true,
-            storage = FakeStorage(token = "token", expiresAtMillis = NOW + TWO_DAYS),
+            storage = FakeStorage(storedToken = "token", storedExpiresAtMillis = NOW + TWO_DAYS),
             client = client,
             nowMillis = { NOW },
         ).synthesize("text", "zahar")
@@ -144,16 +144,16 @@ class InstallationTtsClientTest {
         }
 
     private class FakeStorage(
-        var token: String? = null,
-        var expiresAtMillis: Long? = null,
+        var storedToken: String? = null,
+        var storedExpiresAtMillis: Long? = null,
     ) : TtsInstallationStorage {
-        override fun getToken(): String? = token
+        override fun getToken(): String? = storedToken
 
-        override fun getExpiresAtMillis(): Long? = expiresAtMillis
+        override fun getExpiresAtMillis(): Long? = storedExpiresAtMillis
 
         override fun set(token: String?, expiresAtMillis: Long?) {
-            this.token = token
-            this.expiresAtMillis = expiresAtMillis
+            storedToken = token
+            storedExpiresAtMillis = expiresAtMillis
         }
     }
 
