@@ -13,6 +13,8 @@ object SharedSdkProvider {
             instance ?: SharedSdk(
                 baseUrl = BuildConfig.BACKEND_URL,
                 platformContext = context.applicationContext,
+                ttsInstallationTokensEnabled = BuildConfig.TTS_INSTALLATION_TOKENS_ENABLED,
+                ttsBackendBaseUrl = BuildConfig.TTS_BACKEND_URL,
             ).also { instance = it }
         }
     }

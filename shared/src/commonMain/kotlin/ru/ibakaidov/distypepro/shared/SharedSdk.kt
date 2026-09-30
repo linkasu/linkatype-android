@@ -27,13 +27,30 @@ import ru.ibakaidov.distypepro.shared.session.DefaultSessionRepository
 import ru.ibakaidov.distypepro.shared.session.SessionStorage
 import ru.ibakaidov.distypepro.shared.sync.ChangesSyncer
 import ru.ibakaidov.distypepro.shared.sync.OfflineQueueProcessor
+import ru.ibakaidov.distypepro.shared.tts.InstallationTtsClient
+import ru.ibakaidov.distypepro.shared.tts.SessionTtsInstallationStorage
 
 class SharedSdk(
     baseUrl: String,
     platformContext: PlatformContext,
+    ttsInstallationTokensEnabled: Boolean,
+    ttsBackendBaseUrl: String,
 ) {
+    constructor(baseUrl: String, platformContext: PlatformContext) : this(
+        baseUrl = baseUrl,
+        platformContext = platformContext,
+        ttsInstallationTokensEnabled = false,
+        ttsBackendBaseUrl = InstallationTtsClient.DEFAULT_BASE_URL,
+    )
+
     val tokenStorage = DefaultTokenStorage(SecureTokenStorage(platformContext))
-    val sessionRepository = DefaultSessionRepository(SessionStorage(platformContext))
+    private val sessionStorage = SessionStorage(platformContext)
+    val sessionRepository = DefaultSessionRepository(sessionStorage)
+    val installationTtsClient = InstallationTtsClient(
+        enabled = ttsInstallationTokensEnabled,
+        storage = SessionTtsInstallationStorage(sessionStorage),
+        baseUrl = ttsBackendBaseUrl,
+    )
     private val apiClient = ApiClient(baseUrl, tokenStorage)
     private val database = LinkaDatabaseFactory(DatabaseDriverFactory(platformContext)).create()
     private val localStore = LocalStore(database)

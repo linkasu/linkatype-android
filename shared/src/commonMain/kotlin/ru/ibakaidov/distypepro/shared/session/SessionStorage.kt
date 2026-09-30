@@ -7,4 +7,7 @@ expect class SessionStorage(context: PlatformContext) {
     fun setMode(value: String?)
     fun getDeviceId(): String?
     fun setDeviceId(value: String?)
+    fun getTtsInstallationToken(): String?
+    fun getTtsInstallationTokenExpiresAtMillis(): Long?
+    fun setTtsInstallationToken(token: String?, expiresAtMillis: Long?)
 }
